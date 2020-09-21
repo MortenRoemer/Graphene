@@ -7,20 +7,23 @@ namespace Graphene.InMemory
 {
     public class MemoryVertexRepository : IVertexRepository
     {
+        public MemoryVertexRepository(MemoryGraph graph, MemoryEdgeRepository edges)
+        {
+            Graph = graph ?? throw new ArgumentNullException(nameof(graph));
+            Vertices = new SortedDictionary<Guid, MemoryVertex>();
+            Edges = edges ?? throw new ArgumentNullException(nameof(edges));
+        }
+
         private MemoryGraph Graph { get; }
 
         private IDictionary<Guid, MemoryVertex> Vertices { get; }
 
-        public MemoryVertexRepository(MemoryGraph graph)
-        {
-            Graph = graph ?? throw new ArgumentNullException(nameof(graph));
-            Vertices = new SortedDictionary<Guid, MemoryVertex>();
-        }
+        private MemoryEdgeRepository Edges { get; }
 
         public void Clear()
         {
             Vertices.Clear();
-            // TODO: #1 Also clear edges
+            Edges.Clear();
         }
 
         public bool Contains(IEnumerable<Guid> ids)
@@ -35,7 +38,7 @@ namespace Graphene.InMemory
 
         public IVertex Create()
         {
-            return new MemoryVertex(Graph, GenerateUniqueId());
+            return new MemoryVertex(Graph, Edges, GenerateUniqueId());
         }
 
         public void Delete(IEnumerable<IVertex> items)
@@ -54,11 +57,6 @@ namespace Graphene.InMemory
         public IEnumerator<IVertex> GetEnumerator()
         {
             return Vertices.Values.GetEnumerator();
-        }
-
-        public void Update(IEnumerable<IVertex> items)
-        {
-            // do nothing
         }
 
         IEnumerator IEnumerable.GetEnumerator()

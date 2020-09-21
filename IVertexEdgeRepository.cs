@@ -5,7 +5,7 @@ namespace Graphene {
     public interface IVertexEdgeRepository : IReadOnlyRepository<IEdge> {
         IEdge Add(IVertex other);
 
-        void Delete(IEdge id);
+        void Delete(IEdge edge);
 
         void Clear();
     }

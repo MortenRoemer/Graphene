@@ -4,7 +4,7 @@ namespace Graphene.InMemory
 {
     public class MemoryEdge : IEdge
     {
-        public MemoryEdge(MemoryGraph graph, MemoryVertex fromVertex, MemoryVertex toVertex, bool directed, Guid id)
+        public MemoryEdge(MemoryGraph graph, IVertex fromVertex, IVertex toVertex, bool directed, Guid id)
         {
             Graph = graph ?? throw new ArgumentNullException(nameof(graph));
             FromVertex = fromVertex ?? throw new ArgumentNullException(nameof(fromVertex));

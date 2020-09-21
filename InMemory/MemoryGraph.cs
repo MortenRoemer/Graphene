@@ -3,18 +3,24 @@ namespace Graphene.InMemory {
     {
         public MemoryGraph()
         {
-            Vertices = new MemoryVertexRepository(this);
+            MemoryEdges = new MemoryEdgeRepository(this);
+            MemoryVertices = new MemoryVertexRepository(this, MemoryEdges);
         }
 
-        public long Size => throw new System.NotImplementedException();
+        public long Size => Vertices.Count() + Edges.Count();
 
-        public IVertexRepository Vertices  { get; }
+        public IVertexRepository Vertices => MemoryVertices;
 
-        public IReadOnlyRepository<IEdge> Edges => throw new System.NotImplementedException();
+        public IReadOnlyRepository<IEdge> Edges => MemoryEdges;
+
+        private MemoryVertexRepository MemoryVertices { get; }
+
+        private MemoryEdgeRepository MemoryEdges { get; }
 
         public void Clear()
         {
-            throw new System.NotImplementedException();
+            MemoryEdges.Clear();
+            Vertices.Clear();
         }
 
         public IGraph Clone()

@@ -4,18 +4,21 @@ namespace Graphene.InMemory
 {
     public class MemoryVertex : IVertex
     {
-        public MemoryVertex(MemoryGraph graph, Guid id)
+        public MemoryVertex(MemoryGraph graph, MemoryEdgeRepository edges, Guid id)
         {
             Graph = graph ?? throw new ArgumentNullException(nameof(graph));
             Id = id;
             Attributes = new MemoryAttributeSet();
+            IngoingEdges = new MemoryIngoingEdgeRepository(edges, this);
+            OutgoingEdges = new MemoryOutgoingEdgeRepository(edges, this);
+            BidirectionalEdges = new MemoryBidirectionalEdgeRepository(edges, this);
         }
 
-        public IVertexEdgeRepository IngoingEdges => throw new NotImplementedException();
+        public IVertexEdgeRepository IngoingEdges { get; }
 
-        public IVertexEdgeRepository OutgoingEdges => throw new NotImplementedException();
+        public IVertexEdgeRepository OutgoingEdges { get; }
 
-        public IVertexEdgeRepository BidirectionalEdges => throw new NotImplementedException();
+        public IVertexEdgeRepository BidirectionalEdges { get; }
 
         public IGraph Graph { get; }
 

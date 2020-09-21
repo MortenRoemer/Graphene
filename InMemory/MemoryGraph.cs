@@ -3,11 +3,12 @@ namespace Graphene.InMemory {
     {
         public MemoryGraph()
         {
+            Vertices = new MemoryVertexRepository(this);
         }
 
         public long Size => throw new System.NotImplementedException();
 
-        public IVertexRepository Vertices => throw new System.NotImplementedException();
+        public IVertexRepository Vertices  { get; }
 
         public IReadOnlyRepository<IEdge> Edges => throw new System.NotImplementedException();
 

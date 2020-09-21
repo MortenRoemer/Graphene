@@ -4,10 +4,14 @@
     {
         long Size { get; }
 
-        IRepository<IVertex> Vertices { get; }
+        IVertexRepository Vertices { get; }
 
-        IRepository<IEdge> Edges { get; }
+        IReadOnlyRepository<IEdge> Edges { get; }
 
         void Clear();
+
+        IGraph Clone();
+
+        void Merge(IGraph other);
     }
 }

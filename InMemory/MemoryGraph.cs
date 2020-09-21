@@ -7,11 +7,21 @@ namespace Graphene.InMemory {
 
         public long Size => throw new System.NotImplementedException();
 
-        public IRepository<IVertex> Vertices => throw new System.NotImplementedException();
+        public IVertexRepository Vertices => throw new System.NotImplementedException();
 
-        public IRepository<IEdge> Edges => throw new System.NotImplementedException();
+        public IReadOnlyRepository<IEdge> Edges => throw new System.NotImplementedException();
 
         public void Clear()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public IGraph Clone()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void Merge(IGraph other)
         {
             throw new System.NotImplementedException();
         }

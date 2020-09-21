@@ -1,5 +1,3 @@
-using System;
-
 namespace Graphene
 {
     public interface IVertex : IEntity
@@ -7,5 +5,7 @@ namespace Graphene
         IVertexEdgeRepository IngoingEdges { get; }
 
         IVertexEdgeRepository OutgoingEdges { get; }
+
+        IVertexEdgeRepository BidirectionalEdges { get; }
     }
 }

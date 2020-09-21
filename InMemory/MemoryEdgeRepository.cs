@@ -1,49 +1,83 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Graphene.InMemory
 {
     public class MemoryEdgeRepository : IRepository<IEdge>
     {
+        public MemoryEdgeRepository(MemoryGraph graph)
+        {
+            Graph = graph ?? throw new ArgumentNullException(nameof(graph));
+            Edges = new SortedDictionary<Guid, MemoryEdge>();
+        }
+
+        private MemoryGraph Graph { get; }
+
+        private IDictionary<Guid, MemoryEdge> Edges { get; }
+
+        public MemoryEdge Create(IVertex fromVertex, IVertex toVertex, bool directed)
+        {
+            if (!Graph.Vertices.Contains(fromVertex.Id))
+                throw new ArgumentException($"{nameof(fromVertex)} with id {fromVertex.Id} does not exist in this graph");
+
+            if (!Graph.Vertices.Contains(toVertex.Id))
+                throw new ArgumentException($"{nameof(toVertex)} with id {toVertex.Id} does not exist in this graph");
+
+            var id = GetUniqueId();
+            var result = new MemoryEdge(Graph, fromVertex, toVertex, directed, id);
+            Edges.Add(id, result);
+            return result;
+        }
+
         public void Clear()
         {
-            throw new NotImplementedException();
+            Edges.Clear();
         }
 
         public bool Contains(IEnumerable<Guid> ids)
         {
-            throw new NotImplementedException();
+            return ids.All(id => Edges.ContainsKey(id));
         }
 
         public long Count()
         {
-            throw new NotImplementedException();
+            return Edges.Count;
         }
 
         public void Delete(IEnumerable<IEdge> items)
         {
-            throw new NotImplementedException();
+            foreach (var item in items)
+            {
+                Edges.Remove(item.Id);
+            }
         }
 
         public IEnumerable<IEdge> Get(IEnumerable<Guid> ids)
         {
-            throw new NotImplementedException();
+            return ids.Select(id => Edges[id]);
         }
 
         public IEnumerator<IEdge> GetEnumerator()
         {
-            throw new NotImplementedException();
-        }
-
-        public void Update(IEnumerable<IEdge> items)
-        {
-            throw new NotImplementedException();
+            return Edges.Values.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            throw new NotImplementedException();
+            return GetEnumerator();
+        }
+
+        private Guid GetUniqueId()
+        {
+            while (true)
+            {
+                var id = Guid.NewGuid();
+
+                if (!Edges.ContainsKey(id))
+                    return id;
+            }
         }
     }
 }

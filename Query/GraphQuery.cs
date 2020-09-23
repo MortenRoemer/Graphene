@@ -8,7 +8,7 @@ namespace Graphene.Query
 
         public bool Contains(IEntity entity)
         {
-            return Root?.Contains(entity) ?? true; 
+            return Root?.Contains(entity) ?? false; 
         }
     }
 }

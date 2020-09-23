@@ -11,12 +11,9 @@ namespace Graphene.Query
 
         public IEnumerable<string> Attributes { get; set; }
 
-        public override bool Contains(IEntity entity)
-        {
-            if (entity is IVertex)
-                return Filter?.Contains(entity) ?? true;
-            else
-                return false;
-        }
+        public override bool Contains(IEntity entity) =>
+            entity is IVertex 
+            ? Filter?.Contains(entity) ?? true
+            : false;
     }
 }

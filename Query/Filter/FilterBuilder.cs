@@ -136,5 +136,7 @@ namespace Graphene.Query.Filter
 
             public class Not : Token {}
         }
+
+        public static implicit operator EntityFilter(FilterBuilder builder) => builder.FinishFilter();
     }
 }

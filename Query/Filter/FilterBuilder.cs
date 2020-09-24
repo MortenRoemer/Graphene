@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Graphene.Query.Filter
 {
-    public class FilterBuilder
+    public partial class FilterBuilder
     {
         private List<Token> TokenBuffer { get; } = new List<Token>();
 
@@ -31,9 +31,51 @@ namespace Graphene.Query.Filter
             return this;
         }
 
-        public EntityFilter Finish()
+        public EntityFilter FinishFilter()
         {
-            throw new NotImplementedException();
+            using (var enumerator = TokenBuffer.GetEnumerator())
+            {
+                return BuildGroup(enumerator, group => new AndGroupFilter(group));
+            }
+        }
+
+        private static EntityFilter BuildGroup(IEnumerator<Token> enumerator, Func<IEnumerable<EntityFilter>, EntityFilter> constructor)
+        {
+            var members = new List<EntityFilter>();
+
+            while (enumerator.MoveNext())
+            {
+                if (enumerator.Current is Token.EndGroup)
+                    break;
+                
+                members.Add(BuildToken(enumerator, false));
+            }
+
+            return constructor.Invoke(members);
+        }
+
+        private static EntityFilter BuildToken(IEnumerator<Token> enumerator, bool inversed)
+        {
+            if (enumerator.Current is Token.Not)
+            {
+                if (!enumerator.MoveNext())
+                    throw new InvalidOperationException("unexpected token after not-token: <empty>");
+
+                return BuildToken(enumerator, !inversed);
+            }
+
+            EntityFilter result;
+            
+            if (enumerator.Current is Token.Filter filtertoken)
+                result = filtertoken.Content;
+            else if (enumerator.Current is Token.StartAndGroup)
+                result = BuildGroup(enumerator, group => new AndGroupFilter(group));
+            else if (enumerator.Current is Token.StartOrGroup)
+                result = BuildGroup(enumerator, group => new OrGroupFilter(group));
+            else
+                throw new InvalidOperationException($"unexpected token: {enumerator.Current.GetType()}");
+
+            return inversed ? new NotFilter(result) : result;
         }
 
         public FilterBuilder OrGroup()
@@ -43,138 +85,43 @@ namespace Graphene.Query.Filter
             return this;
         }
 
+        public FilterBuilder HasAnyLabelIn(IEnumerable<string> labels)
+        {
+            TokenBuffer.Add(
+                new Token.Filter {
+                    Content = new LabelFilter.In(labels)
+                }
+            );
+
+            return this;
+        }
+
+        public FilterBuilder HasLabelEqualTo(string label)
+        {
+            TokenBuffer.Add(
+                new Token.Filter {
+                    Content = new LabelFilter.Equal(label)
+                }
+            );
+
+            return this;
+        }
+
+        public FilterBuilder HasLabelLike(string pattern)
+        {
+            TokenBuffer.Add(
+                new Token.Filter {
+                    Content = new LabelFilter.Like(pattern)
+                }
+            );
+
+            return this;
+        }
+
         public FilterBuilder Not()
         {
             TokenBuffer.Add(new Token.Not());
             return this;
-        }
-
-        public class AttributeBuilder
-        {
-            internal AttributeBuilder(FilterBuilder builder, string name)
-            {
-                Builder = builder ?? throw new ArgumentNullException(nameof(builder));
-                Name = name ?? throw new ArgumentNullException(nameof(name));
-            }
-
-            private FilterBuilder Builder { get; }
-
-            private string Name { get; }
-
-            public FilterBuilder IsBetween<T>(T from, T to) where T : IComparable<T>
-            {
-                Builder.TokenBuffer.Add(new Token.StartAndGroup());
-
-                Builder.TokenBuffer.Add(
-                    new Token.Filter {
-                        Content = new AttributeFilter.GreaterThan<T>(Name, from)
-                    }
-                );
-
-                Builder.TokenBuffer.Add(
-                    new Token.Filter {
-                        Content = new AttributeFilter.LessThan<T>(Name, to)
-                    }
-                );
-
-                Builder.TokenBuffer.Add(new Token.EndGroup());
-                return Builder;
-            }
-
-            public FilterBuilder IsContainedIn(IEnumerable<object> values)
-            {
-                Builder.TokenBuffer.Add(
-                    new Token.Filter {
-                        Content = new AttributeFilter.In(Name, values)
-                    }
-                );
-
-                return Builder;
-            }
-
-            public FilterBuilder IsEqualTo(object value) 
-            {
-                Builder.TokenBuffer.Add(
-                    new Token.Filter {
-                        Content = new AttributeFilter.Equal(Name, value)
-                    }
-                );
-
-                return Builder;
-            }
-
-            public FilterBuilder IsGreaterThan<T>(T value) where T : IComparable<T>
-            {
-                Builder.TokenBuffer.Add(
-                    new Token.Filter {
-                        Content = new AttributeFilter.GreaterThan<T>(Name, value)
-                    }
-                );
-
-                return Builder;
-            }
-
-            public FilterBuilder IsGreaterOrEqualTo<T>(T value) where T : IComparable<T>
-            {
-                Builder.TokenBuffer.Add(new Token.StartOrGroup());
-
-                Builder.TokenBuffer.Add(
-                    new Token.Filter {
-                        Content = new AttributeFilter.GreaterThan<T>(Name, value)
-                    }
-                );
-
-                Builder.TokenBuffer.Add(
-                    new Token.Filter {
-                        Content = new AttributeFilter.Equal(Name, value)
-                    }
-                );
-
-                Builder.TokenBuffer.Add(new Token.EndGroup());
-                return Builder;
-            }
-
-            public FilterBuilder IsLessThan<T>(T value) where T : IComparable<T>
-            {
-                Builder.TokenBuffer.Add(
-                    new Token.Filter {
-                        Content = new AttributeFilter.LessThan<T>(Name, value)
-                    }
-                );
-
-                return Builder;
-            }
-
-            public FilterBuilder IsLessOrEqualTo<T>(T value) where T : IComparable<T>
-            {
-                Builder.TokenBuffer.Add(new Token.StartOrGroup());
-
-                Builder.TokenBuffer.Add(
-                    new Token.Filter {
-                        Content = new AttributeFilter.LessThan<T>(Name, value)
-                    }
-                );
-
-                Builder.TokenBuffer.Add(
-                    new Token.Filter {
-                        Content = new AttributeFilter.Equal(Name, value)
-                    }
-                );
-
-                Builder.TokenBuffer.Add(new Token.EndGroup());
-                return Builder;
-            }
-
-            public FilterBuilder IsNull()
-            {
-                Builder.TokenBuffer.Add(
-                    new Token.Filter {
-                        Content = new AttributeFilter.Null(Name)
-                    }
-                );
-
-                return Builder;
-            }
         }
 
         internal abstract class Token

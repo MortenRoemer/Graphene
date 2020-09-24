@@ -52,14 +52,14 @@ namespace Graphene.Query.Filter
                 entity.Attributes.TryGet(Name, out T otherValue) ? Value.CompareTo(otherValue) < 0 : false;
         }
 
-        public class Null : AttributeFilter
+        public class HasValue : AttributeFilter
         {
-            public Null(string name) : base(name)
+            public HasValue(string name) : base(name)
             {
             }
 
             public override bool Contains(IEntity entity) =>
-                entity.Attributes.TryGet(Name, out object value) ? value is null : true;
+                entity.Attributes.TryGet<object>(Name, out _);
         }
 
         public class In : AttributeFilter

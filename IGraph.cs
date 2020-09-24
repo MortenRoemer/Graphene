@@ -1,4 +1,6 @@
-﻿namespace Graphene
+﻿using Graphene.Query;
+
+namespace Graphene
 {
     public interface IGraph
     {
@@ -13,5 +15,7 @@
         IGraph Clone();
 
         void Merge(IGraph other);
+
+        IGraph Select(GraphQuery query);
     }
 }

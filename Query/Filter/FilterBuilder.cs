@@ -43,12 +43,9 @@ namespace Graphene.Query.Filter
         {
             var members = new List<EntityFilter>();
 
-            while (enumerator.MoveNext())
+            while (enumerator.MoveNext() && !(enumerator.Current is Token.EndGroup))
             {
-                if (enumerator.Current is Token.EndGroup)
-                    break;
-                
-                members.Add(BuildToken(enumerator, false));
+                members.Add(BuildToken(enumerator, inversed: false));
             }
 
             return constructor.Invoke(members);

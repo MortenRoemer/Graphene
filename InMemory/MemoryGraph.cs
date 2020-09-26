@@ -35,7 +35,7 @@ namespace Graphene.InMemory {
             throw new System.NotImplementedException();
         }
 
-        public IGraph Select(GraphQuery query)
+        public IQueryBuilder Select()
         {
             throw new System.NotImplementedException();
         }

@@ -16,6 +16,6 @@ namespace Graphene
 
         void Merge(IGraph other);
 
-        IGraph Select(GraphQuery query);
+        IQueryBuilder Select();
     }
 }

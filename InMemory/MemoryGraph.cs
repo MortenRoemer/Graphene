@@ -1,3 +1,5 @@
+using Graphene.Query;
+
 namespace Graphene.InMemory {
     public class MemoryGraph : IGraph
     {
@@ -29,6 +31,11 @@ namespace Graphene.InMemory {
         }
 
         public void Merge(IGraph other)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public IQueryBuilderRoot Select()
         {
             throw new System.NotImplementedException();
         }

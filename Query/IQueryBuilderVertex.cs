@@ -1,6 +1,6 @@
 namespace Graphene.Query
 {
-    public interface IQueryBuilderVertex
+    public interface IQueryBuilderVertex : IQueryBuilder, IQueryFilterable<IQueryBuilderVertex>
     {
         
     }

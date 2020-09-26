@@ -1,6 +1,6 @@
 namespace Graphene.Query
 {
-    public interface IQueryBuilderEdge
+    public interface IQueryBuilderEdge : IQueryBuilder, IQueryFilterable<IQueryBuilderEdge>
     {
         
     }

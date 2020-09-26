@@ -1,7 +1,7 @@
 namespace Graphene.Query
 {
-    public interface IQueryFilterable
+    public interface IQueryFilterable<T>
     {
-        IQueryBuilderFilter Where();
+        IFilterRoot<T> Where();
     }
 }

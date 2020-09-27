@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Graphene.InMemory.Query;
 using Graphene.Query;
 
 namespace Graphene.InMemory {
@@ -72,7 +73,7 @@ namespace Graphene.InMemory {
 
         public IQueryBuilderRoot Select()
         {
-            throw new System.NotImplementedException();
+            return new MemoryQueryBuilderRoot(this);
         }
     }
 }

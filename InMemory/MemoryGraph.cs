@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using Graphene.Query;
 
 namespace Graphene.InMemory {
@@ -27,12 +29,45 @@ namespace Graphene.InMemory {
 
         public IGraph Clone()
         {
-            throw new System.NotImplementedException();
+            var result = new MemoryGraph();
+            result.Merge(this);
+            return result;
         }
 
         public void Merge(IGraph other)
         {
-            throw new System.NotImplementedException();
+             var mappedIds = new Dictionary<Guid, Guid>();
+
+            foreach (var vertex in other.Vertices)
+            {
+                var newVertex = Vertices.Create();
+                mappedIds.Add(vertex.Id, newVertex.Id);
+                newVertex.Label = vertex.Label;
+                
+                foreach (var attribute in vertex.Attributes)
+                {
+                    newVertex.Attributes.Set(attribute.Key, attribute.Value);
+                }
+            }
+
+            foreach (var edge in other.Edges)
+            {
+                IEdge newEdge;
+                var fromVertex = Vertices.Get(mappedIds[edge.FromVertex.Id]);
+                var ToVertex = Vertices.Get(mappedIds[edge.ToVertex.Id]);
+
+                if (edge.Directed)
+                    newEdge = fromVertex.OutgoingEdges.Add(ToVertex);
+                else
+                    newEdge = fromVertex.BidirectionalEdges.Add(ToVertex);
+
+                newEdge.Label = edge.Label;
+
+                foreach (var attribute in edge.Attributes)
+                {
+                    newEdge.Attributes.Set(attribute.Key, attribute.Value);
+                }
+            }
         }
 
         public IQueryBuilderRoot Select()

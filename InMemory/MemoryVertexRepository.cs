@@ -10,7 +10,7 @@ namespace Graphene.InMemory
         public MemoryVertexRepository(MemoryGraph graph, MemoryEdgeRepository edges)
         {
             Graph = graph ?? throw new ArgumentNullException(nameof(graph));
-            Vertices = new SortedDictionary<Guid, MemoryVertex>();
+            Vertices = new Dictionary<Guid, MemoryVertex>();
             Edges = edges ?? throw new ArgumentNullException(nameof(edges));
         }
 

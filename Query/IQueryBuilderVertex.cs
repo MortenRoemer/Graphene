@@ -3,11 +3,9 @@ using System.Collections.Generic;
 
 namespace Graphene.Query
 {
-    public interface IQueryBuilderVertex : IQueryBuilder, IQueryFilterable<IQueryBuilderVertex>
+    public interface IQueryBuilderVertex : IQueryBuilder, IQueryFilterable<IQueryBuilderVertex>, IQueryRoutable
     {
         IQueryBuilderEdge AnyEdges();
-
-        IQueryBuilderEdge AnyBidrectionalEdges();
 
         IQueryBuilderEdge AnyIngoingEdges();
 
@@ -15,6 +13,6 @@ namespace Graphene.Query
 
         IQueryBuilderEdge Edge(Guid id);
 
-        IQueryBuilderEdge Edges(IEnumerable<Guid> id);
+        IQueryBuilderEdge Edges(IEnumerable<Guid> ids);
     }
 }

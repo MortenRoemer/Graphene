@@ -6,29 +6,38 @@ namespace Graphene.InMemory.Query
 {
     public class MemoryQueryBuilderVertex : IQueryBuilderVertex
     {
-        public MemoryQueryBuilderVertex(MemoryQueryBuilderRoot root, IEnumerable<Guid> range)
+        public MemoryQueryBuilderVertex(MemoryQueryBuilderRoot root) : this(root, null, VertexSearchMode.All) {}
+
+        public MemoryQueryBuilderVertex(MemoryQueryBuilderRoot root, IEnumerable<Guid> range) : this(root, range, VertexSearchMode.All) {}
+
+        public MemoryQueryBuilderVertex(MemoryQueryBuilderRoot root, VertexSearchMode searchMode) : this(root, null, searchMode) {}
+
+        public MemoryQueryBuilderVertex(MemoryQueryBuilderRoot root, IEnumerable<Guid> range, VertexSearchMode searchMode)
         {
             Root = root ?? throw new ArgumentNullException(nameof(root));
             Range = range;
+            SearchMode = searchMode;
         }
 
         private IEnumerable<Guid> Range { get; }
 
         private MemoryQueryBuilderRoot Root { get; }
 
+        private VertexSearchMode SearchMode { get; }
+
         public IQueryBuilderEdge AnyEdges()
         {
-            return Root.AddToken(new MemoryQueryBuilderEdge(Root, null));
+            return Root.AddToken(new MemoryQueryBuilderEdge(Root));
         }
 
         public IQueryBuilderEdge AnyIngoingEdges()
         {
-            throw new NotImplementedException();
+            return Root.AddToken(new MemoryQueryBuilderEdge(Root, EdgeSearchMode.Ingoing));
         }
 
         public IQueryBuilderEdge AnyOutgoingEdges()
         {
-            throw new NotImplementedException();
+            return Root.AddToken(new MemoryQueryBuilderEdge(Root, EdgeSearchMode.Outgoing));
         }
 
         public IQueryBuilderEdge Edge(Guid id)

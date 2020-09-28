@@ -24,12 +24,12 @@ namespace Graphene.InMemory.Query
 
         public IQueryBuilderEdge AnyEdges()
         {
-            return AddToken(new MemoryQueryBuilderEdge(this, null));
+            return AddToken(new MemoryQueryBuilderEdge(this));
         }
 
         public IQueryBuilderVertex AnyVertex()
         {
-            return AddToken(new MemoryQueryBuilderVertex(this, null));
+            return AddToken(new MemoryQueryBuilderVertex(this));
         }
 
         public IQueryBuilderEdge Edge(Guid id)

@@ -6,19 +6,28 @@ namespace Graphene.InMemory.Query
 {
     public class MemoryQueryBuilderEdge : IQueryBuilderEdge
     {
-        public MemoryQueryBuilderEdge(MemoryQueryBuilderRoot root, IEnumerable<Guid> range)
+        public MemoryQueryBuilderEdge(MemoryQueryBuilderRoot root) : this(root, null, EdgeSearchMode.All) {}
+
+        public MemoryQueryBuilderEdge(MemoryQueryBuilderRoot root, IEnumerable<Guid> range) : this(root, range, EdgeSearchMode.All) {}
+
+        public MemoryQueryBuilderEdge(MemoryQueryBuilderRoot root, EdgeSearchMode searchMode) : this(root, null, searchMode) {}
+
+        private MemoryQueryBuilderEdge(MemoryQueryBuilderRoot root, IEnumerable<Guid> range, EdgeSearchMode searchMode)
         {
             Root = root ?? throw new ArgumentNullException(nameof(root));
             Range = range;
+            SearchMode = searchMode;
         }
 
         private IEnumerable<Guid> Range { get; }
 
         private MemoryQueryBuilderRoot Root { get; }
 
+        private EdgeSearchMode SearchMode { get; }
+
         public IQueryBuilderVertex AnyVertices()
         {
-            throw new NotImplementedException();
+            return Root.AddToken(new MemoryQueryBuilderVertex(Root));
         }
 
         public IGraph Resolve()
@@ -28,22 +37,22 @@ namespace Graphene.InMemory.Query
 
         public IQueryBuilderVertex SourceVertex()
         {
-            throw new NotImplementedException();
+            return Root.AddToken(new MemoryQueryBuilderVertex(Root, VertexSearchMode.Source));
         }
 
         public IQueryBuilderVertex TargetVertex()
         {
-            throw new NotImplementedException();
+            return Root.AddToken(new MemoryQueryBuilderVertex(Root, VertexSearchMode.Target));
         }
 
         public IQueryBuilderVertex Vertex(Guid id)
         {
-            throw new NotImplementedException();
+            return Root.AddToken(new MemoryQueryBuilderVertex(Root, new[] { id }));
         }
 
         public IQueryBuilderVertex Vertices(IEnumerable<Guid> ids)
         {
-            throw new NotImplementedException();
+            return Root.AddToken(new MemoryQueryBuilderVertex(Root, ids));
         }
 
         public IFilterRoot<IQueryBuilderEdge> Where()

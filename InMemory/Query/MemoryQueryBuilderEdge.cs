@@ -32,7 +32,7 @@ namespace Graphene.InMemory.Query
 
         public IGraph Resolve()
         {
-            throw new NotImplementedException();
+            return Root.Resolve();
         }
 
         public IQueryBuilderVertex SourceVertex()

@@ -42,6 +42,11 @@ namespace Graphene.InMemory.Query
             return AddToken(new MemoryQueryBuilderEdge(this, ids));
         }
 
+        internal IGraph Resolve()
+        {
+            throw new NotImplementedException();
+        }
+
         public IQueryBuilderVertex Vertex(Guid id)
         {
             return AddToken(new MemoryQueryBuilderVertex(this, new[] { id }));

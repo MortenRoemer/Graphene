@@ -52,37 +52,37 @@ namespace Graphene.InMemory.Query
 
         public IGraph Resolve()
         {
-            throw new NotImplementedException();
+            return Root.Resolve();
         }
 
         public IQueryBuilderRoute RouteToAnyEdge()
         {
-            throw new NotImplementedException();
+            return Root.AddToken(new MemoryQueryBuilderRoute(Root, RouteSearchMode.Edge));
         }
 
         public IQueryBuilderRoute RouteToAnyVertex()
         {
-            throw new NotImplementedException();
+            return Root.AddToken(new MemoryQueryBuilderRoute(Root, RouteSearchMode.Vertex));
         }
 
         public IQueryBuilderRoute RouteToEdge(Guid id)
         {
-            throw new NotImplementedException();
+            return Root.AddToken(new MemoryQueryBuilderRoute(Root, RouteSearchMode.Edge, new[] { id }));
         }
 
         public IQueryBuilderRoute RouteToEdges(IEnumerable<Guid> ids)
         {
-            throw new NotImplementedException();
+            return Root.AddToken(new MemoryQueryBuilderRoute(Root, RouteSearchMode.Edge, ids));
         }
 
         public IQueryBuilderRoute RouteToVertex(Guid id)
         {
-            throw new NotImplementedException();
+            return Root.AddToken(new MemoryQueryBuilderRoute(Root, RouteSearchMode.Vertex, new[] { id }));
         }
 
         public IQueryBuilderRoute RouteToVertices(IEnumerable<Guid> ids)
         {
-            throw new NotImplementedException();
+            return Root.AddToken(new MemoryQueryBuilderRoute(Root, RouteSearchMode.Vertex, ids));
         }
 
         public IFilterRoot<IQueryBuilderVertex> Where()

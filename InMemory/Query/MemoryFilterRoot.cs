@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Graphene.Query;
 
 namespace Graphene.InMemory.Query
@@ -7,18 +8,26 @@ namespace Graphene.InMemory.Query
         public MemoryFilterRoot(T reference)
         {
             Reference = reference;
+            Filters = new List<AttributeFilter>();
         }
+
+        private List<AttributeFilter> Filters { get; }
 
         private T Reference { get; }
 
+        internal void AddFilter(AttributeFilter filter)
+        {
+            Filters.Add(filter);
+        }
+
         public IFilterAttribute<T> Attribute(string name)
         {
-            throw new System.NotImplementedException();
+            return new MemoryFilterAttribute<T>(this, name); 
         }
 
         public T EndWhere()
         {
-            throw new System.NotImplementedException();
+            return Reference;
         }
 
         public IFilterLabel<T> Label()

@@ -25,6 +25,8 @@ namespace Graphene.InMemory.Query
 
         private VertexSearchMode SearchMode { get; }
 
+        private MemoryFilterRoot<IQueryBuilderVertex> Filter { get; set; }
+
         public IQueryBuilderEdge AnyEdges()
         {
             return Root.AddToken(new MemoryQueryBuilderEdge(Root));
@@ -87,7 +89,8 @@ namespace Graphene.InMemory.Query
 
         public IFilterRoot<IQueryBuilderVertex> Where()
         {
-            throw new NotImplementedException();
+            Filter = new MemoryFilterRoot<IQueryBuilderVertex>(this);
+            return Filter;
         }
     }
 }

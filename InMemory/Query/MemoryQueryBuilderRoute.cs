@@ -25,6 +25,8 @@ namespace Graphene.InMemory.Query
 
         private long? VertexHopLimit { get; set; }
 
+        private MemoryFilterRoot<IQueryBuilderRoute> TargetFilter { get; set; }
+
         public IGraph Resolve()
         {
             return Root.Resolve();
@@ -32,7 +34,8 @@ namespace Graphene.InMemory.Query
 
         public IFilterRoot<IQueryBuilderRoute> Where()
         {
-            throw new System.NotImplementedException();
+            TargetFilter = new MemoryFilterRoot<IQueryBuilderRoute>(this);
+            return TargetFilter;
         }
 
         public IGroupFilterRoot<IQueryBuilderRoute> WhereAnyHopEdge()

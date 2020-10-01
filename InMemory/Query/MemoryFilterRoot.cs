@@ -5,20 +5,20 @@ namespace Graphene.InMemory.Query
 {
     public class MemoryFilterRoot<T> : IFilterRoot<T>
     {
-        public MemoryFilterRoot(T reference)
+        internal MemoryFilterRoot(T reference)
         {
             Reference = reference;
-            Filters = new List<AttributeFilter>();
+            Filters = new List<Filter>();
             Sequences = new List<FilterSequenceMode>();
         }
 
-        private List<AttributeFilter> Filters { get; }
+        private List<Filter> Filters { get; }
 
         private T Reference { get; }
 
         private List<FilterSequenceMode> Sequences { get; }
 
-        internal void AddFilter(AttributeFilter filter)
+        internal void AddFilter(Filter filter)
         {
             Filters.Add(filter);
         }
@@ -40,7 +40,7 @@ namespace Graphene.InMemory.Query
 
         public IFilterLabel<T> Label()
         {
-            throw new System.NotImplementedException();
+            return new MemoryFilterLabel<T>(this);
         }
     }
 }

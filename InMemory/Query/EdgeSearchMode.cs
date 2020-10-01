@@ -1,6 +1,6 @@
 namespace Graphene.InMemory.Query
 {
-    public enum EdgeSearchMode : byte
+    internal enum EdgeSearchMode : byte
     {
         All = 0,
         Ingoing = 1,

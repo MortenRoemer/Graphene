@@ -6,13 +6,13 @@ namespace Graphene.InMemory.Query
 {
     public class MemoryQueryBuilderVertex : IQueryBuilderVertex
     {
-        public MemoryQueryBuilderVertex(MemoryQueryBuilderRoot root) : this(root, null, VertexSearchMode.All) {}
+        internal MemoryQueryBuilderVertex(MemoryQueryBuilderRoot root) : this(root, null, VertexSearchMode.All) {}
 
-        public MemoryQueryBuilderVertex(MemoryQueryBuilderRoot root, IEnumerable<Guid> range) : this(root, range, VertexSearchMode.All) {}
+        internal MemoryQueryBuilderVertex(MemoryQueryBuilderRoot root, IEnumerable<Guid> range) : this(root, range, VertexSearchMode.All) {}
 
-        public MemoryQueryBuilderVertex(MemoryQueryBuilderRoot root, VertexSearchMode searchMode) : this(root, null, searchMode) {}
+        internal MemoryQueryBuilderVertex(MemoryQueryBuilderRoot root, VertexSearchMode searchMode) : this(root, null, searchMode) {}
 
-        public MemoryQueryBuilderVertex(MemoryQueryBuilderRoot root, IEnumerable<Guid> range, VertexSearchMode searchMode)
+        internal MemoryQueryBuilderVertex(MemoryQueryBuilderRoot root, IEnumerable<Guid> range, VertexSearchMode searchMode)
         {
             Root = root ?? throw new ArgumentNullException(nameof(root));
             Range = range;

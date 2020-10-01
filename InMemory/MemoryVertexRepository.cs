@@ -7,7 +7,7 @@ namespace Graphene.InMemory
 {
     public class MemoryVertexRepository : IVertexRepository
     {
-        public MemoryVertexRepository(MemoryGraph graph, MemoryEdgeRepository edges)
+        internal MemoryVertexRepository(MemoryGraph graph, MemoryEdgeRepository edges)
         {
             Graph = graph ?? throw new ArgumentNullException(nameof(graph));
             Vertices = new Dictionary<Guid, MemoryVertex>();

@@ -6,13 +6,13 @@ namespace Graphene.InMemory.Query
 {
     public class MemoryQueryBuilderEdge : IQueryBuilderEdge
     {
-        public MemoryQueryBuilderEdge(MemoryQueryBuilderRoot root) : this(root, null, EdgeSearchMode.All) {}
+        internal MemoryQueryBuilderEdge(MemoryQueryBuilderRoot root) : this(root, null, EdgeSearchMode.All) {}
 
-        public MemoryQueryBuilderEdge(MemoryQueryBuilderRoot root, IEnumerable<Guid> range) : this(root, range, EdgeSearchMode.All) {}
+        internal MemoryQueryBuilderEdge(MemoryQueryBuilderRoot root, IEnumerable<Guid> range) : this(root, range, EdgeSearchMode.All) {}
 
-        public MemoryQueryBuilderEdge(MemoryQueryBuilderRoot root, EdgeSearchMode searchMode) : this(root, null, searchMode) {}
+        internal MemoryQueryBuilderEdge(MemoryQueryBuilderRoot root, EdgeSearchMode searchMode) : this(root, null, searchMode) {}
 
-        private MemoryQueryBuilderEdge(MemoryQueryBuilderRoot root, IEnumerable<Guid> range, EdgeSearchMode searchMode)
+        internal MemoryQueryBuilderEdge(MemoryQueryBuilderRoot root, IEnumerable<Guid> range, EdgeSearchMode searchMode)
         {
             Root = root ?? throw new ArgumentNullException(nameof(root));
             Range = range;

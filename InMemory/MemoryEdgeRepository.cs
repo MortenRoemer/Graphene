@@ -7,7 +7,7 @@ namespace Graphene.InMemory
 {
     public class MemoryEdgeRepository : IRepository<IEdge>
     {
-        public MemoryEdgeRepository(MemoryGraph graph)
+        internal MemoryEdgeRepository(MemoryGraph graph)
         {
             Graph = graph ?? throw new ArgumentNullException(nameof(graph));
             Edges = new Dictionary<Guid, MemoryEdge>();

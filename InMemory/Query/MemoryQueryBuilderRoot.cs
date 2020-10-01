@@ -6,7 +6,7 @@ namespace Graphene.InMemory.Query
 {
     public class MemoryQueryBuilderRoot : IQueryBuilderRoot
     {
-        public MemoryQueryBuilderRoot(MemoryGraph graph)
+        internal MemoryQueryBuilderRoot(MemoryGraph graph)
         {
             Graph = graph ?? throw new ArgumentNullException(nameof(graph));
             Tokens = new List<object>();

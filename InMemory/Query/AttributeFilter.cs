@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Graphene.InMemory.Query
 {
-    internal abstract class AttributeFilter
+    internal abstract class AttributeFilter : Filter
     {
         protected AttributeFilter(string name)
         {
@@ -13,13 +13,11 @@ namespace Graphene.InMemory.Query
 
         protected string Name { get; }
 
-        public abstract bool Contains(IGraph graph, IEntity entity);
-
         internal class HasNoValue : AttributeFilter
         {
             public HasNoValue(string name) : base(name) {}
 
-            public override bool Contains(IGraph graph, IEntity entity)
+            public override bool Contains(MemoryQueryAgent agent, IEntity entity)
             {
                 return !entity.Attributes.TryGet<object>(Name, out _);
             }
@@ -29,7 +27,7 @@ namespace Graphene.InMemory.Query
         {
             public HasValue(string name) : base(name) {}
 
-            public override bool Contains(IGraph graph, IEntity entity)
+            public override bool Contains(MemoryQueryAgent agent, IEntity entity)
             {
                 return entity.Attributes.TryGet<object>(Name, out _);
             }
@@ -47,7 +45,7 @@ namespace Graphene.InMemory.Query
 
             private object To { get; }
 
-            public override bool Contains(IGraph graph, IEntity entity)
+            public override bool Contains(MemoryQueryAgent agent, IEntity entity)
             {
                 if (!entity.Attributes.TryGet(Name, out IComparable reference))
                     return false;
@@ -65,7 +63,7 @@ namespace Graphene.InMemory.Query
 
             private object Other { get; }
 
-            public override bool Contains(IGraph graph, IEntity entity)
+            public override bool Contains(MemoryQueryAgent agent, IEntity entity)
             {
                 return entity.Attributes.TryGet(Name, out object value) && value.Equals(Other);
             }
@@ -80,7 +78,7 @@ namespace Graphene.InMemory.Query
 
             private object Other { get; }
 
-            public override bool Contains(IGraph graph, IEntity entity)
+            public override bool Contains(MemoryQueryAgent agent, IEntity entity)
             {
                 return entity.Attributes.TryGet(Name, out IComparable value) && value.CompareTo(Other) >= 0;
             }
@@ -95,7 +93,7 @@ namespace Graphene.InMemory.Query
 
             private object Other { get; }
 
-            public override bool Contains(IGraph graph, IEntity entity)
+            public override bool Contains(MemoryQueryAgent agent, IEntity entity)
             {
                 return entity.Attributes.TryGet(Name, out IComparable value) && value.CompareTo(Other) > 0;
             }
@@ -110,7 +108,7 @@ namespace Graphene.InMemory.Query
 
             private IEnumerable<object> Range { get; }
 
-            public override bool Contains(IGraph graph, IEntity entity)
+            public override bool Contains(MemoryQueryAgent agent, IEntity entity)
             {
                 return entity.Attributes.TryGet(Name, out object value) && Range.Contains(value);
             }
@@ -125,7 +123,7 @@ namespace Graphene.InMemory.Query
 
             private object Other { get; }
 
-            public override bool Contains(IGraph graph, IEntity entity)
+            public override bool Contains(MemoryQueryAgent agent, IEntity entity)
             {
                 return entity.Attributes.TryGet(Name, out IComparable value) && value.CompareTo(Other) <= 0;
             }
@@ -140,7 +138,7 @@ namespace Graphene.InMemory.Query
 
             private object Other { get; }
 
-            public override bool Contains(IGraph graph, IEntity entity)
+            public override bool Contains(MemoryQueryAgent agent, IEntity entity)
             {
                 return entity.Attributes.TryGet(Name, out IComparable value) && value.CompareTo(Other) < 0;
             }
@@ -158,7 +156,7 @@ namespace Graphene.InMemory.Query
 
             private object To { get; }
 
-            public override bool Contains(IGraph graph, IEntity entity)
+            public override bool Contains(MemoryQueryAgent agent, IEntity entity)
             {
                 if (!entity.Attributes.TryGet(Name, out IComparable reference))
                     return true;
@@ -176,7 +174,7 @@ namespace Graphene.InMemory.Query
 
             private object Other { get; }
 
-            public override bool Contains(IGraph graph, IEntity entity)
+            public override bool Contains(MemoryQueryAgent agent, IEntity entity)
             {
                 return !entity.Attributes.TryGet(Name, out object value) || !value.Equals(Other);
             }
@@ -191,7 +189,7 @@ namespace Graphene.InMemory.Query
 
             private IEnumerable<object> Range { get; }
 
-            public override bool Contains(IGraph graph, IEntity entity)
+            public override bool Contains(MemoryQueryAgent agent, IEntity entity)
             {
                 return !entity.Attributes.TryGet(Name, out object value) || !Range.Contains(value);
             }

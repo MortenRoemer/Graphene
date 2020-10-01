@@ -6,9 +6,9 @@ namespace Graphene.InMemory.Query
 {
     public class MemoryQueryBuilderRoute : IQueryBuilderRoute
     {
-        public MemoryQueryBuilderRoute(MemoryQueryBuilderRoot root, RouteSearchMode mode) : this(root, mode, null) {}
+        internal MemoryQueryBuilderRoute(MemoryQueryBuilderRoot root, RouteSearchMode mode) : this(root, mode, null) {}
 
-        public MemoryQueryBuilderRoute(MemoryQueryBuilderRoot root, RouteSearchMode mode, IEnumerable<Guid> range)
+        internal MemoryQueryBuilderRoute(MemoryQueryBuilderRoot root, RouteSearchMode mode, IEnumerable<Guid> range)
         {
             Root = root ?? throw new ArgumentNullException(nameof(root));
             Mode = mode;

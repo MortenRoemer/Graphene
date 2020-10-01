@@ -1,6 +1,6 @@
 namespace Graphene.InMemory.Query
 {
-    public enum FilterSequenceMode : byte
+    internal enum FilterSequenceMode : byte
     {
         And = 0,
         Or = 1,

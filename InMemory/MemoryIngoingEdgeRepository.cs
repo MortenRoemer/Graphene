@@ -7,7 +7,7 @@ namespace Graphene.InMemory
 {
     public class MemoryIngoingEdgeRepository : IVertexEdgeRepository
     {
-        public MemoryIngoingEdgeRepository(MemoryEdgeRepository edges, MemoryVertex vertex)
+        internal MemoryIngoingEdgeRepository(MemoryEdgeRepository edges, MemoryVertex vertex)
         {
             Edges = edges ?? throw new ArgumentNullException(nameof(edges));
             Vertex = vertex ?? throw new ArgumentNullException(nameof(vertex));

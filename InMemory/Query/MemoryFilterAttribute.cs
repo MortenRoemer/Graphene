@@ -6,7 +6,7 @@ namespace Graphene.InMemory.Query
 {
     public class MemoryFilterAttribute<T> : IFilterAttribute<T>
     {
-        public MemoryFilterAttribute(MemoryFilterRoot<T> root, string name)
+        internal MemoryFilterAttribute(MemoryFilterRoot<T> root, string name)
         {
             Root = root;
             Name = name;

@@ -5,7 +5,7 @@ namespace Graphene.InMemory.Query
 {
     public class MemoryFilterSequence<T> : IFilterSequence<T>
     {
-        public MemoryFilterSequence(MemoryFilterRoot<T> root)
+        internal MemoryFilterSequence(MemoryFilterRoot<T> root)
         {
             Root = root ?? throw new ArgumentNullException(nameof(root));
         }
@@ -31,7 +31,8 @@ namespace Graphene.InMemory.Query
 
         public IFilterLabel<T> Label()
         {
-            throw new System.NotImplementedException();
+            Root.AddSequence(FilterSequenceMode.And);
+            return new MemoryFilterLabel<T>(Root);
         }
 
         public IFilterNode<T> Or()

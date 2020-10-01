@@ -14,17 +14,19 @@ namespace Graphene.InMemory.Query
 
         public IFilterNode<T> And()
         {
-            throw new System.NotImplementedException();
+            Root.AddSequence(FilterSequenceMode.And);
+            return Root;
         }
 
         public IFilterAttribute<T> Attribute(string name)
         {
-            throw new System.NotImplementedException();
+            Root.AddSequence(FilterSequenceMode.And);
+            return new MemoryFilterAttribute<T>(Root, name);
         }
 
         public T EndWhere()
         {
-            throw new System.NotImplementedException();
+            return Root.EndWhere();
         }
 
         public IFilterLabel<T> Label()
@@ -34,12 +36,14 @@ namespace Graphene.InMemory.Query
 
         public IFilterNode<T> Or()
         {
-            throw new System.NotImplementedException();
+            Root.AddSequence(FilterSequenceMode.Or);
+            return Root;
         }
 
         public IFilterNode<T> Xor()
         {
-            throw new System.NotImplementedException();
+            Root.AddSequence(FilterSequenceMode.Xor);
+            return Root;
         }
     }
 }

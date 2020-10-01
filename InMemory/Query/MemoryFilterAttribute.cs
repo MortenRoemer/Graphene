@@ -30,37 +30,44 @@ namespace Graphene.InMemory.Query
 
         public IFilterSequence<T> IsBetween(object from, object to)
         {
-            throw new System.NotImplementedException();
+            Root.AddFilter(new AttributeFilter.IsBetween(Name, from, to));
+            return new MemoryFilterSequence<T>(Root);
         }
 
         public IFilterSequence<T> IsEqualTo(object other)
         {
-            throw new System.NotImplementedException();
+            Root.AddFilter(new AttributeFilter.IsEqualTo(Name, other));
+            return new MemoryFilterSequence<T>(Root);
         }
 
         public IFilterSequence<T> IsGreaterOrEqualTo(object other)
         {
-            throw new System.NotImplementedException();
+            Root.AddFilter(new AttributeFilter.IsGreaterOrEqualTo(Name, other));
+            return new MemoryFilterSequence<T>(Root);
         }
 
         public IFilterSequence<T> IsGreaterThan(object other)
         {
-            throw new System.NotImplementedException();
+            Root.AddFilter(new AttributeFilter.IsGreaterThan(Name, other));
+            return new MemoryFilterSequence<T>(Root);
         }
 
         public IFilterSequence<T> IsIn(IEnumerable<object> values)
         {
-            throw new System.NotImplementedException();
+            Root.AddFilter(new AttributeFilter.IsIn(Name, values));
+            return new MemoryFilterSequence<T>(Root);
         }
 
         public IFilterSequence<T> IsLessOrEqualTo(object other)
         {
-            throw new System.NotImplementedException();
+            Root.AddFilter(new AttributeFilter.IsLessOrEqualTo(Name, other));
+            return new MemoryFilterSequence<T>(Root);
         }
 
         public IFilterSequence<T> IsLessThan(object other)
         {
-            throw new System.NotImplementedException();
+            Root.AddFilter(new AttributeFilter.IsLessThan(Name, other));
+            return new MemoryFilterSequence<T>(Root);
         }
 
         public IFilterSequence<T> IsMaximal()
@@ -75,17 +82,20 @@ namespace Graphene.InMemory.Query
 
         public IFilterSequence<T> IsNotBetween(object from, object to)
         {
-            throw new System.NotImplementedException();
+            Root.AddFilter(new AttributeFilter.IsNotBetween(Name, from, to));
+            return new MemoryFilterSequence<T>(Root);
         }
 
         public IFilterSequence<T> IsNotEqualTo(object other)
         {
-            throw new System.NotImplementedException();
+            Root.AddFilter(new AttributeFilter.IsNotEqualTo(Name, other));
+            return new MemoryFilterSequence<T>(Root);
         }
 
         public IFilterSequence<T> IsNotIn(IEnumerable<object> values)
         {
-            throw new System.NotImplementedException();
+            Root.AddFilter(new AttributeFilter.IsNotIn(Name, values));
+            return new MemoryFilterSequence<T>(Root);
         }
     }
 }

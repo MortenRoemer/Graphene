@@ -31,7 +31,7 @@ namespace Graphene.InMemory.Query
 
         private MemoryFilterRoot<IQueryBuilderRoute> VertexFilter { get; set; }
 
-        public IGraph Resolve()
+        public IQueryResult Resolve()
         {
             return Root.Resolve();
         }

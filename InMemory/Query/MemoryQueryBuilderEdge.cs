@@ -32,7 +32,7 @@ namespace Graphene.InMemory.Query
             return Root.AddToken(new MemoryQueryBuilderVertex(Root));
         }
 
-        public IGraph Resolve()
+        public IQueryResult Resolve()
         {
             return Root.Resolve();
         }

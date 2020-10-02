@@ -42,7 +42,7 @@ namespace Graphene.InMemory.Query
             return AddToken(new MemoryQueryBuilderEdge(this, ids));
         }
 
-        internal IGraph Resolve()
+        internal IQueryResult Resolve()
         {
             throw new NotImplementedException();
         }

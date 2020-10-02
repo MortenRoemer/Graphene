@@ -1,6 +1,6 @@
 namespace Graphene.InMemory.Query
 {
-    internal class MemoryQueryAgent
+    internal class QueryAgent
     {
         
     }

@@ -3,14 +3,14 @@ using Graphene.Query;
 
 namespace Graphene.InMemory.Query
 {
-    public class MemoryFilterSequence<T> : IFilterSequence<T>
+    public class FilterSequence<T> : IFilterSequence<T>
     {
-        internal MemoryFilterSequence(MemoryFilterRoot<T> root)
+        internal FilterSequence(FilterRoot<T> root)
         {
             Root = root ?? throw new ArgumentNullException(nameof(root));
         }
 
-        private MemoryFilterRoot<T> Root { get; }
+        private FilterRoot<T> Root { get; }
 
         public IFilterNode<T> And()
         {
@@ -21,7 +21,7 @@ namespace Graphene.InMemory.Query
         public IFilterAttribute<T> Attribute(string name)
         {
             Root.AddSequence(FilterSequenceMode.And);
-            return new MemoryFilterAttribute<T>(Root, name);
+            return new FilterAttribute<T>(Root, name);
         }
 
         public T EndWhere()
@@ -32,7 +32,7 @@ namespace Graphene.InMemory.Query
         public IFilterLabel<T> Label()
         {
             Root.AddSequence(FilterSequenceMode.And);
-            return new MemoryFilterLabel<T>(Root);
+            return new FilterLabel<T>(Root);
         }
 
         public IFilterNode<T> Or()

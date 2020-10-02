@@ -4,18 +4,18 @@ using Graphene.Query;
 
 namespace Graphene.InMemory.Query
 {
-    public class MemoryQueryBuilderRoute : IQueryBuilderRoute
+    public class BuilderRoute : IQueryBuilderRoute
     {
-        internal MemoryQueryBuilderRoute(MemoryQueryBuilderRoot root, RouteSearchMode mode) : this(root, mode, null) {}
+        internal BuilderRoute(BuilderRoot root, RouteSearchMode mode) : this(root, mode, null) {}
 
-        internal MemoryQueryBuilderRoute(MemoryQueryBuilderRoot root, RouteSearchMode mode, IEnumerable<Guid> range)
+        internal BuilderRoute(BuilderRoot root, RouteSearchMode mode, IEnumerable<Guid> range)
         {
             Root = root ?? throw new ArgumentNullException(nameof(root));
             Mode = mode;
             Range = range;
         }
 
-        private MemoryQueryBuilderRoot Root { get; }
+        private BuilderRoot Root { get; }
 
         private RouteSearchMode Mode { get; }
 
@@ -25,17 +25,17 @@ namespace Graphene.InMemory.Query
 
         private long? VertexHopLimit { get; set; }
 
-        private MemoryFilterRoot<IQueryBuilderRoute> TargetFilter { get; set; }
+        private FilterRoot<IQueryBuilderRoute> TargetFilter { get; set; }
 
-        private MemoryFilterRoot<IQueryBuilderRoute> EdgeFilter { get; set; }
+        private FilterRoot<IQueryBuilderRoute> EdgeFilter { get; set; }
 
-        private MemoryFilterRoot<IQueryBuilderRoute> VertexFilter { get; set; }
+        private FilterRoot<IQueryBuilderRoute> VertexFilter { get; set; }
 
         private OptimizerSettings OptimizerSettings { get; set; }
 
         public IQueryBuilderOptimizer<IQueryBuilderRoute> OptimizeSoThat()
         {
-            return (IQueryBuilderOptimizer<IQueryBuilderRoute>)new MemoryQueryBuilderOptimizer(this);
+            return (IQueryBuilderOptimizer<IQueryBuilderRoute>)new OptimizerRoot(this);
         }
 
         public IQueryResult Resolve()
@@ -50,19 +50,19 @@ namespace Graphene.InMemory.Query
 
         public IFilterRoot<IQueryBuilderRoute> Where()
         {
-            TargetFilter = new MemoryFilterRoot<IQueryBuilderRoute>(this);
+            TargetFilter = new FilterRoot<IQueryBuilderRoute>(this);
             return TargetFilter;
         }
 
         public IFilterRoot<IQueryBuilderRoute> WhereAnyHopEdge()
         {
-            EdgeFilter = new MemoryFilterRoot<IQueryBuilderRoute>(this);
+            EdgeFilter = new FilterRoot<IQueryBuilderRoute>(this);
             return EdgeFilter;
         }
 
         public IFilterRoot<IQueryBuilderRoute> WhereAnyHopVertex()
         {
-            VertexFilter = new MemoryFilterRoot<IQueryBuilderRoute>(this);
+            VertexFilter = new FilterRoot<IQueryBuilderRoute>(this);
             return VertexFilter;
         }
 

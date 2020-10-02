@@ -73,7 +73,7 @@ namespace Graphene.InMemory {
 
         public IQueryBuilderRoot Select()
         {
-            return new MemoryQueryBuilderRoot(this);
+            return new BuilderRoot(this);
         }
     }
 }

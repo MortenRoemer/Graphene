@@ -4,9 +4,9 @@ using Graphene.Query;
 
 namespace Graphene.InMemory.Query
 {
-    public class MemoryQueryBuilderRoot : IQueryBuilderRoot
+    public class BuilderRoot : IQueryBuilderRoot
     {
-        internal MemoryQueryBuilderRoot(MemoryGraph graph)
+        internal BuilderRoot(MemoryGraph graph)
         {
             Graph = graph ?? throw new ArgumentNullException(nameof(graph));
             Tokens = new List<object>();
@@ -24,22 +24,22 @@ namespace Graphene.InMemory.Query
 
         public IQueryBuilderEdge AnyEdges()
         {
-            return AddToken(new MemoryQueryBuilderEdge(this));
+            return AddToken(new BuilderEdge(this));
         }
 
         public IQueryBuilderVertex AnyVertex()
         {
-            return AddToken(new MemoryQueryBuilderVertex(this));
+            return AddToken(new BuilderVertex(this));
         }
 
         public IQueryBuilderEdge Edge(Guid id)
         {
-            return AddToken(new MemoryQueryBuilderEdge(this, new[] { id }));
+            return AddToken(new BuilderEdge(this, new[] { id }));
         }
 
         public IQueryBuilderEdge Edges(IEnumerable<Guid> ids)
         {
-            return AddToken(new MemoryQueryBuilderEdge(this, ids));
+            return AddToken(new BuilderEdge(this, ids));
         }
 
         internal IQueryResult Resolve()
@@ -49,12 +49,12 @@ namespace Graphene.InMemory.Query
 
         public IQueryBuilderVertex Vertex(Guid id)
         {
-            return AddToken(new MemoryQueryBuilderVertex(this, new[] { id }));
+            return AddToken(new BuilderVertex(this, new[] { id }));
         }
 
         public IQueryBuilderVertex Vertices(IEnumerable<Guid> ids)
         {
-            return AddToken(new MemoryQueryBuilderVertex(this, ids));
+            return AddToken(new BuilderVertex(this, ids));
         }
     }
 }

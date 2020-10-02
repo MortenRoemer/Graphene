@@ -3,9 +3,9 @@ using Graphene.Query;
 
 namespace Graphene.InMemory.Query
 {
-    public class MemoryFilterRoot<T> : IFilterRoot<T>
+    public class FilterRoot<T> : IFilterRoot<T>
     {
-        internal MemoryFilterRoot(T reference)
+        internal FilterRoot(T reference)
         {
             Reference = reference;
             Filters = new List<Filter>();
@@ -30,7 +30,7 @@ namespace Graphene.InMemory.Query
 
         public IFilterAttribute<T> Attribute(string name)
         {
-            return new MemoryFilterAttribute<T>(this, name); 
+            return new FilterAttribute<T>(this, name); 
         }
 
         public T EndWhere()
@@ -40,7 +40,7 @@ namespace Graphene.InMemory.Query
 
         public IFilterLabel<T> Label()
         {
-            return new MemoryFilterLabel<T>(this);
+            return new FilterLabel<T>(this);
         }
     }
 }

@@ -3,9 +3,9 @@ using Graphene.Query;
 
 namespace Graphene.InMemory.Query
 {
-    public class MemoryQueryBuilderOptimizerAttribute : IOptimizerAttribute<MemoryQueryBuilderRoute>
+    public class OptimizerAttribute : IOptimizerAttribute<BuilderRoute>
     {
-        internal MemoryQueryBuilderOptimizerAttribute(MemoryQueryBuilderRoute reference, OptimizerAggregateMode aggregateMode, string attributeName)
+        internal OptimizerAttribute(BuilderRoute reference, OptimizerAggregateMode aggregateMode, string attributeName)
         {
             Reference = reference ?? throw new ArgumentNullException(nameof(reference));
             AggregateMode = aggregateMode;
@@ -16,15 +16,15 @@ namespace Graphene.InMemory.Query
 
         private string AttributeName { get; }
 
-        private MemoryQueryBuilderRoute Reference { get; }
+        private BuilderRoute Reference { get; }
 
-        public MemoryQueryBuilderRoute IsMaximal()
+        public BuilderRoute IsMaximal()
         {
             Reference.SetOptimizerSettings(new OptimizerSettings(AggregateMode, AttributeName, OptimizerTargetMode.Maximum));
             return Reference;
         }
 
-        public MemoryQueryBuilderRoute IsMinimal()
+        public BuilderRoute IsMinimal()
         {
             Reference.SetOptimizerSettings(new OptimizerSettings(AggregateMode, AttributeName, OptimizerTargetMode.Minimum));
             return Reference;

@@ -17,7 +17,7 @@ namespace Graphene.InMemory.Query
         {
             public HasNoValue(string name) : base(name) {}
 
-            public override bool Contains(MemoryQueryAgent agent, IEntity entity)
+            public override bool Contains(IEntity entity)
             {
                 return !entity.Attributes.TryGet<object>(Name, out _);
             }
@@ -27,171 +27,171 @@ namespace Graphene.InMemory.Query
         {
             public HasValue(string name) : base(name) {}
 
-            public override bool Contains(MemoryQueryAgent agent, IEntity entity)
+            public override bool Contains(IEntity entity)
             {
                 return entity.Attributes.TryGet<object>(Name, out _);
             }
         }
 
-        internal class IsBetween : AttributeFilter
+        internal class IsBetween<T> : AttributeFilter
         {
-            public IsBetween(string name, object from, object to) : base(name)
+            public IsBetween(string name, T from, T to) : base(name)
             {
                 From = from ?? throw new ArgumentNullException(nameof(from));
                 To = to ?? throw new ArgumentNullException(nameof(to));
             }
 
-            private object From { get; }
+            private T From { get; }
 
-            private object To { get; }
+            private T To { get; }
 
-            public override bool Contains(MemoryQueryAgent agent, IEntity entity)
+            public override bool Contains(IEntity entity)
             {
-                if (!entity.Attributes.TryGet(Name, out IComparable reference))
+                if (!entity.Attributes.TryGet(Name, out IComparable<T> reference))
                     return false;
 
                 return reference.CompareTo(From) >= 0 && reference.CompareTo(To) <= 0;
             }
         }
 
-        internal class IsEqualTo : AttributeFilter
+        internal class IsEqualTo<T> : AttributeFilter
         {
-            public IsEqualTo(string name, object other) : base(name)
+            public IsEqualTo(string name, T other) : base(name)
             {
                 Other = other ?? throw new ArgumentNullException(nameof(other));
             }
 
-            private object Other { get; }
+            private T Other { get; }
 
-            public override bool Contains(MemoryQueryAgent agent, IEntity entity)
+            public override bool Contains(IEntity entity)
             {
-                return entity.Attributes.TryGet(Name, out object value) && value.Equals(Other);
+                return entity.Attributes.TryGet(Name, out T value) && value.Equals(Other);
             }
         }
 
-        internal class IsGreaterOrEqualTo : AttributeFilter
+        internal class IsGreaterOrEqualTo<T> : AttributeFilter
         {
-            public IsGreaterOrEqualTo(string name, object other) : base(name)
+            public IsGreaterOrEqualTo(string name, T other) : base(name)
             {
                 Other = other ?? throw new ArgumentNullException(nameof(other));
             }
 
-            private object Other { get; }
+            private T Other { get; }
 
-            public override bool Contains(MemoryQueryAgent agent, IEntity entity)
+            public override bool Contains(IEntity entity)
             {
-                return entity.Attributes.TryGet(Name, out IComparable value) && value.CompareTo(Other) >= 0;
+                return entity.Attributes.TryGet(Name, out IComparable<T> value) && value.CompareTo(Other) >= 0;
             }
         }
 
-        internal class IsGreaterThan : AttributeFilter
+        internal class IsGreaterThan<T> : AttributeFilter
         {
-            public IsGreaterThan(string name, object other) : base(name)
+            public IsGreaterThan(string name, T other) : base(name)
             {
                 Other = other ?? throw new ArgumentNullException(nameof(other));
             }
 
-            private object Other { get; }
+            private T Other { get; }
 
-            public override bool Contains(MemoryQueryAgent agent, IEntity entity)
+            public override bool Contains(IEntity entity)
             {
-                return entity.Attributes.TryGet(Name, out IComparable value) && value.CompareTo(Other) > 0;
+                return entity.Attributes.TryGet(Name, out IComparable<T> value) && value.CompareTo(Other) > 0;
             }
         }
 
-        internal class IsIn : AttributeFilter
+        internal class IsIn<T> : AttributeFilter
         {
-            public IsIn(string name, IEnumerable<object> range) : base(name)
+            public IsIn(string name, IEnumerable<T> range) : base(name)
             {
                 Range = range ?? throw new ArgumentNullException(nameof(range));
             }
 
-            private IEnumerable<object> Range { get; }
+            private IEnumerable<T> Range { get; }
 
-            public override bool Contains(MemoryQueryAgent agent, IEntity entity)
+            public override bool Contains(IEntity entity)
             {
-                return entity.Attributes.TryGet(Name, out object value) && Range.Contains(value);
+                return entity.Attributes.TryGet(Name, out T value) && Range.Contains(value);
             }
         }
 
-        internal class IsLessOrEqualTo : AttributeFilter
+        internal class IsLessOrEqualTo<T> : AttributeFilter
         {
-            public IsLessOrEqualTo(string name, object other) : base(name)
+            public IsLessOrEqualTo(string name, T other) : base(name)
             {
                 Other = other ?? throw new ArgumentNullException(nameof(other));
             }
 
-            private object Other { get; }
+            private T Other { get; }
 
-            public override bool Contains(MemoryQueryAgent agent, IEntity entity)
+            public override bool Contains(IEntity entity)
             {
-                return entity.Attributes.TryGet(Name, out IComparable value) && value.CompareTo(Other) <= 0;
+                return entity.Attributes.TryGet(Name, out IComparable<T> value) && value.CompareTo(Other) <= 0;
             }
         }
 
-        internal class IsLessThan : AttributeFilter
+        internal class IsLessThan<T> : AttributeFilter
         {
-            public IsLessThan(string name, object other) : base(name)
+            public IsLessThan(string name, T other) : base(name)
             {
                 Other = other ?? throw new ArgumentNullException(nameof(other));
             }
 
-            private object Other { get; }
+            private T Other { get; }
 
-            public override bool Contains(MemoryQueryAgent agent, IEntity entity)
+            public override bool Contains(IEntity entity)
             {
-                return entity.Attributes.TryGet(Name, out IComparable value) && value.CompareTo(Other) < 0;
+                return entity.Attributes.TryGet(Name, out IComparable<T> value) && value.CompareTo(Other) < 0;
             }
         }
 
-        internal class IsNotBetween : AttributeFilter
+        internal class IsNotBetween<T> : AttributeFilter
         {
-            public IsNotBetween(string name, object from, object to) : base(name)
+            public IsNotBetween(string name, T from, T to) : base(name)
             {
                 From = from ?? throw new ArgumentNullException(nameof(from));
                 To = to ?? throw new ArgumentNullException(nameof(to));
             }
 
-            private object From { get; }
+            private T From { get; }
 
-            private object To { get; }
+            private T To { get; }
 
-            public override bool Contains(MemoryQueryAgent agent, IEntity entity)
+            public override bool Contains(IEntity entity)
             {
-                if (!entity.Attributes.TryGet(Name, out IComparable reference))
+                if (!entity.Attributes.TryGet(Name, out IComparable<T> reference))
                     return true;
 
                 return reference.CompareTo(From) < 0 || reference.CompareTo(To) > 0;
             }
         }
 
-        internal class IsNotEqualTo : AttributeFilter
+        internal class IsNotEqualTo<T> : AttributeFilter
         {
-            public IsNotEqualTo(string name, object other) : base(name)
+            public IsNotEqualTo(string name, T other) : base(name)
             {
                 Other = other ?? throw new ArgumentNullException(nameof(other));
             }
 
-            private object Other { get; }
+            private T Other { get; }
 
-            public override bool Contains(MemoryQueryAgent agent, IEntity entity)
+            public override bool Contains(IEntity entity)
             {
                 return !entity.Attributes.TryGet(Name, out object value) || !value.Equals(Other);
             }
         }
 
-        internal class IsNotIn : AttributeFilter
+        internal class IsNotIn<T> : AttributeFilter
         {
-            public IsNotIn(string name, IEnumerable<object> range) : base(name)
+            public IsNotIn(string name, IEnumerable<T> range) : base(name)
             {
                 Range = range ?? throw new ArgumentNullException(nameof(range));
             }
 
-            private IEnumerable<object> Range { get; }
+            private IEnumerable<T> Range { get; }
 
-            public override bool Contains(MemoryQueryAgent agent, IEntity entity)
+            public override bool Contains(IEntity entity)
             {
-                return !entity.Attributes.TryGet(Name, out object value) || !Range.Contains(value);
+                return !entity.Attributes.TryGet(Name, out T value) || !Range.Contains(value);
             }
         }
     }

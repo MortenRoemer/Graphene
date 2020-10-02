@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Graphene.Query;
 
@@ -28,73 +27,63 @@ namespace Graphene.InMemory.Query
             return new MemoryFilterSequence<T>(Root);
         }
 
-        public IFilterSequence<T> IsBetween(object from, object to)
+        public IFilterSequence<T> IsBetween<V>(V from, V to)
         {
-            Root.AddFilter(new AttributeFilter.IsBetween(Name, from, to));
+            Root.AddFilter(new AttributeFilter.IsBetween<V>(Name, from, to));
             return new MemoryFilterSequence<T>(Root);
         }
 
-        public IFilterSequence<T> IsEqualTo(object other)
+        public IFilterSequence<T> IsEqualTo<V>(V other)
         {
-            Root.AddFilter(new AttributeFilter.IsEqualTo(Name, other));
+            Root.AddFilter(new AttributeFilter.IsEqualTo<V>(Name, other));
             return new MemoryFilterSequence<T>(Root);
         }
 
-        public IFilterSequence<T> IsGreaterOrEqualTo(object other)
+        public IFilterSequence<T> IsGreaterOrEqualTo<V>(V other)
         {
-            Root.AddFilter(new AttributeFilter.IsGreaterOrEqualTo(Name, other));
+            Root.AddFilter(new AttributeFilter.IsGreaterOrEqualTo<V>(Name, other));
             return new MemoryFilterSequence<T>(Root);
         }
 
-        public IFilterSequence<T> IsGreaterThan(object other)
+        public IFilterSequence<T> IsGreaterThan<V>(V other)
         {
-            Root.AddFilter(new AttributeFilter.IsGreaterThan(Name, other));
+            Root.AddFilter(new AttributeFilter.IsGreaterThan<V>(Name, other));
             return new MemoryFilterSequence<T>(Root);
         }
 
-        public IFilterSequence<T> IsIn(IEnumerable<object> values)
+        public IFilterSequence<T> IsIn<V>(IEnumerable<V> values)
         {
-            Root.AddFilter(new AttributeFilter.IsIn(Name, values));
+            Root.AddFilter(new AttributeFilter.IsIn<V>(Name, values));
             return new MemoryFilterSequence<T>(Root);
         }
 
-        public IFilterSequence<T> IsLessOrEqualTo(object other)
+        public IFilterSequence<T> IsLessOrEqualTo<V>(V other)
         {
-            Root.AddFilter(new AttributeFilter.IsLessOrEqualTo(Name, other));
+            Root.AddFilter(new AttributeFilter.IsLessOrEqualTo<V>(Name, other));
             return new MemoryFilterSequence<T>(Root);
         }
 
-        public IFilterSequence<T> IsLessThan(object other)
+        public IFilterSequence<T> IsLessThan<V>(V other)
         {
-            Root.AddFilter(new AttributeFilter.IsLessThan(Name, other));
+            Root.AddFilter(new AttributeFilter.IsLessThan<V>(Name, other));
             return new MemoryFilterSequence<T>(Root);
         }
 
-        public IFilterSequence<T> IsMaximal()
+        public IFilterSequence<T> IsNotBetween<V>(V from, V to)
         {
-            throw new System.NotImplementedException();
-        }
-
-        public IFilterSequence<T> IsMinimal()
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public IFilterSequence<T> IsNotBetween(object from, object to)
-        {
-            Root.AddFilter(new AttributeFilter.IsNotBetween(Name, from, to));
+            Root.AddFilter(new AttributeFilter.IsNotBetween<V>(Name, from, to));
             return new MemoryFilterSequence<T>(Root);
         }
 
-        public IFilterSequence<T> IsNotEqualTo(object other)
+        public IFilterSequence<T> IsNotEqualTo<V>(V other)
         {
-            Root.AddFilter(new AttributeFilter.IsNotEqualTo(Name, other));
+            Root.AddFilter(new AttributeFilter.IsNotEqualTo<V>(Name, other));
             return new MemoryFilterSequence<T>(Root);
         }
 
-        public IFilterSequence<T> IsNotIn(IEnumerable<object> values)
+        public IFilterSequence<T> IsNotIn<V>(IEnumerable<V> values)
         {
-            Root.AddFilter(new AttributeFilter.IsNotIn(Name, values));
+            Root.AddFilter(new AttributeFilter.IsNotIn<V>(Name, values));
             return new MemoryFilterSequence<T>(Root);
         }
     }

@@ -17,7 +17,7 @@ namespace Graphene.InMemory.Query
 
             private Regex Pattern { get; }
 
-            public override bool Contains(MemoryQueryAgent agent, IEntity entity)
+            public override bool Contains(IEntity entity)
             {
                 return Pattern.IsMatch(entity.Label);
             }
@@ -32,7 +32,7 @@ namespace Graphene.InMemory.Query
 
             private Regex Pattern { get; }
 
-            public override bool Contains(MemoryQueryAgent agent, IEntity entity)
+            public override bool Contains(IEntity entity)
             {
                 return !Pattern.IsMatch(entity.Label);
             }
@@ -47,7 +47,7 @@ namespace Graphene.InMemory.Query
 
             private string Other { get; }
 
-            public override bool Contains(MemoryQueryAgent agent, IEntity entity)
+            public override bool Contains(IEntity entity)
             {
                 return Comparer.Equals(entity.Label, Other);
             }
@@ -62,7 +62,7 @@ namespace Graphene.InMemory.Query
 
             private IEnumerable<string> Range { get; }
 
-            public override bool Contains(MemoryQueryAgent agent, IEntity entity)
+            public override bool Contains(IEntity entity)
             {
                 foreach (var other in Range)
                 {
@@ -83,7 +83,7 @@ namespace Graphene.InMemory.Query
 
             private string Other { get; }
 
-            public override bool Contains(MemoryQueryAgent agent, IEntity entity)
+            public override bool Contains(IEntity entity)
             {
                 return !Comparer.Equals(entity.Label, Other);
             }
@@ -98,7 +98,7 @@ namespace Graphene.InMemory.Query
 
             private IEnumerable<string> Range { get; }
 
-            public override bool Contains(MemoryQueryAgent agent, IEntity entity)
+            public override bool Contains(IEntity entity)
             {
                 foreach (var other in Range)
                 {

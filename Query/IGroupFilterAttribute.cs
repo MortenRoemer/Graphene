@@ -8,28 +8,24 @@ namespace Graphene.Query
 
         IGroupFilterSequence<T> HasNoValue();
 
-        IGroupFilterSequence<T> IsBetween(object from, object to);
+        IGroupFilterSequence<T> IsBetween<V>(V from, V to);
 
-        IGroupFilterSequence<T> IsEqualTo(object other);
+        IGroupFilterSequence<T> IsEqualTo<V>(V other);
 
-        IGroupFilterSequence<T> IsGreaterThan(object other);
+        IGroupFilterSequence<T> IsGreaterThan<V>(V other);
 
-        IGroupFilterSequence<T> IsGreaterOrEqualTo(object other);
+        IGroupFilterSequence<T> IsGreaterOrEqualTo<V>(V other);
 
-        IGroupFilterSequence<T> IsIn(IEnumerable<object> values);
+        IGroupFilterSequence<T> IsIn<V>(IEnumerable<V> values);
 
-        IGroupFilterSequence<T> IsLessThan(object other);
+        IGroupFilterSequence<T> IsLessThan<V>(V other);
 
-        IGroupFilterSequence<T> IsLessOrEqualTo(object other);
+        IGroupFilterSequence<T> IsLessOrEqualTo<V>(V other);
 
-        IGroupFilterSequence<T> IsMaximal();
+        IGroupFilterSequence<T> IsNotBetween<V>(V from, V to);
 
-        IGroupFilterSequence<T> IsMinimal();
+        IGroupFilterSequence<T> IsNotEqualTo<V>(V other);
 
-        IGroupFilterSequence<T> IsNotBetween(object from, object to);
-
-        IGroupFilterSequence<T> IsNotEqualTo(object other);
-
-        IGroupFilterSequence<T> IsNotIn(IEnumerable<object> values);
+        IGroupFilterSequence<T> IsNotIn<V>(IEnumerable<V> values);
     }
 }

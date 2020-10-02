@@ -2,9 +2,9 @@ namespace Graphene.Query
 {
     public interface IQueryBuilderRoute : IQueryBuilder, IQueryFilterable<IQueryBuilderRoute>
     {
-        IGroupFilterRoot<IQueryBuilderRoute> WhereAnyHopEdge();
+        IFilterRoot<IQueryBuilderRoute> WhereAnyHopEdge();
 
-        IGroupFilterRoot<IQueryBuilderRoute> WhereAnyHopVertex();
+        IFilterRoot<IQueryBuilderRoute> WhereAnyHopVertex();
 
         IQueryBuilderRoute WithEdgeHopLimit(long limit);
 

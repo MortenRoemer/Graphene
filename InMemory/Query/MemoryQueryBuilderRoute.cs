@@ -27,6 +27,10 @@ namespace Graphene.InMemory.Query
 
         private MemoryFilterRoot<IQueryBuilderRoute> TargetFilter { get; set; }
 
+        private MemoryFilterRoot<IQueryBuilderRoute> EdgeFilter { get; set; }
+
+        private MemoryFilterRoot<IQueryBuilderRoute> VertexFilter { get; set; }
+
         public IGraph Resolve()
         {
             return Root.Resolve();
@@ -38,14 +42,16 @@ namespace Graphene.InMemory.Query
             return TargetFilter;
         }
 
-        public IGroupFilterRoot<IQueryBuilderRoute> WhereAnyHopEdge()
+        public IFilterRoot<IQueryBuilderRoute> WhereAnyHopEdge()
         {
-            throw new System.NotImplementedException();
+            EdgeFilter = new MemoryFilterRoot<IQueryBuilderRoute>(this);
+            return EdgeFilter;
         }
 
-        public IGroupFilterRoot<IQueryBuilderRoute> WhereAnyHopVertex()
+        public IFilterRoot<IQueryBuilderRoute> WhereAnyHopVertex()
         {
-            throw new System.NotImplementedException();
+            VertexFilter = new MemoryFilterRoot<IQueryBuilderRoute>(this);
+            return VertexFilter;
         }
 
         public IQueryBuilderRoute WithEdgeHopLimit(long limit)

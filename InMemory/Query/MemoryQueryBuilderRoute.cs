@@ -31,9 +31,21 @@ namespace Graphene.InMemory.Query
 
         private MemoryFilterRoot<IQueryBuilderRoute> VertexFilter { get; set; }
 
+        private OptimizerSettings OptimizerSettings { get; set; }
+
+        public IQueryBuilderOptimizer<IQueryBuilderRoute> OptimizeSoThat()
+        {
+            return (IQueryBuilderOptimizer<IQueryBuilderRoute>)new MemoryQueryBuilderOptimizer(this);
+        }
+
         public IQueryResult Resolve()
         {
             return Root.Resolve();
+        }
+
+        internal void SetOptimizerSettings(OptimizerSettings settings)
+        {
+            OptimizerSettings = settings;
         }
 
         public IFilterRoot<IQueryBuilderRoute> Where()

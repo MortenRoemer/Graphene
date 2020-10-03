@@ -7,6 +7,11 @@ namespace Graphene.InMemory
 {
     public class MemoryAttributeSet : IAttributeSet
     {
+        internal MemoryAttributeSet()
+        {
+            Attributes = new Lazy<IDictionary<string, object>>(() => new SortedDictionary<string, object>(), isThreadSafe: false);
+        }
+
         private Lazy<IDictionary<string, object>> Attributes { get; }
 
         public long Count => Attributes.IsValueCreated ? Attributes.Value.Count : 0;
@@ -14,11 +19,6 @@ namespace Graphene.InMemory
         public IEnumerable<string> Names => Attributes.IsValueCreated ? Attributes.Value.Keys : Enumerable.Empty<string>();
 
         public IEnumerable<object> Values => Attributes.IsValueCreated ? Attributes.Value.Values : Enumerable.Empty<object>();
-
-        public MemoryAttributeSet()
-        {
-            Attributes = new Lazy<IDictionary<string, object>>(() => new SortedDictionary<string, object>(), isThreadSafe: false);
-        }
 
         public void Clear()
         {

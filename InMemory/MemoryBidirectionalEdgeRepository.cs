@@ -7,7 +7,7 @@ namespace Graphene.InMemory
 {
     public class MemoryBidirectionalEdgeRepository : IVertexEdgeRepository
     {
-        public MemoryBidirectionalEdgeRepository(MemoryEdgeRepository edges, MemoryVertex vertex)
+        internal MemoryBidirectionalEdgeRepository(MemoryEdgeRepository edges, MemoryVertex vertex)
         {
             Edges = edges ?? throw new ArgumentNullException(nameof(edges));
             Vertex = vertex ?? throw new ArgumentNullException(nameof(vertex));

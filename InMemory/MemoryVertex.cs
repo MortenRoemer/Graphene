@@ -4,7 +4,7 @@ namespace Graphene.InMemory
 {
     public class MemoryVertex : IVertex
     {
-        public MemoryVertex(MemoryGraph graph, MemoryEdgeRepository edges, Guid id)
+        internal MemoryVertex(MemoryGraph graph, MemoryEdgeRepository edges, Guid id)
         {
             Graph = graph ?? throw new ArgumentNullException(nameof(graph));
             Id = id;

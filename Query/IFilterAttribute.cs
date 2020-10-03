@@ -8,28 +8,24 @@ namespace Graphene.Query
 
         IFilterSequence<T> HasNoValue();
 
-        IFilterSequence<T> IsBetween(object from, object to);
+        IFilterSequence<T> IsBetween<V>(V from, V to);
 
-        IFilterSequence<T> IsEqualTo(object other);
+        IFilterSequence<T> IsEqualTo<V>(V other);
 
-        IFilterSequence<T> IsGreaterThan(object other);
+        IFilterSequence<T> IsGreaterThan<V>(V other);
 
-        IFilterSequence<T> IsGreaterOrEqualTo(object other);
+        IFilterSequence<T> IsGreaterOrEqualTo<V>(V other);
 
-        IFilterSequence<T> IsIn(IEnumerable<object> values);
+        IFilterSequence<T> IsIn<V>(IEnumerable<V> values);
 
-        IFilterSequence<T> IsLessThan(object other);
+        IFilterSequence<T> IsLessThan<V>(V other);
 
-        IFilterSequence<T> IsLessOrEqualTo(object other);
+        IFilterSequence<T> IsLessOrEqualTo<V>(V other);
 
-        IFilterSequence<T> IsMaximal();
+        IFilterSequence<T> IsNotBetween<V>(V from, V to);
 
-        IFilterSequence<T> IsMinimal();
+        IFilterSequence<T> IsNotEqualTo<V>(V other);
 
-        IFilterSequence<T> IsNotBetween(object from, object to);
-
-        IFilterSequence<T> IsNotEqualTo(object other);
-
-        IFilterSequence<T> IsNotIn(IEnumerable<object> values);
+        IFilterSequence<T> IsNotIn<V>(IEnumerable<V> values);
     }
 }

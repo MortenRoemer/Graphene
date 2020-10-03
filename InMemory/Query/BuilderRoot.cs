@@ -32,27 +32,27 @@ namespace Graphene.InMemory.Query
             return AddToken(new BuilderVertex(this));
         }
 
-        public IQueryBuilderEdge Edge(Guid id)
+        public IQueryBuilderEdge Edge(long id)
         {
             return AddToken(new BuilderEdge(this, new[] { id }));
         }
 
-        public IQueryBuilderEdge Edges(IEnumerable<Guid> ids)
+        public IQueryBuilderEdge Edges(IEnumerable<long> ids)
         {
             return AddToken(new BuilderEdge(this, ids));
         }
 
-        internal IQueryResult Resolve()
+        internal bool Resolve(out IQueryResult result)
         {
-            throw new NotImplementedException();
+            return new QueryAgent(this, null).FindSolution(out result);
         }
 
-        public IQueryBuilderVertex Vertex(Guid id)
+        public IQueryBuilderVertex Vertex(long id)
         {
             return AddToken(new BuilderVertex(this, new[] { id }));
         }
 
-        public IQueryBuilderVertex Vertices(IEnumerable<Guid> ids)
+        public IQueryBuilderVertex Vertices(IEnumerable<long> ids)
         {
             return AddToken(new BuilderVertex(this, ids));
         }

@@ -1,16 +1,11 @@
-using System;
 using System.Collections.Generic;
 
 namespace Graphene.Query
 {
-    public interface IQueryResult
+    public interface IQueryResult : IEnumerable<IEntity>
     {
-        TimeSpan Duration { get; }
+        IGraph ResultGraph { get; }
 
-        float Efficiency { get; }
-
-        IGraph Graph { get; }
-
-        IEnumerable<IQuerySolution> Solutions { get; }
+        bool FindNextResult(out IQueryResult next);
     }
 }

@@ -1,9 +1,9 @@
-using System;
 using System.Collections.Generic;
 using Graphene.InMemory.Query;
 using Graphene.Query;
 
-namespace Graphene.InMemory {
+namespace Graphene.InMemory
+{
     public class MemoryGraph : IGraph
     {
         public MemoryGraph()
@@ -37,7 +37,7 @@ namespace Graphene.InMemory {
 
         public void Merge(IGraph other)
         {
-             var mappedIds = new Dictionary<Guid, Guid>();
+             var mappedIds = new Dictionary<long, long>();
 
             foreach (var vertex in other.Vertices)
             {

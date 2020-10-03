@@ -8,7 +8,7 @@ namespace Graphene.InMemory.Query
     {
         internal BuilderRoute(BuilderRoot root, RouteSearchMode mode) : this(root, mode, null) {}
 
-        internal BuilderRoute(BuilderRoot root, RouteSearchMode mode, IEnumerable<Guid> range)
+        internal BuilderRoute(BuilderRoot root, RouteSearchMode mode, IEnumerable<long> range)
         {
             Root = root ?? throw new ArgumentNullException(nameof(root));
             Mode = mode;
@@ -19,7 +19,7 @@ namespace Graphene.InMemory.Query
 
         private RouteSearchMode Mode { get; }
 
-        private IEnumerable<Guid> Range { get; }
+        private IEnumerable<long> Range { get; }
 
         private long? EdgeHopLimit { get; set; }
 
@@ -38,9 +38,9 @@ namespace Graphene.InMemory.Query
             return (IQueryBuilderOptimizer<IQueryBuilderRoute>)new OptimizerRoot(this);
         }
 
-        public IQueryResult Resolve()
+        public bool Resolve(out IQueryResult result)
         {
-            return Root.Resolve();
+            return Root.Resolve(out result);
         }
 
         internal void SetOptimizerSettings(OptimizerSettings settings)

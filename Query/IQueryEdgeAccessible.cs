@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 
 namespace Graphene.Query
@@ -7,8 +6,8 @@ namespace Graphene.Query
     {
         IQueryBuilderEdge AnyEdges();
 
-        IQueryBuilderEdge Edge(Guid id);
+        IQueryBuilderEdge Edge(long id);
 
-        IQueryBuilderEdge Edges(IEnumerable<Guid> ids);
+        IQueryBuilderEdge Edges(IEnumerable<long> ids);
     }
 }

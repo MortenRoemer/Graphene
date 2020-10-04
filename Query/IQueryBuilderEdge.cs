@@ -10,8 +10,8 @@ namespace Graphene.Query
 
         IQueryBuilderVertex TargetVertex();
 
-        IQueryBuilderVertex Vertex(long id);
+        IQueryBuilderVertex Vertex(ulong id);
 
-        IQueryBuilderVertex Vertices(IEnumerable<long> ids);
+        IQueryBuilderVertex Vertices(IEnumerable<ulong> ids);
     }
 }

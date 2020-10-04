@@ -8,24 +8,24 @@ namespace Graphene.InMemory.Query
     {
         internal BuilderVertex(BuilderRoot root) : this(root, null, VertexSearchMode.All) {}
 
-        internal BuilderVertex(BuilderRoot root, IEnumerable<long> range) : this(root, range, VertexSearchMode.All) {}
+        internal BuilderVertex(BuilderRoot root, IEnumerable<ulong> range) : this(root, range, VertexSearchMode.All) {}
 
         internal BuilderVertex(BuilderRoot root, VertexSearchMode searchMode) : this(root, null, searchMode) {}
 
-        internal BuilderVertex(BuilderRoot root, IEnumerable<long> range, VertexSearchMode searchMode)
+        internal BuilderVertex(BuilderRoot root, IEnumerable<ulong> range, VertexSearchMode searchMode)
         {
             Root = root ?? throw new ArgumentNullException(nameof(root));
             Range = range;
             SearchMode = searchMode;
         }
 
-        private IEnumerable<long> Range { get; }
+        internal IEnumerable<ulong> Range { get; }
 
         private BuilderRoot Root { get; }
 
-        private VertexSearchMode SearchMode { get; }
+        internal VertexSearchMode SearchMode { get; }
 
-        private FilterRoot<IQueryBuilderVertex> Filter { get; set; }
+        internal FilterRoot<IQueryBuilderVertex> Filter { get; set; }
 
         public IQueryBuilderEdge AnyEdges()
         {
@@ -42,12 +42,12 @@ namespace Graphene.InMemory.Query
             return Root.AddToken(new BuilderEdge(Root, EdgeSearchMode.Outgoing));
         }
 
-        public IQueryBuilderEdge Edge(long id)
+        public IQueryBuilderEdge Edge(ulong id)
         {
             return Root.AddToken(new BuilderEdge(Root, new[] { id }));
         }
 
-        public IQueryBuilderEdge Edges(IEnumerable<long> ids)
+        public IQueryBuilderEdge Edges(IEnumerable<ulong> ids)
         {
             return Root.AddToken(new BuilderEdge(Root, ids));
         }
@@ -67,22 +67,22 @@ namespace Graphene.InMemory.Query
             return Root.AddToken(new BuilderRoute(Root, RouteSearchMode.Vertex));
         }
 
-        public IQueryBuilderRoute RouteToEdge(long id)
+        public IQueryBuilderRoute RouteToEdge(ulong id)
         {
             return Root.AddToken(new BuilderRoute(Root, RouteSearchMode.Edge, new[] { id }));
         }
 
-        public IQueryBuilderRoute RouteToEdges(IEnumerable<long> ids)
+        public IQueryBuilderRoute RouteToEdges(IEnumerable<ulong> ids)
         {
             return Root.AddToken(new BuilderRoute(Root, RouteSearchMode.Edge, ids));
         }
 
-        public IQueryBuilderRoute RouteToVertex(long id)
+        public IQueryBuilderRoute RouteToVertex(ulong id)
         {
             return Root.AddToken(new BuilderRoute(Root, RouteSearchMode.Vertex, new[] { id }));
         }
 
-        public IQueryBuilderRoute RouteToVertices(IEnumerable<long> ids)
+        public IQueryBuilderRoute RouteToVertices(IEnumerable<ulong> ids)
         {
             return Root.AddToken(new BuilderRoute(Root, RouteSearchMode.Vertex, ids));
         }

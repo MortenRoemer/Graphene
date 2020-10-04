@@ -6,8 +6,8 @@ namespace Graphene.Query
     {
         IQueryBuilderEdge AnyEdges();
 
-        IQueryBuilderEdge Edge(long id);
+        IQueryBuilderEdge Edge(ulong id);
 
-        IQueryBuilderEdge Edges(IEnumerable<long> ids);
+        IQueryBuilderEdge Edges(IEnumerable<ulong> ids);
     }
 }

@@ -10,12 +10,12 @@ namespace Graphene.InMemory
         internal MemoryEdgeRepository(MemoryGraph graph)
         {
             Graph = graph ?? throw new ArgumentNullException(nameof(graph));
-            Edges = new SortedDictionary<long, MemoryEdge>();
+            Edges = new SortedDictionary<ulong, MemoryEdge>();
         }
 
         private MemoryGraph Graph { get; }
 
-        private IDictionary<long, MemoryEdge> Edges { get; }
+        private IDictionary<ulong, MemoryEdge> Edges { get; }
 
         private static Random Random { get; } = new Random();
 
@@ -38,7 +38,7 @@ namespace Graphene.InMemory
             Edges.Clear();
         }
 
-        public bool Contains(IEnumerable<long> ids)
+        public bool Contains(IEnumerable<ulong> ids)
         {
             return ids.All(id => Edges.ContainsKey(id));
         }
@@ -56,7 +56,7 @@ namespace Graphene.InMemory
             }
         }
 
-        public IEnumerable<IEdge> Get(IEnumerable<long> ids)
+        public IEnumerable<IEdge> Get(IEnumerable<ulong> ids)
         {
             return ids.Select(id => Edges[id]);
         }
@@ -71,14 +71,14 @@ namespace Graphene.InMemory
             return GetEnumerator();
         }
 
-        private long GetUniqueId()
+        private ulong GetUniqueId()
         {
             byte[] buffer = new byte[8];
 
             while (true)
             {
                 Random.NextBytes(buffer);
-                var id = BitConverter.ToInt64(buffer);
+                var id = BitConverter.ToUInt64(buffer);
 
                 if (!Edges.ContainsKey(id))
                     return id;

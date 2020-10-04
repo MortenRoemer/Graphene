@@ -6,14 +6,14 @@ namespace Graphene.Query
     {
         IQueryBuilderRoute RouteToAnyEdge();
 
-        IQueryBuilderRoute RouteToEdge(long id);
+        IQueryBuilderRoute RouteToEdge(ulong id);
 
-        IQueryBuilderRoute RouteToEdges(IEnumerable<long> ids);
+        IQueryBuilderRoute RouteToEdges(IEnumerable<ulong> ids);
 
         IQueryBuilderRoute RouteToAnyVertex();
 
-        IQueryBuilderRoute RouteToVertex(long id);
+        IQueryBuilderRoute RouteToVertex(ulong id);
 
-        IQueryBuilderRoute RouteToVertices(IEnumerable<long> ids);
+        IQueryBuilderRoute RouteToVertices(IEnumerable<ulong> ids);
     }
 }

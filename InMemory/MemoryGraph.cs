@@ -37,7 +37,7 @@ namespace Graphene.InMemory
 
         public void Merge(IGraph other)
         {
-             var mappedIds = new Dictionary<long, long>();
+             var mappedIds = new Dictionary<ulong, ulong>();
 
             foreach (var vertex in other.Vertices)
             {

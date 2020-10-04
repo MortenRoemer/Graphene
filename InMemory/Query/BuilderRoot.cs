@@ -12,9 +12,9 @@ namespace Graphene.InMemory.Query
             Tokens = new List<object>();
         }
 
-        private MemoryGraph Graph { get; }
+        internal MemoryGraph Graph { get; }
 
-        private List<object> Tokens { get; }
+        internal List<object> Tokens { get; }
 
         internal T AddToken<T>(T token)
         {
@@ -32,12 +32,12 @@ namespace Graphene.InMemory.Query
             return AddToken(new BuilderVertex(this));
         }
 
-        public IQueryBuilderEdge Edge(long id)
+        public IQueryBuilderEdge Edge(ulong id)
         {
             return AddToken(new BuilderEdge(this, new[] { id }));
         }
 
-        public IQueryBuilderEdge Edges(IEnumerable<long> ids)
+        public IQueryBuilderEdge Edges(IEnumerable<ulong> ids)
         {
             return AddToken(new BuilderEdge(this, ids));
         }
@@ -47,12 +47,12 @@ namespace Graphene.InMemory.Query
             return new QueryAgent(this, null).FindSolution(out result);
         }
 
-        public IQueryBuilderVertex Vertex(long id)
+        public IQueryBuilderVertex Vertex(ulong id)
         {
             return AddToken(new BuilderVertex(this, new[] { id }));
         }
 
-        public IQueryBuilderVertex Vertices(IEnumerable<long> ids)
+        public IQueryBuilderVertex Vertices(IEnumerable<ulong> ids)
         {
             return AddToken(new BuilderVertex(this, ids));
         }

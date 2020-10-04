@@ -10,8 +10,8 @@ namespace Graphene.Query
 
         IQueryBuilderEdge AnyOutgoingEdges();
 
-        IQueryBuilderEdge Edge(long id);
+        IQueryBuilderEdge Edge(ulong id);
 
-        IQueryBuilderEdge Edges(IEnumerable<long> ids);
+        IQueryBuilderEdge Edges(IEnumerable<ulong> ids);
     }
 }

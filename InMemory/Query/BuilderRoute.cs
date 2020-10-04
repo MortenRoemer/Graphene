@@ -8,7 +8,7 @@ namespace Graphene.InMemory.Query
     {
         internal BuilderRoute(BuilderRoot root, RouteSearchMode mode) : this(root, mode, null) {}
 
-        internal BuilderRoute(BuilderRoot root, RouteSearchMode mode, IEnumerable<long> range)
+        internal BuilderRoute(BuilderRoot root, RouteSearchMode mode, IEnumerable<ulong> range)
         {
             Root = root ?? throw new ArgumentNullException(nameof(root));
             Mode = mode;
@@ -19,11 +19,11 @@ namespace Graphene.InMemory.Query
 
         private RouteSearchMode Mode { get; }
 
-        private IEnumerable<long> Range { get; }
+        private IEnumerable<ulong> Range { get; }
 
-        private long? EdgeHopLimit { get; set; }
+        private ulong? EdgeHopLimit { get; set; }
 
-        private long? VertexHopLimit { get; set; }
+        private ulong? VertexHopLimit { get; set; }
 
         private FilterRoot<IQueryBuilderRoute> TargetFilter { get; set; }
 
@@ -66,13 +66,13 @@ namespace Graphene.InMemory.Query
             return VertexFilter;
         }
 
-        public IQueryBuilderRoute WithEdgeHopLimit(long limit)
+        public IQueryBuilderRoute WithEdgeHopLimit(ulong limit)
         {
             this.EdgeHopLimit = limit;
             return this;
         }
 
-        public IQueryBuilderRoute WithVertexHopLimit(long limit)
+        public IQueryBuilderRoute WithVertexHopLimit(ulong limit)
         {
             this.VertexHopLimit = limit;
             return this;

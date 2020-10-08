@@ -7,42 +7,116 @@ namespace Graphene.InMemory.Query
 {
     internal class QueryAgent
     {
-        public QueryAgent(BuilderRoot query, IEnumerable<ulong> offset)
+        public QueryAgent(BuilderRoot query)
         {
             Query = query ?? throw new ArgumentNullException(nameof(query));
-            Offset = offset is null ? null : offset.ToArray();
         }
-
-        private ulong[] Offset { get; }
 
         private BuilderRoot Query { get; }
 
         public bool FindSolution(out IQueryResult result)
         {
-            throw new NotImplementedException();
+            var stack = new Stack<IEntity>();
+            var token = Query.Tokens.FirstOrDefault();
+
+            if (token is BuilderVertex vertexDefinition)
+            {
+                if (FindVertices(stack, vertexDefinition))
+                {
+                    result = PackResult(stack);
+                    return true;
+                }
+            }
+            else if (token is BuilderEdge edgeDefinition)
+            {
+                if (FindEdges(stack, edgeDefinition))
+                {
+                    result = PackResult(stack);
+                    return true;
+                }
+            }
+            else
+                throw new InvalidOperationException($"query token type {token.GetType()} not supported on base level");
+
+            result = default;
+            return false;
         }
 
-        private bool FindNextVertex(BuilderVertex vertexDefinition, out IVertex vertex)
+        private bool FindVertices(Stack<IEntity> stack, BuilderVertex vertexDefinition)
         {
-            throw new NotImplementedException();
+            var vertices = vertexDefinition.Range is null
+                ? Query.Graph.Vertices
+                : Query.Graph.Vertices.Get(vertexDefinition.Range);
+
+            if (vertexDefinition.Filter != null)
+                vertices = vertices.Where(vertex => vertexDefinition.Filter.Contains(vertex));
+
+            foreach (var vertex in vertices)
+            {
+                stack.Push(vertex);
+
+                if (Query.Tokens.Count <= stack.Count)
+                    return true;
+
+                var token = Query.Tokens[stack.Count];
+
+                if (token is BuilderEdge edgeDefinition)
+                {
+                    throw new NotImplementedException();
+                }
+                else if (token is BuilderRoute routeDefinition)
+                {
+                    throw new NotImplementedException();
+                }
+                else
+                {
+                    throw new InvalidOperationException($"query token type {token.GetType()} not supported relative to vertex");
+                }
+
+                stack.Pop();
+            }
+
+            return false;
         }
 
-        private bool FindNextVertexRelativeTo(IEdge edge, BuilderVertex vertexDefinition, out IVertex vertex)
+        private bool FindEdges(Stack<IEntity> stack, BuilderEdge edgeDefinition)
         {
-            throw new NotImplementedException();
+            var edges = edgeDefinition.Range is null
+                ? Query.Graph.Vertices
+                : Query.Graph.Vertices.Get(edgeDefinition.Range);
+
+            if (edgeDefinition.Filter != null)
+                edges = edges.Where(vertex => edgeDefinition.Filter.Contains(vertex));
+
+            foreach (var edge in edges)
+            {
+                stack.Push(edge);
+
+                if (Query.Tokens.Count <= stack.Count)
+                    return true;
+
+                var token = Query.Tokens[stack.Count];
+
+                if (token is BuilderVertex vertexDefinition)
+                {
+                    throw new NotImplementedException();
+                }
+                else if (token is BuilderRoute routeDefinition)
+                {
+                    throw new NotImplementedException();
+                }
+                else
+                {
+                    throw new InvalidOperationException($"query token type {token.GetType()} not supported relative to edge");
+                }
+
+                stack.Pop();
+            }
+
+            return false;
         }
 
-        private bool FindNextEdge(BuilderEdge edgeDefinition, out IEdge edge)
-        {
-            throw new NotImplementedException();
-        }
-
-        private bool FindNextEdgeRelativeTo(IVertex vertex, BuilderEdge edgeDefinition, out IEdge edge)
-        {
-            throw new NotImplementedException();
-        }
-
-        private bool FindNextRoute(BuilderRoute routeDefinition, IEntity fromEntity, out IEnumerable<IEntity> entities)
+        private IQueryResult PackResult(Stack<IEntity> stack)
         {
             throw new NotImplementedException();
         }

@@ -44,7 +44,7 @@ namespace Graphene.InMemory.Query
 
         internal bool Resolve(out IQueryResult result)
         {
-            return new QueryAgent(this, null).FindSolution(out result);
+            return new QueryAgent(this).FindSolution(out result);
         }
 
         public IQueryBuilderVertex Vertex(ulong id)

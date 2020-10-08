@@ -19,13 +19,13 @@ namespace Graphene.InMemory.Query
             SearchMode = searchMode;
         }
 
-        private IEnumerable<ulong> Range { get; }
+        internal IEnumerable<ulong> Range { get; }
 
         private BuilderRoot Root { get; }
 
         private EdgeSearchMode SearchMode { get; }
 
-        private FilterRoot<IQueryBuilderEdge> Filter { get; set; }
+        internal FilterRoot<IQueryBuilderEdge> Filter { get; set; }
 
         public IQueryBuilderVertex AnyVertices()
         {

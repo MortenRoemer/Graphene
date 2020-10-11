@@ -186,6 +186,7 @@ namespace Graphene.Test
             Assert.False(edges.MoveNext());
         }
 
+        [Fact]
         public void AttributeClearShouldWork()
         {
             IGraph graph = new MemoryGraph();

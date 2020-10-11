@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 
 namespace Graphene.Query
@@ -7,14 +6,14 @@ namespace Graphene.Query
     {
         IQueryBuilderRoute RouteToAnyEdge();
 
-        IQueryBuilderRoute RouteToEdge(Guid id);
+        IQueryBuilderRoute RouteToEdge(ulong id);
 
-        IQueryBuilderRoute RouteToEdges(IEnumerable<Guid> ids);
+        IQueryBuilderRoute RouteToEdges(IEnumerable<ulong> ids);
 
         IQueryBuilderRoute RouteToAnyVertex();
 
-        IQueryBuilderRoute RouteToVertex(Guid id);
+        IQueryBuilderRoute RouteToVertex(ulong id);
 
-        IQueryBuilderRoute RouteToVertices(IEnumerable<Guid> ids);
+        IQueryBuilderRoute RouteToVertices(IEnumerable<ulong> ids);
     }
 }

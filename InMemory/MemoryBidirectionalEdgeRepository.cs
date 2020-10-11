@@ -27,9 +27,11 @@ namespace Graphene.InMemory
             Edges.Delete(FilterEdges().ToArray());
         }
 
-        public bool Contains(IEnumerable<Guid> ids)
+        public bool Contains(IEnumerable<ulong> ids)
         {
-            return Edges.Get(ids).All(edge => IsContainedEdge(edge));
+            return Edges
+                .Get(ids)
+                .All(edge => IsContainedEdge(edge));
         }
 
         public long Count()
@@ -42,7 +44,7 @@ namespace Graphene.InMemory
             Edges.Delete(edge);
         }
 
-        public IEnumerable<IEdge> Get(IEnumerable<Guid> ids)
+        public IEnumerable<IEdge> Get(IEnumerable<ulong> ids)
         {
             return Edges
                 .Get(ids)

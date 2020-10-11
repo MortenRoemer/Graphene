@@ -2,6 +2,6 @@ namespace Graphene.Query
 {
     public interface IQueryBuilder
     {
-        IQueryResult Resolve();
+        bool Resolve(out IQueryResult result);
     }
 }

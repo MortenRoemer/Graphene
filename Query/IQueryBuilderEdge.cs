@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 
 namespace Graphene.Query
@@ -11,8 +10,8 @@ namespace Graphene.Query
 
         IQueryBuilderVertex TargetVertex();
 
-        IQueryBuilderVertex Vertex(Guid id);
+        IQueryBuilderVertex Vertex(ulong id);
 
-        IQueryBuilderVertex Vertices(IEnumerable<Guid> ids);
+        IQueryBuilderVertex Vertices(IEnumerable<ulong> ids);
     }
 }

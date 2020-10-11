@@ -10,15 +10,17 @@ namespace Graphene.InMemory
         internal MemoryVertexRepository(MemoryGraph graph, MemoryEdgeRepository edges)
         {
             Graph = graph ?? throw new ArgumentNullException(nameof(graph));
-            Vertices = new Dictionary<Guid, MemoryVertex>();
+            Vertices = new SortedDictionary<ulong, MemoryVertex>();
             Edges = edges ?? throw new ArgumentNullException(nameof(edges));
         }
 
         private MemoryGraph Graph { get; }
 
-        private IDictionary<Guid, MemoryVertex> Vertices { get; }
+        private IDictionary<ulong, MemoryVertex> Vertices { get; }
 
         private MemoryEdgeRepository Edges { get; }
+
+        private static Random Random { get; } = new Random();
 
         public void Clear()
         {
@@ -26,7 +28,7 @@ namespace Graphene.InMemory
             Edges.Clear();
         }
 
-        public bool Contains(IEnumerable<Guid> ids)
+        public bool Contains(IEnumerable<ulong> ids)
         {
             return ids.All(id => Vertices.ContainsKey(id));
         }
@@ -49,7 +51,7 @@ namespace Graphene.InMemory
             }
         }
 
-        public IEnumerable<IVertex> Get(IEnumerable<Guid> ids)
+        public IEnumerable<IVertex> Get(IEnumerable<ulong> ids)
         {
             return ids.Select(id => Vertices[id]);
         }
@@ -64,11 +66,14 @@ namespace Graphene.InMemory
             return GetEnumerator();
         }
 
-        private Guid GenerateUniqueId()
+        private ulong GenerateUniqueId()
         {
+            byte[] buffer = new byte[8];
+
             while (true)
             {
-                var id = Guid.NewGuid();
+                Random.NextBytes(buffer);
+                var id = BitConverter.ToUInt64(buffer);
 
                 if (!Vertices.ContainsKey(id))
                     return id;

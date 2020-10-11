@@ -8,8 +8,8 @@ namespace Graphene.Query
 
         IFilterRoot<IQueryBuilderRoute> WhereAnyHopVertex();
 
-        IQueryBuilderRoute WithEdgeHopLimit(long limit);
+        IQueryBuilderRoute WithEdgeHopLimit(ulong limit);
 
-        IQueryBuilderRoute WithVertexHopLimit(long limit);
+        IQueryBuilderRoute WithVertexHopLimit(ulong limit);
     }
 }

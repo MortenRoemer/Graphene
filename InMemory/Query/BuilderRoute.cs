@@ -8,7 +8,7 @@ namespace Graphene.InMemory.Query
     {
         internal BuilderRoute(BuilderRoot root, RouteSearchMode mode) : this(root, mode, null) {}
 
-        internal BuilderRoute(BuilderRoot root, RouteSearchMode mode, IEnumerable<Guid> range)
+        internal BuilderRoute(BuilderRoot root, RouteSearchMode mode, IEnumerable<ulong> range)
         {
             Root = root ?? throw new ArgumentNullException(nameof(root));
             Mode = mode;
@@ -19,11 +19,11 @@ namespace Graphene.InMemory.Query
 
         private RouteSearchMode Mode { get; }
 
-        private IEnumerable<Guid> Range { get; }
+        private IEnumerable<ulong> Range { get; }
 
-        private long? EdgeHopLimit { get; set; }
+        private ulong? EdgeHopLimit { get; set; }
 
-        private long? VertexHopLimit { get; set; }
+        private ulong? VertexHopLimit { get; set; }
 
         private FilterRoot<IQueryBuilderRoute> TargetFilter { get; set; }
 
@@ -38,9 +38,9 @@ namespace Graphene.InMemory.Query
             return (IQueryBuilderOptimizer<IQueryBuilderRoute>)new OptimizerRoot(this);
         }
 
-        public IQueryResult Resolve()
+        public bool Resolve(out IQueryResult result)
         {
-            return Root.Resolve();
+            return Root.Resolve(out result);
         }
 
         internal void SetOptimizerSettings(OptimizerSettings settings)
@@ -66,13 +66,13 @@ namespace Graphene.InMemory.Query
             return VertexFilter;
         }
 
-        public IQueryBuilderRoute WithEdgeHopLimit(long limit)
+        public IQueryBuilderRoute WithEdgeHopLimit(ulong limit)
         {
             this.EdgeHopLimit = limit;
             return this;
         }
 
-        public IQueryBuilderRoute WithVertexHopLimit(long limit)
+        public IQueryBuilderRoute WithVertexHopLimit(ulong limit)
         {
             this.VertexHopLimit = limit;
             return this;

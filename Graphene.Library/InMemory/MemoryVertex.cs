@@ -27,5 +27,13 @@ namespace Graphene.InMemory
         public string Label { get; set; }
 
         public IAttributeSet Attributes { get; }
+
+        public static bool operator ==(MemoryVertex left, MemoryVertex right) => left.Id == right.Id;
+        public static bool operator !=(MemoryVertex left, MemoryVertex right) => !(left == right);
+        public override bool Equals(object obj)
+        {
+            if (obj is MemoryVertex memoryVertex) return memoryVertex == this;
+            else return false;
+        }
     }
 }

@@ -40,7 +40,9 @@ namespace Graphene.InMemory
 
         public IVertex Create()
         {
-            return new MemoryVertex(Graph, Edges, GenerateUniqueId());
+            var vertex = new MemoryVertex(Graph, Edges, GenerateUniqueId());
+            Vertices.Add(vertex.Id, vertex); 
+            return vertex;
         }
 
         public void Delete(IEnumerable<IVertex> items)

@@ -62,11 +62,13 @@ namespace Graphene.InMemory.Query
 
                 if (token is BuilderEdge edgeDefinition)
                 {
-                    throw new NotImplementedException();
+                    if (FindEdgesRelativeTo(stack, vertex, edgeDefinition))
+                        return true;
                 }
                 else if (token is BuilderRoute routeDefinition)
                 {
-                    throw new NotImplementedException();
+                    if (FindRouteRelativeTo(stack, vertex, routeDefinition))
+                        return true;
                 }
                 else
                 {
@@ -79,14 +81,19 @@ namespace Graphene.InMemory.Query
             return false;
         }
 
+        private bool FindVerticesRelativeTo(Stack<IEntity> stack, IEdge edge, BuilderVertex vertexDefinition)
+        {
+            throw new NotImplementedException();
+        }
+
         private bool FindEdges(Stack<IEntity> stack, BuilderEdge edgeDefinition)
         {
             var edges = edgeDefinition.Range is null
-                ? Query.Graph.Vertices
-                : Query.Graph.Vertices.Get(edgeDefinition.Range);
+                ? Query.Graph.Edges
+                : Query.Graph.Edges.Get(edgeDefinition.Range);
 
             if (edgeDefinition.Filter != null)
-                edges = edges.Where(vertex => edgeDefinition.Filter.Contains(vertex));
+                edges = edges.Where(edge => edgeDefinition.Filter.Contains(edge));
 
             foreach (var edge in edges)
             {
@@ -99,11 +106,13 @@ namespace Graphene.InMemory.Query
 
                 if (token is BuilderVertex vertexDefinition)
                 {
-                    throw new NotImplementedException();
+                    if (FindVerticesRelativeTo(stack, edge, vertexDefinition))
+                        return true;
                 }
                 else if (token is BuilderRoute routeDefinition)
                 {
-                    throw new NotImplementedException();
+                    if (FindRouteRelativeTo(stack, edge, routeDefinition))
+                        return true;
                 }
                 else
                 {
@@ -116,9 +125,19 @@ namespace Graphene.InMemory.Query
             return false;
         }
 
-        private IQueryResult PackResult(Stack<IEntity> stack)
+        private bool FindEdgesRelativeTo(Stack<IEntity> stack, IVertex vertex, BuilderEdge edgeDefinition)
         {
             throw new NotImplementedException();
+        }
+
+        private bool FindRouteRelativeTo(Stack<IEntity> stack, IEntity entity, BuilderRoute routeDefinition)
+        {
+            throw new NotImplementedException();
+        }
+
+        private IQueryResult PackResult(Stack<IEntity> stack)
+        {
+            return new AgentResult(Query.Graph, stack);
         }
     }
 }

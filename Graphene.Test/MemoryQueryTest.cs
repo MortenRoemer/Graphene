@@ -1,5 +1,8 @@
 using System;
+using System.Linq;
+using System.Text.RegularExpressions;
 using Graphene.InMemory;
+using Graphene.Query;
 using Xunit;
 
 namespace Graphene.Test
@@ -11,7 +14,187 @@ namespace Graphene.Test
         [Fact]
         public void EmptyVertexQueryShouldGiveAnyVertexInOrder()
         {
-            throw new NotImplementedException();
+            var query = ExampleGraph.Value
+                .Select()
+                .AnyVertex();
+
+            Assert.True(query.Resolve(out IQueryResult result));
+            Assert.Single(result);
+            var entity = result.First();
+            Assert.True(entity is IVertex);
+            var lastid = entity.Id;
+
+            while (result.FindNextResult(out result))
+            {
+                Assert.Single(result);
+                entity = result.First();
+                Assert.True(entity is IVertex);
+                Assert.True(entity.Id > lastid);
+                lastid = entity.Id;
+            }
+        }
+
+        [Fact]
+        public void LabelIsEqualToFilterShouldGiveCorrectEntities()
+        {
+            var query = ExampleGraph.Value
+                .Select()
+                .AnyVertex()
+                .Where()
+                    .Label().IsEqualTo("berlin")
+                .EndWhere();
+
+            Assert.True(query.Resolve(out IQueryResult result));
+            Assert.Single(result);
+            var entity = result.First();
+            Assert.Equal("berlin", entity.Label);
+
+            while (result.FindNextResult(out result))
+            {
+                Assert.Single(result);
+                entity = result.First();
+                Assert.Equal("berlin", entity.Label);
+            }
+        }
+
+        [Fact]
+        public void LabelIsNotEqualToFilterShouldGiveCorrectEntities()
+        {
+            var query = ExampleGraph.Value
+                .Select()
+                .AnyVertex()
+                .Where()
+                    .Label().IsNotEqualTo("berlin")
+                .EndWhere();
+
+            Assert.True(query.Resolve(out IQueryResult result));
+            Assert.Single(result);
+            var entity = result.First();
+            Assert.NotEqual("berlin", entity.Label);
+
+            while (result.FindNextResult(out result))
+            {
+                Assert.Single(result);
+                entity = result.First();
+                Assert.NotEqual("berlin", entity.Label);
+            }
+        }
+
+        [Fact]
+        public void LabelDoesMatchFilterShouldGiveCorrectEntities()
+        {
+            var query = ExampleGraph.Value
+                .Select()
+                .AnyVertex()
+                .Where()
+                    .Label().DoesMatch("ha.+")
+                .EndWhere();
+
+            Assert.True(query.Resolve(out IQueryResult result));
+            Assert.Single(result);
+            var entity = result.First();
+            Assert.Matches("ha.+", entity.Label);
+
+            while (result.FindNextResult(out result))
+            {
+                Assert.Single(result);
+                entity = result.First();
+                Assert.Matches("ha.+", entity.Label);
+            }
+        }
+
+        [Fact]
+        public void LabelDoesNotMatchFilterShouldGiveCorrectEntities()
+        {
+            var query = ExampleGraph.Value
+                .Select()
+                .AnyVertex()
+                .Where()
+                    .Label().DoesNotMatch("ha.+")
+                .EndWhere();
+
+            Assert.True(query.Resolve(out IQueryResult result));
+            Assert.Single(result);
+            var entity = result.First();
+            Assert.False(Regex.IsMatch(entity.Label, "ha.+"));
+
+            while (result.FindNextResult(out result))
+            {
+                Assert.Single(result);
+                entity = result.First();
+                Assert.False(Regex.IsMatch(entity.Label, "ha.+"));
+            }
+        }
+
+        [Fact]
+        public void LabelIsInFilterShouldGiveCorrectEntities()
+        {
+            var labels = new[] {"hamburg", "berlin"};
+            var query = ExampleGraph.Value
+                .Select()
+                .AnyVertex()
+                .Where()
+                    .Label().IsIn(labels)
+                .EndWhere();
+
+            Assert.True(query.Resolve(out IQueryResult result));
+            Assert.Single(result);
+            var entity = result.First();
+            Assert.Contains(entity.Label, labels);
+
+            while (result.FindNextResult(out result))
+            {
+                Assert.Single(result);
+                entity = result.First();
+                Assert.Contains(entity.Label, labels);
+            }
+        }
+
+        [Fact]
+        public void LabelIsNotInFilterShouldGiveCorrectEntities()
+        {
+            var labels = new[] {"hamburg", "berlin"};
+            var query = ExampleGraph.Value
+                .Select()
+                .AnyVertex()
+                .Where()
+                    .Label().IsNotIn(labels)
+                .EndWhere();
+
+            Assert.True(query.Resolve(out IQueryResult result));
+            Assert.Single(result);
+            var entity = result.First();
+            Assert.DoesNotContain(entity.Label, labels);
+
+            while (result.FindNextResult(out result))
+            {
+                Assert.Single(result);
+                entity = result.First();
+                Assert.DoesNotContain(entity.Label, labels);
+            }
+        }
+
+        [Fact]
+        public void EmptyEdgeQueryShouldGiveAnyEdgeInOrder()
+        {
+            var query = ExampleGraph.Value
+                .Select()
+                .AnyEdges();
+
+            Assert.True(query.Resolve(out IQueryResult result));
+            Assert.Single(result);
+            var entity = result.First();
+            Assert.True(entity is IEdge);
+            var lastid = entity.Id;
+
+            while (result.FindNextResult(out result))
+            {
+                Assert.Single(result);
+                entity = result.First();
+                Assert.True(entity is IEdge);
+                Assert.True(entity.Id > lastid);
+                lastid = entity.Id;
+            }
         }
 
         private static IGraph PrepareGraph()

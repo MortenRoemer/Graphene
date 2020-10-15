@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using System.Text.RegularExpressions;
 using Graphene.InMemory;
 using Graphene.Query;
 using Xunit;
@@ -31,6 +30,304 @@ namespace Graphene.Test
                 Assert.True(entity is IVertex);
                 Assert.True(entity.Id > lastid);
                 lastid = entity.Id;
+            }
+        }
+
+        [Fact]
+        public void AttributeHasNoValueFilterShouldGiveCorrectEntities()
+        {
+            var query = ExampleGraph.Value
+                .Select()
+                .AnyVertex()
+                .Where()
+                    .Attribute("hanseatic").HasNoValue()
+                .EndWhere();
+
+            Assert.True(query.Resolve(out IQueryResult result));
+            Assert.Single(result);
+            var entity = result.First();
+            Assert.DoesNotContain("hanseatic", entity.Attributes.Select(attribute => attribute.Key));
+
+            while (result.FindNextResult(out result))
+            {
+                Assert.Single(result);
+                entity = result.First();
+                Assert.DoesNotContain("hanseatic", entity.Attributes.Select(attribute => attribute.Key));
+            }
+        }
+
+        [Fact]
+        public void AttributeHasValueFilterShouldGiveCorrectEntities()
+        {
+            var query = ExampleGraph.Value
+                .Select()
+                .AnyVertex()
+                .Where()
+                    .Attribute("hanseatic").HasValue()
+                .EndWhere();
+
+            Assert.True(query.Resolve(out IQueryResult result));
+            Assert.Single(result);
+            var entity = result.First();
+            Assert.Contains("hanseatic", entity.Attributes.Select(attribute => attribute.Key));
+
+            while (result.FindNextResult(out result))
+            {
+                Assert.Single(result);
+                entity = result.First();
+                Assert.Contains("hanseatic", entity.Attributes.Select(attribute => attribute.Key));
+            }
+        }
+
+        [Fact]
+        public void AttributeIsBetweenFilterShouldGiveCorrectEntities()
+        {
+            var query = ExampleGraph.Value
+                .Select()
+                .AnyEdges()
+                .Where()
+                    .Attribute("distance").IsBetween(100, 200)
+                .EndWhere();
+
+            Assert.True(query.Resolve(out IQueryResult result));
+            Assert.Single(result);
+            var entity = result.First();
+            Assert.True(entity.Attributes.TryGet("distance", out int distance));
+            Assert.InRange(distance, 100, 200);
+
+            while (result.FindNextResult(out result))
+            {
+                Assert.Single(result);
+                entity = result.First();
+                Assert.True(entity.Attributes.TryGet("distance", out distance));
+                Assert.InRange(distance, 100, 200);
+            }
+        }
+
+        [Fact]
+        public void AttributeIsEqualToFilterShouldGiveCorrectEntities()
+        {
+            var query = ExampleGraph.Value
+                .Select()
+                .AnyEdges()
+                .Where()
+                    .Attribute("distance").IsEqualTo(232)
+                .EndWhere();
+
+            Assert.True(query.Resolve(out IQueryResult result));
+            Assert.Single(result);
+            var entity = result.First();
+            Assert.True(entity.Attributes.TryGet("distance", out int distance));
+            Assert.Equal(232, distance);
+
+            while (result.FindNextResult(out result))
+            {
+                Assert.Single(result);
+                entity = result.First();
+                Assert.True(entity.Attributes.TryGet("distance", out distance));
+                Assert.Equal(232, distance);
+            }
+        }
+
+        [Fact]
+        public void AttributeIsGreaterOrEqualToFilterShouldGiveCorrectEntities()
+        {
+            var query = ExampleGraph.Value
+                .Select()
+                .AnyEdges()
+                .Where()
+                    .Attribute("distance").IsGreaterOrEqualTo(232)
+                .EndWhere();
+
+            Assert.True(query.Resolve(out IQueryResult result));
+            Assert.Single(result);
+            var entity = result.First();
+            Assert.True(entity.Attributes.TryGet("distance", out int distance));
+            Assert.True(distance >= 232);
+
+            while (result.FindNextResult(out result))
+            {
+                Assert.Single(result);
+                entity = result.First();
+                Assert.True(entity.Attributes.TryGet("distance", out distance));
+                Assert.True(distance >= 232);
+            }
+        }
+
+        [Fact]
+        public void AttributeIsGreaterThanFilterShouldGiveCorrectEntities()
+        {
+            var query = ExampleGraph.Value
+                .Select()
+                .AnyEdges()
+                .Where()
+                    .Attribute("distance").IsGreaterThan(232)
+                .EndWhere();
+
+            Assert.True(query.Resolve(out IQueryResult result));
+            Assert.Single(result);
+            var entity = result.First();
+            Assert.True(entity.Attributes.TryGet("distance", out int distance));
+            Assert.True(distance > 232);
+
+            while (result.FindNextResult(out result))
+            {
+                Assert.Single(result);
+                entity = result.First();
+                Assert.True(entity.Attributes.TryGet("distance", out distance));
+                Assert.True(distance > 232);
+            }
+        }
+
+        [Fact]
+        public void AttributeIsInFilterShouldGiveCorrectEntities()
+        {
+            var distances = new[] { 232, 367 };
+            var query = ExampleGraph.Value
+                .Select()
+                .AnyEdges()
+                .Where()
+                    .Attribute("distance").IsIn(distances)
+                .EndWhere();
+
+            Assert.True(query.Resolve(out IQueryResult result));
+            Assert.Single(result);
+            var entity = result.First();
+            Assert.True(entity.Attributes.TryGet("distance", out int distance));
+            Assert.Contains(distance, distances);
+
+            while (result.FindNextResult(out result))
+            {
+                Assert.Single(result);
+                entity = result.First();
+                Assert.True(entity.Attributes.TryGet("distance", out distance));
+                Assert.Contains(distance, distances);
+            }
+        }
+
+        [Fact]
+        public void AttributeIsLessOrEqualToFilterShouldGiveCorrectEntities()
+        {
+            var query = ExampleGraph.Value
+                .Select()
+                .AnyEdges()
+                .Where()
+                    .Attribute("distance").IsLessOrEqualTo(232)
+                .EndWhere();
+
+            Assert.True(query.Resolve(out IQueryResult result));
+            Assert.Single(result);
+            var entity = result.First();
+            Assert.True(entity.Attributes.TryGet("distance", out int distance));
+            Assert.True(distance <= 232);
+
+            while (result.FindNextResult(out result))
+            {
+                Assert.Single(result);
+                entity = result.First();
+                Assert.True(entity.Attributes.TryGet("distance", out distance));
+                Assert.True(distance <= 232);
+            }
+        }
+
+        [Fact]
+        public void AttributeIsLessThanFilterShouldGiveCorrectEntities()
+        {
+            var query = ExampleGraph.Value
+                .Select()
+                .AnyEdges()
+                .Where()
+                    .Attribute("distance").IsLessThan(232)
+                .EndWhere();
+
+            Assert.True(query.Resolve(out IQueryResult result));
+            Assert.Single(result);
+            var entity = result.First();
+            Assert.True(entity.Attributes.TryGet("distance", out int distance));
+            Assert.True(distance < 232);
+
+            while (result.FindNextResult(out result))
+            {
+                Assert.Single(result);
+                entity = result.First();
+                Assert.True(entity.Attributes.TryGet("distance", out distance));
+                Assert.True(distance < 232);
+            }
+        }
+
+        [Fact]
+        public void AttributeIsNotBetweenFilterShouldGiveCorrectEntities()
+        {
+            var query = ExampleGraph.Value
+                .Select()
+                .AnyEdges()
+                .Where()
+                    .Attribute("distance").IsNotBetween(100, 200)
+                .EndWhere();
+
+            Assert.True(query.Resolve(out IQueryResult result));
+            Assert.Single(result);
+            var entity = result.First();
+            Assert.True(entity.Attributes.TryGet("distance", out int distance));
+            Assert.NotInRange(distance, 100, 200);
+
+            while (result.FindNextResult(out result))
+            {
+                Assert.Single(result);
+                entity = result.First();
+                Assert.True(entity.Attributes.TryGet("distance", out distance));
+                Assert.NotInRange(distance, 100, 200);
+            }
+        }
+
+        [Fact]
+        public void AttributeIsNotEqualToFilterShouldGiveCorrectEntities()
+        {
+            var query = ExampleGraph.Value
+                .Select()
+                .AnyEdges()
+                .Where()
+                    .Attribute("distance").IsNotEqualTo(232)
+                .EndWhere();
+
+            Assert.True(query.Resolve(out IQueryResult result));
+            Assert.Single(result);
+            var entity = result.First();
+            Assert.True(entity.Attributes.TryGet("distance", out int distance));
+            Assert.NotEqual(232, distance);
+
+            while (result.FindNextResult(out result))
+            {
+                Assert.Single(result);
+                entity = result.First();
+                Assert.True(entity.Attributes.TryGet("distance", out distance));
+                Assert.NotEqual(232, distance);
+            }
+        }
+
+        [Fact]
+        public void AttributeIsNotInFilterShouldGiveCorrectEntities()
+        {
+            var distances = new[] { 232, 367 };
+            var query = ExampleGraph.Value
+                .Select()
+                .AnyEdges()
+                .Where()
+                    .Attribute("distance").IsNotIn(distances)
+                .EndWhere();
+
+            Assert.True(query.Resolve(out IQueryResult result));
+            Assert.Single(result);
+            var entity = result.First();
+            Assert.True(entity.Attributes.TryGet("distance", out int distance));
+            Assert.DoesNotContain(distance, distances);
+
+            while (result.FindNextResult(out result))
+            {
+                Assert.Single(result);
+                entity = result.First();
+                Assert.True(entity.Attributes.TryGet("distance", out distance));
+                Assert.DoesNotContain(distance, distances);
             }
         }
 
@@ -116,13 +413,13 @@ namespace Graphene.Test
             Assert.True(query.Resolve(out IQueryResult result));
             Assert.Single(result);
             var entity = result.First();
-            Assert.False(Regex.IsMatch(entity.Label, "ha.+"));
+            Assert.DoesNotMatch("ha.+", entity.Label);
 
             while (result.FindNextResult(out result))
             {
                 Assert.Single(result);
                 entity = result.First();
-                Assert.False(Regex.IsMatch(entity.Label, "ha.+"));
+                Assert.DoesNotMatch("ha.+", entity.Label);
             }
         }
 
@@ -200,12 +497,21 @@ namespace Graphene.Test
         private static IGraph PrepareGraph()
         {
             IGraph graph = new MemoryGraph();
+
             IVertex hamburg = graph.Vertices.Create(nameof(hamburg));
+            hamburg.Attributes.Set("hanseatic", true);
+
             IVertex hannover = graph.Vertices.Create(nameof(hannover));
+
             IVertex berlin = graph.Vertices.Create(nameof(berlin));
+
             IVertex dresden = graph.Vertices.Create(nameof(dresden));
+
             IVertex cologne = graph.Vertices.Create(nameof(cologne));
+            cologne.Attributes.Set("hanseatic", true);
+
             IVertex muenchen = graph.Vertices.Create(nameof(muenchen));
+
             IVertex stuttgart = graph.Vertices.Create(nameof(stuttgart));
             
             IEdge a7 = hamburg.BidirectionalEdges.Add(hannover, nameof(a7));

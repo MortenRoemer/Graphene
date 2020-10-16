@@ -494,6 +494,68 @@ namespace Graphene.Test
             }
         }
 
+        [Fact]
+        public void RelativeQueryShouldGiveCorrectSolutions()
+        {
+            var query = ExampleGraph.Value
+                .Select()
+                .AnyEdges()
+                .TargetVertex()
+                .Where()
+                    .Attribute("hanseatic").IsEqualTo(true)
+                .EndWhere();
+
+            Assert.True(query.Resolve(out IQueryResult result));
+            Assert.Equal(2, result.Count());
+
+            using (var enumerator = result.GetEnumerator())
+            {
+                IVertex vertex = null;
+                IEdge edge = null;
+
+                Assert.True(enumerator.MoveNext());
+                Assert.True(enumerator.Current is IEdge);
+                edge = enumerator.Current as IEdge;
+                Assert.True(enumerator.MoveNext());
+                Assert.True(enumerator.Current is IVertex);
+                vertex = enumerator.Current as IVertex;
+
+                if (edge.Directed)
+                    Assert.Equal(vertex.Id, edge.ToVertex.Id);
+                else
+                    Assert.Contains(vertex.Id, new[] { edge.FromVertex.Id, edge.ToVertex.Id });
+                
+                Assert.True(vertex.Attributes.TryGet("hanseatic", out bool isHanseatic));
+                Assert.True(isHanseatic);
+                Assert.False(enumerator.MoveNext());
+            }
+
+            while (result.FindNextResult(out result))
+            {
+                using (var enumerator = result.GetEnumerator())
+                {
+                    IVertex vertex = null;
+                    IEdge edge = null;
+
+                    Assert.True(enumerator.MoveNext());
+                    Assert.True(enumerator.Current is IEdge);
+                    edge = enumerator.Current as IEdge;
+                    Assert.True(enumerator.MoveNext());
+                    Assert.True(enumerator.Current is IVertex);
+                    vertex = enumerator.Current as IVertex;
+
+                    if (edge.Directed)
+                        Assert.Equal(vertex.Id, edge.ToVertex.Id);
+                    else
+                        Assert.Contains(vertex.Id, new[] { edge.FromVertex.Id, edge.ToVertex.Id });
+                    
+                    Assert.True(vertex.Attributes.TryGet("hanseatic", out bool isHanseatic));
+                    Assert.True(isHanseatic);
+                    Assert.False(enumerator.MoveNext());
+                }
+            }
+        }
+
         private static IGraph PrepareGraph()
         {
             IGraph graph = new MemoryGraph();

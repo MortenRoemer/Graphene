@@ -1,30 +1,34 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Graphene.Query;
 
 namespace Graphene.InMemory.Query
 {
     public class AgentResult : IQueryResult
     {
-        internal AgentResult(IGraph graph, IEnumerable<IEntity> entities)
+        internal AgentResult(BuilderRoot query, IEnumerable<IEntity> entities)
         {
-            Graph = graph ?? throw new ArgumentNullException(nameof(graph));
-            Entities = entities ?? throw new ArgumentNullException(nameof(entities));
+            Query = query ?? throw new ArgumentNullException(nameof(query));
+            Entities = entities?.ToArray() ?? throw new ArgumentNullException(nameof(entities));
         }
 
-        public IGraph Graph { get; }
+        public IGraph Graph => Query.Graph;
 
-        private IEnumerable<IEntity> Entities { get; } 
+        private BuilderRoot Query { get; }
+
+        private IEntity[] Entities { get; } 
 
         public bool FindNextResult(out IQueryResult next)
         {
-            throw new System.NotImplementedException();
+            var agent = new QueryAgent(Query, Entities.Select(entities => entities.Id).ToArray());
+            return agent.FindSolution(out next);
         }
 
         public IEnumerator<IEntity> GetEnumerator()
         {
-            return Entities.GetEnumerator();
+            return Entities.Cast<IEntity>().GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()

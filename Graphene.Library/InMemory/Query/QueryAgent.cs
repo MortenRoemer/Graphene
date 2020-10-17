@@ -7,12 +7,17 @@ namespace Graphene.InMemory.Query
 {
     internal class QueryAgent
     {
-        public QueryAgent(BuilderRoot query)
+        public QueryAgent(BuilderRoot query) : this(query, null) {}
+
+        public QueryAgent(BuilderRoot query, ulong[] offset)
         {
             Query = query ?? throw new ArgumentNullException(nameof(query));
+            Offset = offset;
         }
 
         private BuilderRoot Query { get; }
+
+        private ulong[] Offset { get; }
 
         public bool FindSolution(out IQueryResult result)
         {
@@ -47,6 +52,9 @@ namespace Graphene.InMemory.Query
             var vertices = vertexDefinition.Range is null
                 ? Query.Graph.Vertices
                 : Query.Graph.Vertices.Get(vertexDefinition.Range);
+
+            if (Offset != null)
+                vertices = vertices.SkipWhile(vertex => vertex.Id <= Offset[stack.Count]);
 
             if (vertexDefinition.Filter != null)
                 vertices = vertices.Where(vertex => vertexDefinition.Filter.Contains(vertex));
@@ -91,6 +99,9 @@ namespace Graphene.InMemory.Query
             var edges = edgeDefinition.Range is null
                 ? Query.Graph.Edges
                 : Query.Graph.Edges.Get(edgeDefinition.Range);
+
+            if (Offset != null)
+                edges = edges.SkipWhile(edge => edge.Id <= Offset[stack.Count]);
 
             if (edgeDefinition.Filter != null)
                 edges = edges.Where(edge => edgeDefinition.Filter.Contains(edge));
@@ -137,7 +148,7 @@ namespace Graphene.InMemory.Query
 
         private IQueryResult PackResult(Stack<IEntity> stack)
         {
-            return new AgentResult(Query.Graph, stack);
+            return new AgentResult(Query, stack);
         }
     }
 }

@@ -186,5 +186,29 @@ namespace Graphene.Test
             entity.Attributes.Clear();
             Assert.Empty(entity.Attributes);
         }
+
+        [Fact]
+        public void GenericEdgeEnumerationShouldGiveAllEdgesForAVertex()
+        {
+            IGraph graph = new MemoryGraph();
+            IVertex va = graph.Vertices.Create();
+            IVertex vb = graph.Vertices.Create();
+            IEdge ea = va.BidirectionalEdges.Add(vb);
+            IEdge eb = va.IngoingEdges.Add(vb);
+            IEdge ec = va.OutgoingEdges.Add(vb);
+            Assert.Equal(3, va.Edges.Count());
+        }
+
+        [Fact]
+        public void GenericVertexEnumerationShouldGiveAllVerticesForAnEdge()
+        {
+            IGraph graph = new MemoryGraph();
+            IVertex va = graph.Vertices.Create();
+            IVertex vb = graph.Vertices.Create();
+            IEdge ea = va.BidirectionalEdges.Add(vb);
+            Assert.Equal(2, ea.Vertices.Count());
+            IEdge eb = va.BidirectionalEdges.Add(va);
+            Assert.Equal(1, eb.Vertices.Count());
+        }
     }
 }

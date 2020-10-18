@@ -12,6 +12,7 @@ namespace Graphene.InMemory
             Directed = directed;
             Id = id;
             Attributes = new MemoryAttributeSet();
+            Vertices = new MemoryCombinedVertexRepository(this);
         }
 
         public IVertex FromVertex { get; }
@@ -27,5 +28,7 @@ namespace Graphene.InMemory
         public string Label { get; set; }
 
         public IAttributeSet Attributes { get; }
+
+        public IReadOnlyRepository<IVertex> Vertices { get; }
     }
 }

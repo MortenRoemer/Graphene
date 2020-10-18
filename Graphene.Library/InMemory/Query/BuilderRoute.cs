@@ -35,7 +35,7 @@ namespace Graphene.InMemory.Query
 
         public IQueryBuilderOptimizer<IQueryBuilderRoute> OptimizeSoThat()
         {
-            return (IQueryBuilderOptimizer<IQueryBuilderRoute>)new OptimizerRoot(this);
+            return new OptimizerRoot(this);
         }
 
         public bool Resolve(out IQueryResult result)

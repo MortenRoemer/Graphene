@@ -556,6 +556,50 @@ namespace Graphene.Test
             }
         }
 
+        [Fact]
+        public void RouteQueryShouldGiveCorrectResults()
+        {
+            var query = ExampleGraph.Value
+                .Select()
+                .AnyVertex()
+                .Where()
+                    .Label().IsEqualTo("hamburg")
+                .EndWhere()
+                .RouteToAnyVertex()
+                .Where()
+                    .Label().IsEqualTo("cologne")
+                .EndWhere()
+                .WhereAnyHopEdge()
+                    .Attribute("distance").HasValue()
+                .EndWhere()
+                .OptimizeSoThat().TheSumOf().Attribute("distance").IsMinimal();
+            
+            Assert.True(query.Resolve(out IQueryResult result));
+            Assert.Equal(5, result.Count());
+
+            using(var enumerator = result.GetEnumerator())
+            {
+                Assert.True(enumerator.MoveNext());
+                Assert.True(enumerator.Current is IVertex);
+                Assert.Equal("hamburg", enumerator.Current.Label);
+                Assert.True(enumerator.MoveNext());
+                Assert.True(enumerator.Current is IEdge);
+                Assert.Equal("a7", enumerator.Current.Label);
+                Assert.True(enumerator.MoveNext());
+                Assert.True(enumerator.Current is IVertex);
+                Assert.Equal("hannover", enumerator.Current.Label);
+                Assert.True(enumerator.MoveNext());
+                Assert.True(enumerator.Current is IEdge);
+                Assert.Equal("a2", enumerator.Current.Label);
+                Assert.True(enumerator.MoveNext());
+                Assert.True(enumerator.Current is IVertex);
+                Assert.Equal("cologne", enumerator.Current.Label);
+                Assert.False(enumerator.MoveNext());
+            }
+
+            Assert.False(result.FindNextResult(out _));
+        }
+
         private static IGraph PrepareGraph()
         {
             IGraph graph = new MemoryGraph();

@@ -253,6 +253,15 @@ namespace Graphene.InMemory.Query
 
         private bool FindRouteRelativeTo(Stack<IEntity> stack, IEntity entity, BuilderRoute routeDefinition)
         {
+            if (routeDefinition.OptimizerSettings is null)
+                throw new NotImplementedException();
+
+            if (routeDefinition.OptimizerSettings.AggregateMode != OptimizerAggregateMode.Sum)
+                throw new NotImplementedException();
+
+            if (routeDefinition.OptimizerSettings.TargetMode != OptimizerTargetMode.Minimum)
+                throw new NotImplementedException();
+
             throw new NotImplementedException();
         }
 

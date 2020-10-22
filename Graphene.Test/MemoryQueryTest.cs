@@ -570,7 +570,7 @@ namespace Graphene.Test
                     .Label().IsEqualTo("cologne")
                 .EndWhere()
                 .WhereAnyHopEdge()
-                    .Attribute("distance").HasValue()
+                    .Attribute("distance").IsGreaterThan(0)
                 .EndWhere()
                 .OptimizeSoThat().TheSumOf().Attribute("distance").IsMinimal();
             

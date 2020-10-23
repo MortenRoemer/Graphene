@@ -6,32 +6,75 @@ namespace Graphene.InMemory.Query
 {
     internal class SearchGraph
     {
-        private SearchGraph(Vertex[] vertices, bool hasNegativeWeights)
+        private SearchGraph(IReadOnlyDictionary<ulong, Vertex> vertices, bool hasNegativeWeights)
         {
             Vertices = vertices ?? throw new ArgumentNullException(nameof(vertices));
             HasNegativeWeights = hasNegativeWeights;
         }
 
-        private readonly Vertex[] Vertices;
+        private readonly IReadOnlyDictionary<ulong, Vertex> Vertices;
 
         private readonly bool HasNegativeWeights;
 
-        public static SearchGraph CreateForRoute(IGraph graph, IEntity origin, BuilderRoute routeDefinition, double defaultWeight)
+        public static SearchGraph CreateForRoute(
+            IGraph graph,
+            BuilderRoute routeDefinition,
+            IEnumerable<ulong> essentialEntities,
+            Func<IEdge, double> weightFunction
+        )
         {
-            throw new NotImplementedException();
+            var vertices = new Dictionary<ulong, Vertex>();
+            var hasNegativeWeights = false;
+            var essentialEntitySet = new SortedSet<ulong>(essentialEntities);
+
+            foreach (
+                var vertex in graph.Vertices
+                .Where(
+                    vertex => 
+                    essentialEntitySet.Contains(vertex.Id) ||
+                    (routeDefinition.VertexFilter?.Contains(vertex) ?? true)
+                )
+            )
+            {
+                vertices.Add(vertex.Id, new Vertex { Origin = vertex });
+            }
+
+            foreach (var vertex in vertices.Values)
+            {
+                var edges = new List<Edge>();
+                
+                edges.AddRange(
+                    vertex.Origin.OutgoingEdges
+                    .Where(
+                        edge =>
+                        vertices.ContainsKey(edge.ToVertex.Id) &&
+                        essentialEntitySet.Contains(edge.Id) ||
+                        (routeDefinition.EdgeFilter?.Contains(edge) ?? true)
+                    )
+                    .Select(
+                        edge => new Edge {
+                            Origin = edge,
+                            Weight = weightFunction.Invoke(edge),
+                            Target = vertices[edge.ToVertex.Id]
+                        }
+                    )
+                );
+            }
+
+            return new SearchGraph(vertices, hasNegativeWeights);
         }
 
         private class Vertex
         {
-            public readonly IVertex Origin;
-            public readonly Edge[] Edges;
+            public IVertex Origin;
+            public IReadOnlyList<Edge> Edges;
         }
 
         private struct Edge
         {
-            public readonly IEdge Origin;
-            public readonly double Weight;
-            public readonly Vertex Target;
+            public IEdge Origin;
+            public double Weight;
+            public Vertex Target;
         }
     }
 }

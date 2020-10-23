@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace Graphene.InMemory.Utility
 {
@@ -7,15 +8,13 @@ namespace Graphene.InMemory.Utility
     {
         public UniqueNumberSet(ulong from, ulong to)
         {
-            RandomGenerator = new Lazy<Random>(isThreadSafe: false);
-            SampleBuffer = new Lazy<byte[]>(() => new byte[8], isThreadSafe: false);
             Segments = new List<Segment>();
             Segments.Add(new Segment(from, to));
         }
 
-        private Lazy<Random> RandomGenerator;
+        private static readonly ThreadLocal<Random> RandomGenerator = new ThreadLocal<Random>(() => new Random(), trackAllValues: false);
 
-        private Lazy<byte[]> SampleBuffer;
+        private static readonly ThreadLocal<byte[]> SampleBuffer = new ThreadLocal<byte[]>(() => new byte[8], trackAllValues: false);
 
         private List<Segment> Segments;
 

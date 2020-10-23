@@ -49,6 +49,14 @@ namespace Graphene.InMemory
             return found;
         }
 
+        public T GetOrDefault<T>(string name, T defaultValue)
+        {
+            if (TryGet(name, out T result))
+                return result;
+
+            return defaultValue;
+        }
+
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();

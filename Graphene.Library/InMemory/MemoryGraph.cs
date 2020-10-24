@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Graphene.InMemory.Query;
+using Graphene.InMemory.Utility;
 using Graphene.Query;
 
 namespace Graphene.InMemory
@@ -10,6 +11,7 @@ namespace Graphene.InMemory
         {
             MemoryEdges = new MemoryEdgeRepository(this);
             MemoryVertices = new MemoryVertexRepository(this, MemoryEdges);
+            AvailableIds = new UniqueNumberSet(1ul, ulong.MaxValue);
         }
 
         public long Size => Vertices.Count() + Edges.Count();
@@ -21,6 +23,8 @@ namespace Graphene.InMemory
         private MemoryVertexRepository MemoryVertices { get; }
 
         private MemoryEdgeRepository MemoryEdges { get; }
+
+        private UniqueNumberSet AvailableIds { get; }
 
         public void Clear()
         {
@@ -74,6 +78,16 @@ namespace Graphene.InMemory
         public IQueryBuilderRoot Select()
         {
             return new BuilderRoot(this);
+        }
+
+        internal ulong TakeId()
+        {
+            return AvailableIds.SampleRandom();
+        }
+
+        internal void FreeId(ulong id)
+        {
+            AvailableIds.Add(id);
         }
     }
 }

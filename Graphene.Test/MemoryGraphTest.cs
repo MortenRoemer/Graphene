@@ -96,25 +96,19 @@ namespace Graphene.Test
         public void MergeGraphShouldWork()
         {
             IGraph sourceGraph = new MemoryGraph();
-            IVertex va = sourceGraph.Vertices.Create();
-            va.Label = "va";
+            IVertex va = sourceGraph.Vertices.Create("va");
             va.Attributes.Set("value", 1);
-            IVertex vb = sourceGraph.Vertices.Create();
-            vb.Label = "vb";
+            IVertex vb = sourceGraph.Vertices.Create("vb");
             vb.Attributes.Set("value", 2);
-            IEdge ea = va.BidirectionalEdges.Add(vb);
-            ea.Label = "ea";
+            IEdge ea = va.BidirectionalEdges.Add(vb, "ea");
             ea.Attributes.Set("value", 10);
 
             IGraph targetGraph = new MemoryGraph();
-            IVertex vc = targetGraph.Vertices.Create();
-            vc.Label = "vc";
+            IVertex vc = targetGraph.Vertices.Create("vc");
             vc.Attributes.Set("value", 3);
-            IVertex vd = targetGraph.Vertices.Create();
-            vd.Label = "vd";
+            IVertex vd = targetGraph.Vertices.Create("vd");
             vd.Attributes.Set("value", 4);
-            IEdge eb = vc.BidirectionalEdges.Add(vd);
-            eb.Label = "eb";
+            IEdge eb = vc.BidirectionalEdges.Add(vd, "eb");
             eb.Attributes.Set("value", 20);
 
             targetGraph.Merge(sourceGraph);
@@ -154,14 +148,11 @@ namespace Graphene.Test
         public void CloneGraphShouldWork()
         {
             IGraph sourceGraph = new MemoryGraph();
-            IVertex va = sourceGraph.Vertices.Create();
-            va.Label = "va";
+            IVertex va = sourceGraph.Vertices.Create("va");
             va.Attributes.Set("value", 1);
-            IVertex vb = sourceGraph.Vertices.Create();
-            vb.Label = "vb";
+            IVertex vb = sourceGraph.Vertices.Create("vb");
             vb.Attributes.Set("value", 2);
-            IEdge ea = va.BidirectionalEdges.Add(vb);
-            ea.Label = "ea";
+            IEdge ea = va.BidirectionalEdges.Add(vb, "ea");
             ea.Attributes.Set("value", 10);
 
             IGraph targetGraph = sourceGraph.Clone();

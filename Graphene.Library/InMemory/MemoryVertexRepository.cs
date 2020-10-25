@@ -20,10 +20,11 @@ namespace Graphene.InMemory
 
         private MemoryEdgeRepository Edges { get; }
 
-        private static Random Random { get; } = new Random();
-
         public void Clear()
         {
+            foreach(var vertex in Vertices)
+                Graph.FreeId(vertex.Key);
+
             Vertices.Clear();
             Edges.Clear();
         }
@@ -40,8 +41,16 @@ namespace Graphene.InMemory
 
         public IVertex Create()
         {
-            var vertex = new MemoryVertex(Graph, Edges, GenerateUniqueId());
+            var vertex = new MemoryVertex(Graph, Edges, Graph.TakeId());
             Vertices.Add(vertex.Id, vertex); 
+            return vertex;
+        }
+
+        public IVertex Create(string label)
+        {
+            var vertex = new MemoryVertex(Graph, Edges, Graph.TakeId());
+            Vertices.Add(vertex.Id, vertex);
+            vertex.Label = label;
             return vertex;
         }
 
@@ -50,6 +59,7 @@ namespace Graphene.InMemory
             foreach (var item in items)
             {
                 Vertices.Remove(item.Id);
+                Graph.FreeId(item.Id);
             }
         }
 
@@ -66,20 +76,6 @@ namespace Graphene.InMemory
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
-        }
-
-        private ulong GenerateUniqueId()
-        {
-            byte[] buffer = new byte[8];
-
-            while (true)
-            {
-                Random.NextBytes(buffer);
-                var id = BitConverter.ToUInt64(buffer);
-
-                if (!Vertices.ContainsKey(id))
-                    return id;
-            }
         }
     }
 }

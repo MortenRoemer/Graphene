@@ -12,6 +12,7 @@ namespace Graphene.InMemory
             IngoingEdges = new MemoryIngoingEdgeRepository(edges, this);
             OutgoingEdges = new MemoryOutgoingEdgeRepository(edges, this);
             BidirectionalEdges = new MemoryBidirectionalEdgeRepository(edges, this);
+            Edges = new MemoryCombinedEdgeRepository(edges, this);
         }
 
         public IVertexEdgeRepository IngoingEdges { get; }
@@ -27,9 +28,12 @@ namespace Graphene.InMemory
         public string Label { get; set; }
 
         public IAttributeSet Attributes { get; }
+        
+        public IReadOnlyRepository<IEdge> Edges { get; }
 
         public static bool operator ==(MemoryVertex left, MemoryVertex right) => left.Id == right.Id;
         public static bool operator !=(MemoryVertex left, MemoryVertex right) => !(left == right);
+        
         public override bool Equals(object obj)
         {
             if (obj is MemoryVertex memoryVertex) return memoryVertex == this;

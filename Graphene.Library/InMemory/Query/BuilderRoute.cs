@@ -17,25 +17,25 @@ namespace Graphene.InMemory.Query
 
         private BuilderRoot Root { get; }
 
-        private RouteSearchMode Mode { get; }
+        internal RouteSearchMode Mode { get; }
 
-        private IEnumerable<ulong> Range { get; }
+        internal IEnumerable<ulong> Range { get; }
 
-        private ulong? EdgeHopLimit { get; set; }
+        internal ulong? EdgeHopLimit { get; private set; }
 
-        private ulong? VertexHopLimit { get; set; }
+        internal ulong? VertexHopLimit { get; private set; }
 
-        private FilterRoot<IQueryBuilderRoute> TargetFilter { get; set; }
+        internal FilterRoot<IQueryBuilderRoute> TargetFilter { get; private set; }
 
-        private FilterRoot<IQueryBuilderRoute> EdgeFilter { get; set; }
+        internal FilterRoot<IQueryBuilderRoute> EdgeFilter { get; private set; }
 
-        private FilterRoot<IQueryBuilderRoute> VertexFilter { get; set; }
+        internal FilterRoot<IQueryBuilderRoute> VertexFilter { get; private set; }
 
-        private OptimizerSettings OptimizerSettings { get; set; }
+        internal OptimizerSettings OptimizerSettings { get; private set; }
 
         public IQueryBuilderOptimizer<IQueryBuilderRoute> OptimizeSoThat()
         {
-            return (IQueryBuilderOptimizer<IQueryBuilderRoute>)new OptimizerRoot(this);
+            return new OptimizerRoot(this);
         }
 
         public bool Resolve(out IQueryResult result)

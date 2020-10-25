@@ -17,8 +17,6 @@ namespace Graphene.InMemory
 
         private IDictionary<ulong, MemoryEdge> Edges { get; }
 
-        private static Random Random { get; } = new Random();
-
         public MemoryEdge Create(IVertex fromVertex, IVertex toVertex, bool directed)
         {
             if (!Graph.Vertices.Contains(fromVertex.Id))
@@ -27,7 +25,7 @@ namespace Graphene.InMemory
             if (!Graph.Vertices.Contains(toVertex.Id))
                 throw new ArgumentException($"{nameof(toVertex)} with id {toVertex.Id} does not exist in this graph");
 
-            var id = GetUniqueId();
+            var id = Graph.TakeId();
             var result = new MemoryEdge(Graph, fromVertex, toVertex, directed, id);
             Edges.Add(id, result);
             return result;
@@ -35,6 +33,9 @@ namespace Graphene.InMemory
 
         public void Clear()
         {
+            foreach (var edge in Edges)
+                Graph.FreeId(edge.Key);
+
             Edges.Clear();
         }
 
@@ -53,6 +54,7 @@ namespace Graphene.InMemory
             foreach (var item in items)
             {
                 Edges.Remove(item.Id);
+                Graph.FreeId(item.Id);
             }
         }
 
@@ -69,20 +71,6 @@ namespace Graphene.InMemory
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
-        }
-
-        private ulong GetUniqueId()
-        {
-            byte[] buffer = new byte[8];
-
-            while (true)
-            {
-                Random.NextBytes(buffer);
-                var id = BitConverter.ToUInt64(buffer);
-
-                if (!Edges.ContainsKey(id))
-                    return id;
-            }
         }
     }
 }

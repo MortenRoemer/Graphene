@@ -2,9 +2,9 @@ name: .NET Core
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, release/* ]
   pull_request:
-    branches: [ master ]
+    branches: [ master, release/* ]
 
 jobs:
   build:
@@ -21,3 +21,5 @@ jobs:
       run: dotnet restore
     - name: Build
       run: dotnet build --configuration Release --no-restore
+    - name: Test
+      run: dotnet test --no-restore --nologo

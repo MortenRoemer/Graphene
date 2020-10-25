@@ -4,7 +4,7 @@ namespace Graphene.Query
 {
     public interface IQueryResult : IEnumerable<IEntity>
     {
-        IGraph ResultGraph { get; }
+        IGraph Graph { get; }
 
         bool FindNextResult(out IQueryResult next);
     }

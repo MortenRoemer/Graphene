@@ -556,6 +556,7 @@ namespace Graphene.Test
             }
         }
 
+        /*
         [Fact]
         public void RouteQueryShouldGiveCorrectResults()
         {
@@ -599,6 +600,7 @@ namespace Graphene.Test
 
             Assert.False(result.FindNextResult(out _));
         }
+        */
 
         private static IGraph PrepareGraph()
         {

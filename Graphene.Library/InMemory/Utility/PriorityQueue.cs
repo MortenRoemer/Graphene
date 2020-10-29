@@ -1,8 +1,10 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace Graphene.InMemory.Utility
 {
-    public class PriorityQueue<TPriority, TPayLoad> where TPriority : IComparable<TPriority>
+    public class PriorityQueue<TPriority, TPayLoad> : IEnumerable<TPayLoad> where TPriority : IComparable<TPriority>
     {
         private const int STANDARD_CAPACITY = 10;
 
@@ -47,7 +49,7 @@ namespace Graphene.InMemory.Utility
             {
                 var entry = Entries[index];
 
-                if (priority.CompareTo(entry.Priority) > 0)
+                if (priority.CompareTo(entry.Priority) < 0)
                 {
                     Array.Copy(Entries, index, Entries, index + 1, Count - (index - Beginning));
                     Entries[index] = new Entry(priority, payLoad);
@@ -91,6 +93,16 @@ namespace Graphene.InMemory.Utility
             return result;
         }
 
+        public IEnumerator<TPayLoad> GetEnumerator()
+        {
+            return new Enumerator(this);
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
         private struct Entry
         {
             public Entry(TPriority priority, TPayLoad payLoad)
@@ -102,6 +114,59 @@ namespace Graphene.InMemory.Utility
             public TPriority Priority { get; }
 
             public TPayLoad PayLoad { get; }
+        }
+
+        private class Enumerator : IEnumerator<TPayLoad>
+        {
+            public Enumerator(PriorityQueue<TPriority, TPayLoad> backend)
+            {
+                Backend = backend ?? throw new ArgumentNullException(nameof(backend));
+                Index = backend.Beginning - 1;
+            }
+
+            private PriorityQueue<TPriority, TPayLoad> Backend;
+
+            private int Index;
+
+            private bool Disposed;
+
+            public TPayLoad Current
+            {
+                get
+                {
+                    if (Disposed)
+                        throw new ObjectDisposedException(nameof(Enumerator));
+
+                    return Backend.Entries[Index].PayLoad;
+                }
+            }
+
+            object IEnumerator.Current => Current;
+
+            public void Dispose()
+            {
+                if (Disposed)
+                    throw new ObjectDisposedException(nameof(Enumerator));
+
+                Backend = null;
+                Disposed = true;
+            }
+
+            public bool MoveNext()
+            {
+                if (Disposed)
+                    throw new ObjectDisposedException(nameof(Enumerator));
+
+                return ++Index < Backend.Beginning + Backend.Count;
+            }
+
+            public void Reset()
+            {
+                if (Disposed)
+                    throw new ObjectDisposedException(nameof(Enumerator));
+
+                Index = Backend.Beginning - 1;
+            }
         }
     }
 }

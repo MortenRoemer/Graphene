@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 
 namespace Graphene.InMemory.Utility
 {
-    internal class UniqueNumberSet
+    public class UniqueNumberSet
     {
         public UniqueNumberSet(ulong from, ulong to)
         {
@@ -17,6 +18,10 @@ namespace Graphene.InMemory.Utility
         private static readonly ThreadLocal<byte[]> SampleBuffer = new ThreadLocal<byte[]>(() => new byte[8], trackAllValues: false);
 
         private List<Segment> Segments;
+
+        public ulong Count => Segments.Aggregate(0uL, (sum, segment) => sum + segment.Count);
+
+        public bool IsEmpty => Segments.Count <= 0;
 
         public void Add(ulong number)
         {
@@ -51,9 +56,9 @@ namespace Graphene.InMemory.Utility
                 var comparison = segment.Compare(number);
 
                 if (comparison < 0)
-                    right = middle;
+                    right = middle - 1;
                 else if (comparison > 0)
-                    left = middle;
+                    left = middle + 1;
                 else 
                 {
                     index = middle;
@@ -120,6 +125,8 @@ namespace Graphene.InMemory.Utility
             public ulong Min { get; }
 
             public ulong Max { get; }
+
+            public ulong Count => Max - Min + 1;
 
             public int Compare(ulong number)
             {

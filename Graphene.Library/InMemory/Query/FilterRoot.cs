@@ -47,20 +47,13 @@ namespace Graphene.InMemory.Query
 
             while (filters.MoveNext() && sequences.MoveNext())
             {
-                switch (sequences.Current)
+                result = sequences.Current switch
                 {
-                    case FilterSequenceMode.And:
-                        result = result && filters.Current.Contains(entity);
-                        break;
-                    case FilterSequenceMode.Or:
-                        result = result || filters.Current.Contains(entity);
-                        break;
-                    case FilterSequenceMode.Xor:
-                        result = result ^ filters.Current.Contains(entity);
-                        break;
-                    default:
-                        throw new NotImplementedException(sequences.Current.ToString());
-                }
+                    FilterSequenceMode.And => result && filters.Current.Contains(entity),
+                    FilterSequenceMode.Or => result || filters.Current.Contains(entity),
+                    FilterSequenceMode.Xor => result ^ filters.Current.Contains(entity),
+                    _ => throw new NotImplementedException(sequences.Current.ToString()),
+                };
             }
 
             return result;

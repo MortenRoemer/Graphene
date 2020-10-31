@@ -9,15 +9,17 @@ namespace Graphene.InMemory.Utility
     {
         public UniqueNumberSet(ulong from, ulong to)
         {
-            Segments = new List<Segment>();
-            Segments.Add(new Segment(from, to));
+            Segments = new List<Segment>
+            {
+                new Segment(from, to)
+            };
         }
 
         private static readonly ThreadLocal<Random> RandomGenerator = new ThreadLocal<Random>(() => new Random(), trackAllValues: false);
 
         private static readonly ThreadLocal<byte[]> SampleBuffer = new ThreadLocal<byte[]>(() => new byte[8], trackAllValues: false);
 
-        private List<Segment> Segments;
+        private readonly List<Segment> Segments;
 
         public ulong Count => Segments.Aggregate(0uL, (sum, segment) => sum + segment.Count);
 
@@ -98,18 +100,7 @@ namespace Graphene.InMemory.Utility
             var randomGenerator = RandomGenerator.Value;
             var randomIndex = randomGenerator.Next(Segments.Count);
             var segment = Segments[randomIndex];
-
-            if (segment.Min == segment.Max)
-            {
-                Segments.RemoveAt(randomIndex);
-                return segment.Min;
-            }
-
-            var buffer = SampleBuffer.Value;
-            randomGenerator.NextBytes(buffer);
-            var sample = BitConverter.ToUInt64(buffer);
-            var range = segment.Max - segment.Min;
-            var result = (sample % range) + segment.Min;
+            var result = segment.GetRandom();
             Remove(result);
             return result;
         }
@@ -120,6 +111,7 @@ namespace Graphene.InMemory.Utility
             {
                 Min = Math.Min(first, second);
                 Max = Math.Max(first, second);
+
             }
 
             public ulong Min { get; }
@@ -136,6 +128,15 @@ namespace Graphene.InMemory.Utility
                     return 1;
                 else
                     return 0;
+            }
+            
+            public ulong GetRandom()
+            {
+                var randomGenerator = RandomGenerator.Value;
+                var buffer = SampleBuffer.Value;
+                randomGenerator.NextBytes(buffer);
+                var sample = (BitConverter.ToUInt64(buffer) % Count) + Min;
+                return sample;
             }
         }
     }

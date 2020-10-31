@@ -91,30 +91,18 @@ namespace Graphene.InMemory.Query
 
         private bool FindVerticesRelativeTo(Stack<IEntity> stack, IEdge edge, BuilderVertex vertexDefinition)
         {
-            IEnumerable<IVertex> vertices;
-
-            switch (vertexDefinition.SearchMode)
+            IEnumerable<IVertex> vertices = vertexDefinition.SearchMode switch
             {
-                case VertexSearchMode.All:
-                    vertices = edge.Vertices;
-                    break;
+                VertexSearchMode.All => edge.Vertices,
+                VertexSearchMode.Source => edge.Directed
+                    ? new[] { edge.FromVertex }
+                    : edge.Vertices as IEnumerable<IVertex>,
+                VertexSearchMode.Target => edge.Directed
+                    ? new[] { edge.ToVertex }
+                    : edge.Vertices as IEnumerable<IVertex>,
+                _ => throw new NotImplementedException(),
+            };
 
-                case VertexSearchMode.Source:
-                    vertices = edge.Directed
-                        ? new[] { edge.FromVertex }
-                        : edge.Vertices as IEnumerable<IVertex>;
-                    break;
-
-                case VertexSearchMode.Target:
-                    vertices = edge.Directed
-                        ? new[] { edge.ToVertex }
-                        : edge.Vertices as IEnumerable<IVertex>;
-                    break;
-
-                default:
-                    throw new NotImplementedException();
-            }
-            
             if (Offset != null)
                 vertices = vertices.SkipWhile(vertex => vertex.Id <= Offset[stack.Count]);
 
@@ -195,26 +183,14 @@ namespace Graphene.InMemory.Query
 
         private bool FindEdgesRelativeTo(Stack<IEntity> stack, IVertex vertex, BuilderEdge edgeDefinition)
         {
-            IEnumerable<IEdge> edges;
-
-            switch (edgeDefinition.SearchMode)
+            IEnumerable<IEdge> edges = edgeDefinition.SearchMode switch
             {
-                case EdgeSearchMode.All:
-                    edges = vertex.Edges;
-                    break;
-
-                case EdgeSearchMode.Ingoing:
-                    edges = vertex.BidirectionalEdges.Concat(vertex.IngoingEdges);
-                    break;
-
-                case EdgeSearchMode.Outgoing:
-                    edges = vertex.BidirectionalEdges.Concat(vertex.OutgoingEdges);
-                    break;
-
-                default:
-                    throw new NotImplementedException();
-            }
-
+                EdgeSearchMode.All => vertex.Edges,
+                EdgeSearchMode.Ingoing => vertex.BidirectionalEdges.Concat(vertex.IngoingEdges),
+                EdgeSearchMode.Outgoing => vertex.BidirectionalEdges.Concat(vertex.OutgoingEdges),
+                _ => throw new NotImplementedException(),
+            };
+            
             if (Offset != null)
                 edges = edges.SkipWhile(edge => edge.Id <= Offset[stack.Count]);
 

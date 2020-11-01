@@ -3,7 +3,7 @@ using Graphene.Query;
 
 namespace Graphene.InMemory.Query
 {
-    public class OptimizerAttribute : IOptimizerAttribute<BuilderRoute>
+    public class OptimizerAttribute : IOptimizerAttribute<IQueryBuilderRoute>
     {
         internal OptimizerAttribute(BuilderRoute reference, OptimizerAggregateMode aggregateMode, string attributeName)
         {
@@ -18,13 +18,13 @@ namespace Graphene.InMemory.Query
 
         private BuilderRoute Reference { get; }
 
-        public BuilderRoute IsMaximal()
+        public IQueryBuilderRoute IsMaximal()
         {
             Reference.SetOptimizerSettings(new OptimizerSettings(AggregateMode, AttributeName, OptimizerTargetMode.Maximum));
             return Reference;
         }
 
-        public BuilderRoute IsMinimal()
+        public IQueryBuilderRoute IsMinimal()
         {
             Reference.SetOptimizerSettings(new OptimizerSettings(AggregateMode, AttributeName, OptimizerTargetMode.Minimum));
             return Reference;

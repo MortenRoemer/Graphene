@@ -12,6 +12,8 @@ namespace Graphene
 
         bool TryGet<T>(string name, out T value);
 
+        T GetOrDefault<T>(string name, T defaultValue);
+
         void Set(string name, object value);
 
         void Clear();

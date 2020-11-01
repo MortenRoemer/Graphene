@@ -46,6 +46,14 @@ namespace Graphene.InMemory
             return vertex;
         }
 
+        public IVertex Create(string label)
+        {
+            var vertex = new MemoryVertex(Graph, Edges, Graph.TakeId());
+            Vertices.Add(vertex.Id, vertex);
+            vertex.Label = label;
+            return vertex;
+        }
+
         public void Delete(IEnumerable<IVertex> items)
         {
             foreach (var item in items)

@@ -22,6 +22,13 @@ namespace Graphene.InMemory
             return Edges.Create(Vertex, other, directed: true);
         }
 
+        public IEdge Add(IVertex other, string label)
+        {
+            var edge = Edges.Create(Vertex, other, directed: true);
+            edge.Label = label;
+            return edge;
+        }
+
         public void Clear()
         {
             Edges.Delete(FilterEdges().ToArray());

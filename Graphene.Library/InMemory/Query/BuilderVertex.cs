@@ -57,24 +57,9 @@ namespace Graphene.InMemory.Query
             return Root.Resolve(out result);
         }
 
-        public IQueryBuilderRoute RouteToAnyEdge()
-        {
-            return Root.AddToken(new BuilderRoute(Root, RouteSearchMode.Edge));
-        }
-
         public IQueryBuilderRoute RouteToAnyVertex()
         {
             return Root.AddToken(new BuilderRoute(Root, RouteSearchMode.Vertex));
-        }
-
-        public IQueryBuilderRoute RouteToEdge(ulong id)
-        {
-            return Root.AddToken(new BuilderRoute(Root, RouteSearchMode.Edge, new[] { id }));
-        }
-
-        public IQueryBuilderRoute RouteToEdges(IEnumerable<ulong> ids)
-        {
-            return Root.AddToken(new BuilderRoute(Root, RouteSearchMode.Edge, ids));
         }
 
         public IQueryBuilderRoute RouteToVertex(ulong id)

@@ -3,7 +3,7 @@ using Graphene.Query;
 
 namespace Graphene.InMemory.Query
 {
-    public class OptimizerRoot : IQueryBuilderOptimizer<BuilderRoute>
+    public class OptimizerRoot : IQueryBuilderOptimizer<IQueryBuilderRoute>
     {
         internal OptimizerRoot(BuilderRoute reference)
         {
@@ -12,22 +12,22 @@ namespace Graphene.InMemory.Query
 
         private BuilderRoute Reference { get; }
 
-        public IOptimizerAggregate<BuilderRoute> TheAverageOf()
+        public IOptimizerAggregate<IQueryBuilderRoute> TheAverageOf()
         {
             return new OptimizerAggregate(Reference, OptimizerAggregateMode.Average);
         }
 
-        public IOptimizerAggregate<BuilderRoute> TheMaximumOf()
+        public IOptimizerAggregate<IQueryBuilderRoute> TheMaximumOf()
         {
             return new OptimizerAggregate(Reference, OptimizerAggregateMode.Maximum);
         }
 
-        public IOptimizerAggregate<BuilderRoute> TheMinimumOf()
+        public IOptimizerAggregate<IQueryBuilderRoute> TheMinimumOf()
         {
             return new OptimizerAggregate(Reference, OptimizerAggregateMode.Minimum);
         }
 
-        public IOptimizerAggregate<BuilderRoute> TheSumOf()
+        public IOptimizerAggregate<IQueryBuilderRoute> TheSumOf()
         {
             return new OptimizerAggregate(Reference, OptimizerAggregateMode.Sum);
         }

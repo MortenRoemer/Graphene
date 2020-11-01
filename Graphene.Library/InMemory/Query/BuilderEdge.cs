@@ -23,7 +23,7 @@ namespace Graphene.InMemory.Query
 
         private BuilderRoot Root { get; }
 
-        private EdgeSearchMode SearchMode { get; }
+        internal EdgeSearchMode SearchMode { get; }
 
         internal FilterRoot<IQueryBuilderEdge> Filter { get; set; }
 

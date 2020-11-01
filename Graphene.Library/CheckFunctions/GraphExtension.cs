@@ -142,9 +142,9 @@ namespace Graphene.CheckFunctions
                 var tempVertexCheckList = FloodFill(graph, vertexCheckList.First(keyValuePair => !keyValuePair.Value).Key);
                 
             }
-        }
+        }*/
         #endregion
-        */
+        
 
 
     }

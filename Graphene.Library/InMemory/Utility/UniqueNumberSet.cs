@@ -53,13 +53,12 @@ namespace Graphene.InMemory.Utility
 
             while (left < right)
             {
-                var middle = (right + left) / 2;
+                var middle = right / 2 + left / 2;
                 var segment = Segments[middle];
-                var comparison = segment.Compare(number);
 
-                if (comparison < 0)
+                if (number < segment.Min)
                     right = middle - 1;
-                else if (comparison > 0)
+                else if (number > segment.Max)
                     left = middle + 1;
                 else 
                 {
@@ -78,6 +77,9 @@ namespace Graphene.InMemory.Utility
                 return;
 
             var segment = Segments[index];
+
+            if (!segment.Contains(number))
+                throw new InvalidOperationException($"number {number} cannot be removed from segment [{segment.Min}-{segment.Max}]");
 
             if (number == segment.Min && number == segment.Max)
                 Segments.RemoveAt(index);
@@ -111,7 +113,6 @@ namespace Graphene.InMemory.Utility
             {
                 Min = Math.Min(first, second);
                 Max = Math.Max(first, second);
-
             }
 
             public ulong Min { get; }
@@ -120,14 +121,9 @@ namespace Graphene.InMemory.Utility
 
             public ulong Count => Max - Min + 1;
 
-            public int Compare(ulong number)
+            public bool Contains(ulong number)
             {
-                if (number < Min)
-                    return -1;
-                else if (number > Max)
-                    return 1;
-                else
-                    return 0;
+                return Min <= number && number <= Max;
             }
             
             public ulong GetRandom()

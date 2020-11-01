@@ -22,5 +22,26 @@ namespace Graphene.Test
 
             Assert.Equal(11, iterationCount);
         }
+
+        [Fact]
+        public void NumberRemovalShouldWork()
+        {
+            var numbers = new UniqueNumberSet(10, 20);
+            numbers.Remove(15);
+            numbers.Remove(19);
+            numbers.Remove(10);
+            numbers.Remove(14);
+            Assert.False(numbers.Contains(10));
+            Assert.True(numbers.Contains(11));
+            Assert.True(numbers.Contains(12));
+            Assert.True(numbers.Contains(13));
+            Assert.False(numbers.Contains(14));
+            Assert.False(numbers.Contains(15));
+            Assert.True(numbers.Contains(16));
+            Assert.True(numbers.Contains(17));
+            Assert.True(numbers.Contains(18));
+            Assert.False(numbers.Contains(19));
+            Assert.True(numbers.Contains(20));
+        }
     }
 }

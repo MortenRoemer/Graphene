@@ -46,10 +46,17 @@ namespace Graphene.CheckFunctions
         #endregion
 
         #region Graph Algorithms
-        public static Dictionary<IVertex,bool> FloodFill(this IGraph graph, IVertex startingVertex)
+        /// <summary>
+        /// This Function floods the Graph and returns a true in the output Dictionary for every Vertex that was traversed during the flooding.
+        /// </summary>
+        /// <param name="graph"></param>
+        /// <param name="startingVertex"></param>
+        /// <param name="vertexCheckList">An optional vertexCheckList can be given to do floodFill for multiple Subgraphs</param>
+        /// <returns></returns>
+        public static Dictionary<IVertex,bool> FloodFill(this IGraph graph, IVertex startingVertex, Dictionary<IVertex, bool> vertexCheckList = null)
         {
             if (!graph.Vertices.Contains(startingVertex)) throw new ArgumentException("starting Vertex in not part of the Graph");
-            Dictionary<IVertex, bool> vertexCheckList = graph.Vertices.ToDictionary(v => v, v => false);
+            if(vertexCheckList is null) vertexCheckList = graph.Vertices.ToDictionary(v => v, v => false);
             var vertexQueue = new Queue<IVertex>();
             vertexQueue.Enqueue(startingVertex);
             vertexCheckList[startingVertex] = true;
@@ -111,8 +118,33 @@ namespace Graphene.CheckFunctions
                 return vertexPath;
             }            
         }
-        #endregion
 
+        public static int CountSubgraphs(IGraph graph)
+        {
+            int subgraphCount = 0;
+            var vertexCheckList = graph.Vertices.ToDictionary(v => v, v => false);
+            while (!vertexCheckList.Values.All(v => v))
+            {
+                vertexCheckList = FloodFill(graph, vertexCheckList.First(keyValuePair => keyValuePair.Value == false).Key,vertexCheckList);
+                subgraphCount++;
+            }
+            return subgraphCount;
+        }
+
+        /*
+        public delegate IGraph GraphConstructor(); 
+        public static List<IGraph> GetSubgraphs(IGraph graph, GraphConstructor graphConstructor)
+        {
+            var GraphList = new List<IGraph>();
+            var vertexCheckList = graph.Vertices.ToDictionary(v => v, v => false);
+            while (!vertexCheckList.Values.All(v => v))
+            {
+                var tempVertexCheckList = FloodFill(graph, vertexCheckList.First(keyValuePair => !keyValuePair.Value).Key);
+                
+            }
+        }
+        #endregion
+        */
 
 
     }

@@ -27,6 +27,7 @@ namespace Graphene.Test
         public void NumberRemovalShouldWork()
         {
             var numbers = new UniqueNumberSet(10, 20);
+
             numbers.Remove(15);
             numbers.Remove(19);
             numbers.Remove(10);
@@ -42,6 +43,24 @@ namespace Graphene.Test
             Assert.True(numbers.Contains(18));
             Assert.False(numbers.Contains(19));
             Assert.True(numbers.Contains(20));
+        }
+
+        [Fact]
+        public void NumberAdditionShouldWork()
+        {
+            var numbers = new UniqueNumberSet();
+            numbers.Add(3);
+            numbers.Add(1);
+            numbers.Add(4);
+            numbers.Add(2);
+            numbers.Add(5);
+            Assert.False(numbers.Contains(0));
+            Assert.True(numbers.Contains(1));
+            Assert.True(numbers.Contains(2));
+            Assert.True(numbers.Contains(3));
+            Assert.True(numbers.Contains(4));
+            Assert.True(numbers.Contains(5));
+            Assert.False(numbers.Contains(6));
         }
     }
 }

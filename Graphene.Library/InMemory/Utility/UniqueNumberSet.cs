@@ -7,6 +7,11 @@ namespace Graphene.InMemory.Utility
 {
     public class UniqueNumberSet
     {
+        public UniqueNumberSet()
+        {
+            Segments = new List<Segment>();
+        }
+
         public UniqueNumberSet(ulong from, ulong to)
         {
             Segments = new List<Segment>
@@ -19,7 +24,7 @@ namespace Graphene.InMemory.Utility
 
         private static readonly ThreadLocal<byte[]> SampleBuffer = new ThreadLocal<byte[]>(() => new byte[8], trackAllValues: false);
 
-        private readonly List<Segment> Segments;
+        private readonly IList<Segment> Segments;
 
         public ulong Count => Segments.Aggregate(0uL, (sum, segment) => sum + segment.Count);
 
@@ -30,15 +35,56 @@ namespace Graphene.InMemory.Utility
             if (FindSegment(number, out var index))
                 return;
 
-            var previousSegment = Segments[index];
-            var nextSegment = Segments[index + 1];
+            if (index == 0)
+            {
+                if (Segments.Count <= 0)
+                {
+                    Segments.Add(new Segment(number, number));
+                    return;
+                }
 
-            if (previousSegment.Max == number - 1)
-                Segments[index] = new Segment(previousSegment.Min, number);
-            else if (nextSegment.Min == number + 1)
-                Segments[index + 1] = new Segment(number, nextSegment.Max);
+                var segment = Segments[0];
+
+                if (number == segment.Min - 1)
+                    Segments[0] = new Segment(number, segment.Max);
+                else 
+                    Segments.Insert(0, new Segment(number, number));
+
+                return;
+            }
+
+            if (index >= Segments.Count)
+            {
+                var segment = Segments[Segments.Count - 1];
+
+                if (number == segment.Max + 1)
+                    Segments[Segments.Count - 1] = new Segment(segment.Min, number);
+                else
+                    Segments.Add(new Segment(number, number));
+
+                return;
+            }
+
+            var previosSegment = Segments[index - 1];
+            var nextSegment = Segments[index];
+
+            if (previosSegment.Max + 1 == number && nextSegment.Min - 1 == number)
+            {
+                Segments[index - 1] = new Segment(previosSegment.Min, nextSegment.Max);
+                Segments.RemoveAt(index);
+            }
+            else if (previosSegment.Max + 1 == number)
+            {
+                Segments[index - 1] = new Segment(previosSegment.Min, number);
+            }
+            else if (nextSegment.Min - 1 == number)
+            {
+                Segments[index] = new Segment(number, nextSegment.Max);
+            }
             else
+            {
                 Segments.Insert(index, new Segment(number, number));
+            }
         }
 
         public bool Contains(ulong number)
@@ -49,22 +95,22 @@ namespace Graphene.InMemory.Utility
         private bool FindSegment(ulong number, out int index)
         {
             var left = 0;
-            var right = Segments.Count;
+            var right = Segments.Count - 1;
 
-            while (left < right)
+            while (left <= right)
             {
-                var middle = right / 2 + left / 2;
+                var middle = left + (right - left) / 2;
                 var segment = Segments[middle];
 
-                if (number < segment.Min)
-                    right = middle - 1;
-                else if (number > segment.Max)
-                    left = middle + 1;
-                else 
+                if (segment.Contains(number))
                 {
                     index = middle;
                     return true;
                 }
+                else if (number < segment.Min)
+                    right = middle - 1;
+                else
+                    left = middle + 1;
             }
 
             index = left;
@@ -109,10 +155,13 @@ namespace Graphene.InMemory.Utility
 
         private struct Segment
         {
-            public Segment(ulong first, ulong second)
+            public Segment(ulong min, ulong max)
             {
-                Min = Math.Min(first, second);
-                Max = Math.Max(first, second);
+                if (min > max)
+                    throw new ArgumentException($"segment min {min} is greater than {max}");
+
+                Min = min;
+                Max = max;
             }
 
             public ulong Min { get; }

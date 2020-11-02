@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Graphene.InMemory.Utility;
 
 namespace Graphene.InMemory.Query
 {
@@ -101,7 +102,63 @@ namespace Graphene.InMemory.Query
             if (HasNegativeWeights)
                 throw new NotImplementedException();
 
-            throw new NotImplementedException();
+            return FindWithDjikstra(fromVertex, toVertex, out result);
+        }
+
+        private bool FindWithDjikstra(ulong fromVertex, ulong toVertex, out IEnumerable<IEntity> result)
+        {
+            var queue = new PriorityQueue<double, DjikstraVertex>();
+            var visitedVertices = new HashSet<ulong>();
+
+            if (Vertices.TryGetValue(fromVertex, out var startVertex))
+                queue.Insert(0, new DjikstraVertex {Vertex = startVertex});
+            else
+            {
+                result = default;
+                return false;
+            }
+
+            while (!queue.IsEmpty)
+            {
+                var currentVertex = queue.RemoveMin();
+
+                if (currentVertex.Vertex.Origin.Id == toVertex)
+                {
+                    result = GetRouteFromDjikstra(currentVertex);
+                    return true;
+                }
+
+                if (visitedVertices.Contains(currentVertex.Vertex.Origin.Id))
+                    continue;
+
+                visitedVertices.Add(currentVertex.Vertex.Origin.Id);
+
+                foreach (var edge in currentVertex.Vertex.Edges)
+                {
+                    if (visitedVertices.Contains(edge.Target.Origin.Id))
+                        continue;
+
+                    var edgeCost = currentVertex.Cost + edge.Weight;
+                    queue.Insert(edgeCost, new DjikstraVertex{Vertex = edge.Target, Cost = edgeCost, PreviousVertex = currentVertex});
+                }
+            }
+
+            result = default;
+            return false;
+        }
+
+        private static IEnumerable<IEntity> GetRouteFromDjikstra(DjikstraVertex vertex)
+        {
+            var result = new List<IEntity>();
+            
+            while (vertex != null)
+            {
+                result.Add(vertex.Vertex.Origin);
+                vertex = vertex.PreviousVertex;
+            }
+
+            result.Reverse();
+            return result;
         }
 
         private class Vertex
@@ -115,6 +172,13 @@ namespace Graphene.InMemory.Query
             public IEdge Origin;
             public double Weight;
             public Vertex Target;
+        }
+
+        private class DjikstraVertex
+        {
+            public Vertex Vertex;
+            public double Cost;
+            public DjikstraVertex PreviousVertex;
         }
     }
 }

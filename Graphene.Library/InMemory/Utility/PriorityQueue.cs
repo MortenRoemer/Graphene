@@ -16,6 +16,8 @@ namespace Graphene.InMemory.Utility
 
         private int Beginning { get; set; } = 0;
 
+        public bool IsEmpty => Count <= 0; 
+
         public void Clear()
         {
             Beginning = 0;

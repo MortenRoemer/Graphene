@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Graphene.Library\Graphene.csproj" />
+    <ProjectReference Include="..\Graphene.Random\Graphene.Random.csproj" />
   </ItemGroup>
 
 </Project>

@@ -8,7 +8,8 @@ namespace Graphene.Test
 {
     public class MemoryQueryTest
     {
-        private static readonly Lazy<IGraph> ExampleGraph = new Lazy<IGraph>(() => PrepareGraph(), isThreadSafe: true);
+        /*
+        private static readonly Lazy<IGraph> ExampleGraph = new Lazy<IGraph>(PrepareGraph, isThreadSafe: true);
 
         [Fact]
         public void EmptyVertexQueryShouldGiveAnyVertexInOrder()
@@ -532,31 +533,28 @@ namespace Graphene.Test
 
             while (result.FindNextResult(out result))
             {
-                using (var enumerator = result.GetEnumerator())
-                {
-                    IVertex vertex = null;
-                    IEdge edge = null;
+                using var enumerator = result.GetEnumerator();
+                IVertex vertex = null;
+                IEdge edge = null;
 
-                    Assert.True(enumerator.MoveNext());
-                    Assert.True(enumerator.Current is IEdge);
-                    edge = enumerator.Current as IEdge;
-                    Assert.True(enumerator.MoveNext());
-                    Assert.True(enumerator.Current is IVertex);
-                    vertex = enumerator.Current as IVertex;
+                Assert.True(enumerator.MoveNext());
+                Assert.True(enumerator.Current is IEdge);
+                edge = enumerator.Current as IEdge;
+                Assert.True(enumerator.MoveNext());
+                Assert.True(enumerator.Current is IVertex);
+                vertex = enumerator.Current as IVertex;
 
-                    if (edge.Directed)
-                        Assert.Equal(vertex.Id, edge.ToVertex.Id);
-                    else
-                        Assert.Contains(vertex.Id, new[] { edge.FromVertex.Id, edge.ToVertex.Id });
-                    
-                    Assert.True(vertex.Attributes.TryGet("hanseatic", out bool isHanseatic));
-                    Assert.True(isHanseatic);
-                    Assert.False(enumerator.MoveNext());
-                }
+                if (edge.Directed)
+                    Assert.Equal(vertex.Id, edge.ToVertex.Id);
+                else
+                    Assert.Contains(vertex.Id, new[] { edge.FromVertex.Id, edge.ToVertex.Id });
+
+                Assert.True(vertex.Attributes.TryGet("hanseatic", out bool isHanseatic));
+                Assert.True(isHanseatic);
+                Assert.False(enumerator.MoveNext());
             }
         }
 
-        /*
         [Fact]
         public void RouteQueryShouldGiveCorrectResults()
         {
@@ -600,7 +598,6 @@ namespace Graphene.Test
 
             Assert.False(result.FindNextResult(out _));
         }
-        */
 
         private static IGraph PrepareGraph()
         {
@@ -648,5 +645,6 @@ namespace Graphene.Test
 
             return graph;
         }
+        */
     }
 }

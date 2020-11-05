@@ -14,7 +14,7 @@ namespace Graphene.InMemory.Query
 
         internal MemoryGraph Graph { get; }
 
-        internal List<object> Tokens { get; }
+        private List<object> Tokens { get; }
 
         internal T AddToken<T>(T token)
         {
@@ -44,7 +44,7 @@ namespace Graphene.InMemory.Query
 
         internal bool Resolve(out IQueryResult result)
         {
-            return new QueryAgent(this).FindSolution(out result);
+            throw new NotImplementedException();
         }
 
         public IQueryBuilderVertex Vertex(ulong id)

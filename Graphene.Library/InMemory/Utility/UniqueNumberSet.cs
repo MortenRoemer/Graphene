@@ -1,37 +1,90 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 
 namespace Graphene.InMemory.Utility
 {
-    internal class UniqueNumberSet
+    public class UniqueNumberSet
     {
-        public UniqueNumberSet(ulong from, ulong to)
+        public UniqueNumberSet()
         {
             Segments = new List<Segment>();
-            Segments.Add(new Segment(from, to));
+        }
+
+        public UniqueNumberSet(ulong from, ulong to)
+        {
+            Segments = new List<Segment>
+            {
+                new Segment(from, to)
+            };
         }
 
         private static readonly ThreadLocal<Random> RandomGenerator = new ThreadLocal<Random>(() => new Random(), trackAllValues: false);
 
         private static readonly ThreadLocal<byte[]> SampleBuffer = new ThreadLocal<byte[]>(() => new byte[8], trackAllValues: false);
 
-        private List<Segment> Segments;
+        private readonly IList<Segment> Segments;
+
+        public ulong Count => Segments.Aggregate(0uL, (sum, segment) => sum + segment.Count);
+
+        public bool IsEmpty => Segments.Count <= 0;
 
         public void Add(ulong number)
         {
             if (FindSegment(number, out var index))
                 return;
 
-            var previousSegment = Segments[index];
-            var nextSegment = Segments[index + 1];
+            if (index == 0)
+            {
+                if (Segments.Count <= 0)
+                {
+                    Segments.Add(new Segment(number, number));
+                    return;
+                }
 
-            if (previousSegment.Max == number - 1)
-                Segments[index] = new Segment(previousSegment.Min, number);
-            else if (nextSegment.Min == number + 1)
-                Segments[index + 1] = new Segment(number, nextSegment.Max);
+                var segment = Segments[0];
+
+                if (number == segment.Min - 1)
+                    Segments[0] = new Segment(number, segment.Max);
+                else 
+                    Segments.Insert(0, new Segment(number, number));
+
+                return;
+            }
+
+            if (index >= Segments.Count)
+            {
+                var segment = Segments[Segments.Count - 1];
+
+                if (number == segment.Max + 1)
+                    Segments[Segments.Count - 1] = new Segment(segment.Min, number);
+                else
+                    Segments.Add(new Segment(number, number));
+
+                return;
+            }
+
+            var previosSegment = Segments[index - 1];
+            var nextSegment = Segments[index];
+
+            if (previosSegment.Max + 1 == number && nextSegment.Min - 1 == number)
+            {
+                Segments[index - 1] = new Segment(previosSegment.Min, nextSegment.Max);
+                Segments.RemoveAt(index);
+            }
+            else if (previosSegment.Max + 1 == number)
+            {
+                Segments[index - 1] = new Segment(previosSegment.Min, number);
+            }
+            else if (nextSegment.Min - 1 == number)
+            {
+                Segments[index] = new Segment(number, nextSegment.Max);
+            }
             else
+            {
                 Segments.Insert(index, new Segment(number, number));
+            }
         }
 
         public bool Contains(ulong number)
@@ -42,23 +95,22 @@ namespace Graphene.InMemory.Utility
         private bool FindSegment(ulong number, out int index)
         {
             var left = 0;
-            var right = Segments.Count;
+            var right = Segments.Count - 1;
 
-            while (left < right)
+            while (left <= right)
             {
-                var middle = (right + left) / 2;
+                var middle = left + (right - left) / 2;
                 var segment = Segments[middle];
-                var comparison = segment.Compare(number);
 
-                if (comparison < 0)
-                    right = middle;
-                else if (comparison > 0)
-                    left = middle;
-                else 
+                if (segment.Contains(number))
                 {
                     index = middle;
                     return true;
                 }
+                else if (number < segment.Min)
+                    right = middle - 1;
+                else
+                    left = middle + 1;
             }
 
             index = left;
@@ -71,6 +123,9 @@ namespace Graphene.InMemory.Utility
                 return;
 
             var segment = Segments[index];
+
+            if (!segment.Contains(number))
+                throw new InvalidOperationException($"number {number} cannot be removed from segment [{segment.Min}-{segment.Max}]");
 
             if (number == segment.Min && number == segment.Max)
                 Segments.RemoveAt(index);
@@ -93,42 +148,40 @@ namespace Graphene.InMemory.Utility
             var randomGenerator = RandomGenerator.Value;
             var randomIndex = randomGenerator.Next(Segments.Count);
             var segment = Segments[randomIndex];
-
-            if (segment.Min == segment.Max)
-            {
-                Segments.RemoveAt(randomIndex);
-                return segment.Min;
-            }
-
-            var buffer = SampleBuffer.Value;
-            randomGenerator.NextBytes(buffer);
-            var sample = BitConverter.ToUInt64(buffer);
-            var range = segment.Max - segment.Min;
-            var result = (sample % range) + segment.Min;
+            var result = segment.GetRandom();
             Remove(result);
             return result;
         }
 
         private struct Segment
         {
-            public Segment(ulong first, ulong second)
+            public Segment(ulong min, ulong max)
             {
-                Min = Math.Min(first, second);
-                Max = Math.Max(first, second);
+                if (min > max)
+                    throw new ArgumentException($"segment min {min} is greater than {max}");
+
+                Min = min;
+                Max = max;
             }
 
             public ulong Min { get; }
 
             public ulong Max { get; }
 
-            public int Compare(ulong number)
+            public ulong Count => Max - Min + 1;
+
+            public bool Contains(ulong number)
             {
-                if (number < Min)
-                    return -1;
-                else if (number > Max)
-                    return 1;
-                else
-                    return 0;
+                return Min <= number && number <= Max;
+            }
+            
+            public ulong GetRandom()
+            {
+                var randomGenerator = RandomGenerator.Value;
+                var buffer = SampleBuffer.Value;
+                randomGenerator.NextBytes(buffer);
+                var sample = (BitConverter.ToUInt64(buffer) % Count) + Min;
+                return sample;
             }
         }
     }

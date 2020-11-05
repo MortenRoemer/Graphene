@@ -193,9 +193,9 @@ namespace Graphene.Test
             IGraph graph = new MemoryGraph();
             IVertex va = graph.Vertices.Create();
             IVertex vb = graph.Vertices.Create();
-            IEdge ea = va.BidirectionalEdges.Add(vb);
-            IEdge eb = va.IngoingEdges.Add(vb);
-            IEdge ec = va.OutgoingEdges.Add(vb);
+            _ = va.BidirectionalEdges.Add(vb);
+            _ = va.IngoingEdges.Add(vb);
+            _ = va.OutgoingEdges.Add(vb);
             Assert.Equal(3, va.Edges.Count());
         }
 

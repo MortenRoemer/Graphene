@@ -8,7 +8,8 @@ namespace Graphene.Test
 {
     public class MemoryQueryTest
     {
-        private static readonly Lazy<IGraph> ExampleGraph = new Lazy<IGraph>(() => PrepareGraph(), isThreadSafe: true);
+        /*
+        private static readonly Lazy<IGraph> ExampleGraph = new Lazy<IGraph>(PrepareGraph, isThreadSafe: true);
 
         [Fact]
         public void EmptyVertexQueryShouldGiveAnyVertexInOrder()
@@ -644,5 +645,6 @@ namespace Graphene.Test
 
             return graph;
         }
+        */
     }
 }

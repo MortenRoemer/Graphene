@@ -42,6 +42,9 @@ Generated\ Files/
 # Visual Studio Code Files
 .vscode/
 
+# IntelliJ idea Files
+.idea/
+
 # MSTest test Results
 [Tt]est[Rr]esult*/
 [Bb]uild[Ll]og.*

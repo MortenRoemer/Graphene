@@ -4,7 +4,7 @@ namespace Graphene
 {
     public interface IReadOnlyRepository<T> : IEnumerable<T>
     {
-        long Count();
+        ulong Count();
 
         IEnumerable<T> Get(IEnumerable<ulong> ids);
 

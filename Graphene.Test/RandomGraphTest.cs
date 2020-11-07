@@ -11,7 +11,7 @@ namespace Graphene.Test
         public void MinimalGraphShouldHaveOneVertex()
         {
             var graph = RandomGraphs.GetRandomGraph(1, 0.5d, () => new MemoryGraph(), RandomGraphs.edgeType.hybrid,false);
-            Assert.Equal(1, graph.Vertices.Count());
+            Assert.Equal(1uL, graph.Vertices.Count());
         }
 
         [Fact]
@@ -24,13 +24,13 @@ namespace Graphene.Test
         public void EmptyGraphShouldWorkAndHaveNoVerticies()
         {
             var graph = RandomGraphs.GetRandomGraph(0, 0.5d, () => new MemoryGraph(), RandomGraphs.edgeType.hybrid,false);
-            Assert.Equal(0, graph.Vertices.Count());
+            Assert.Equal(0uL, graph.Vertices.Count());
         }
 
         [Theory]
-        [InlineData(10,false,45,9)]
-        [InlineData(10,true,55,10)]
-        public void CompleteBidirectionalGraphsShouldHaveAllEdges(int edgeCount, bool selfdirected, int expectedTotalEdgeCount, int expectedVertexEdgeCount)
+        [InlineData(10,false,45uL,9uL)]
+        [InlineData(10,true,55uL,10uL)]
+        public void CompleteBidirectionalGraphsShouldHaveAllEdges(int edgeCount, bool selfdirected, ulong expectedTotalEdgeCount, ulong expectedVertexEdgeCount)
         {
             var graph = RandomGraphs.GetRandomGraph(edgeCount, 1d, () => new MemoryGraph(), RandomGraphs.edgeType.bidirectedOnly,selfdirected);
             Assert.Equal(expectedTotalEdgeCount, graph.Edges.Count());
@@ -41,9 +41,9 @@ namespace Graphene.Test
         }
 
         [Theory]
-        [InlineData(10, false, 90, 18)]
-        [InlineData(10, true, 100, 20)]
-        public void CompleteDirectionalGraphsShouldHaveAllEdges(int edgeCount, bool selfdirected, int expectedTotalEdgeCount, int expectedVertexEdgeCount)
+        [InlineData(10, false, 90uL, 18uL)]
+        [InlineData(10, true, 100uL, 20uL)]
+        public void CompleteDirectionalGraphsShouldHaveAllEdges(int edgeCount, bool selfdirected, ulong expectedTotalEdgeCount, ulong expectedVertexEdgeCount)
         {
             var graph = RandomGraphs.GetRandomGraph(edgeCount, 1d, () => new MemoryGraph(), RandomGraphs.edgeType.directedOnly,selfdirected);
             Assert.Equal(expectedTotalEdgeCount, graph.Edges.Count());
@@ -54,9 +54,9 @@ namespace Graphene.Test
         }
 
         [Theory]
-        [InlineData(10, false, 135, 27)]
-        [InlineData(10, true, 155, 30)]
-        public void CompleteHybridGraphsShouldHaveAllEdges(int edgeCount, bool selfdirected, int expectedTotalEdgeCount, int expectedVertexEdgeCount)
+        [InlineData(10, false, 135uL, 27uL)]
+        [InlineData(10, true, 155uL, 30uL)]
+        public void CompleteHybridGraphsShouldHaveAllEdges(int edgeCount, bool selfdirected, ulong expectedTotalEdgeCount, ulong expectedVertexEdgeCount)
         {
             var graph = RandomGraphs.GetRandomGraph(edgeCount, 1d, () => new MemoryGraph(), RandomGraphs.edgeType.hybrid, selfdirected);
             Assert.Equal(expectedTotalEdgeCount, graph.Edges.Count());

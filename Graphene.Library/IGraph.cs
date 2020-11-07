@@ -4,7 +4,7 @@ namespace Graphene
 {
     public interface IGraph
     {
-        long Size { get; }
+        ulong Size { get; }
 
         IVertexRepository Vertices { get; }
 

@@ -34,9 +34,9 @@ namespace Graphene.InMemory
             return ids.All(id => Vertices.ContainsKey(id));
         }
 
-        public long Count()
+        public ulong Count()
         {
-            return Vertices.Count;
+            return (ulong)Vertices.Count;
         }
 
         public IVertex Create()

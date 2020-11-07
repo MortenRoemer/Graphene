@@ -30,5 +30,15 @@ namespace Graphene.InMemory
         public IAttributeSet Attributes { get; }
 
         public IReadOnlyRepository<IVertex> Vertices { get; }
+
+        public override bool Equals(object obj)
+        {
+            return obj is IEdge other && Id == other.Id;
+        }
+
+        public override int GetHashCode()
+        {
+            return Id.GetHashCode();
+        }
     }
 }

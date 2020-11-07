@@ -9,9 +9,9 @@ namespace Graphene.InMemory
             Graph = graph ?? throw new ArgumentNullException(nameof(graph));
             Id = id;
             Attributes = new MemoryAttributeSet();
-            IngoingEdges = new MemoryIngoingEdgeRepository(edges, this);
-            OutgoingEdges = new MemoryOutgoingEdgeRepository(edges, this);
-            BidirectionalEdges = new MemoryBidirectionalEdgeRepository(edges, this);
+            IngoingEdges = new MemoryRelativeEdgeRepository.Ingoing(edges, this);
+            OutgoingEdges = new MemoryRelativeEdgeRepository.Outgoing(edges, this);
+            BidirectionalEdges = new MemoryRelativeEdgeRepository.Bidirectional(edges, this);
             Edges = new MemoryCombinedEdgeRepository(edges, this);
         }
 
@@ -31,13 +31,17 @@ namespace Graphene.InMemory
         
         public IReadOnlyRepository<IEdge> Edges { get; }
 
-        public static bool operator ==(MemoryVertex left, MemoryVertex right) => left.Id == right.Id;
-        public static bool operator !=(MemoryVertex left, MemoryVertex right) => !(left == right);
-        
         public override bool Equals(object obj)
         {
-            if (obj is MemoryVertex memoryVertex) return memoryVertex == this;
-            else return false;
+            return obj is IVertex other && this.Id == other.Id;
         }
+
+        public override int GetHashCode()
+        {
+            return Id.GetHashCode();
+        }
+
+        public static bool operator ==(MemoryVertex left, MemoryVertex right) => left?.Id == right?.Id;
+        public static bool operator !=(MemoryVertex left, MemoryVertex right) => !(left == right);
     }
 }

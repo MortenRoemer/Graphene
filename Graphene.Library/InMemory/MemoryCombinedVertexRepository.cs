@@ -22,8 +22,8 @@ namespace Graphene.InMemory
         public bool Contains(IEnumerable<ulong> ids)
             => ids.All(id => id == Edge.FromVertex.Id || id == Edge.ToVertex.Id);
 
-        public long Count()
-            => Vertices.Count();
+        public ulong Count()
+            => (ulong)Vertices.Count();
 
         public IEnumerable<IVertex> Get(IEnumerable<ulong> ids)
             => Vertices.Where(vertex => ids.Contains(vertex.Id));

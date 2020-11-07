@@ -5,35 +5,77 @@ using System.Linq;
 
 namespace Graphene.InMemory
 {
-    public class MemoryCombinedEdgeRepository : IReadOnlyRepository<IEdge>
+    public class MemoryCombinedEdgeRepository : IReadOnlyRepository<IEdge>, IObserver<IEdge>
     {
         internal MemoryCombinedEdgeRepository(MemoryEdgeRepository edges, MemoryVertex vertex)
         {
-            if (edges is null)
-                throw new ArgumentNullException(nameof(edges));
-
-            if (vertex is null)
-                throw new ArgumentNullException(nameof(vertex));
-
-            Edges = edges
-                .Where(edge => edge.FromVertex.Id == vertex.Id || edge.ToVertex.Id == vertex.Id);
+            Edges = edges ?? throw new ArgumentNullException(nameof(edges));
+            Vertex = vertex ?? throw new ArgumentNullException(nameof(vertex));
+            Subscription = edges.Subscribe(this);
         }
 
-        private IEnumerable<IEdge> Edges { get; }
+        ~MemoryCombinedEdgeRepository()
+        {
+            Subscription.Dispose();
+        }
+
+        private MemoryEdgeRepository Edges { get; }
+        
+        private MemoryVertex Vertex { get; }
+        
+        private IReadOnlyList<IEdge> Buffer { get; set; }
+        
+        private IDisposable Subscription { get; }
 
         public bool Contains(IEnumerable<ulong> ids)
-            => ids.All(id => Edges.Select(edge => edge.Id).Contains(id));
+        {
+            return GetEdges().All(edge => ids.Contains(edge.Id));
+        }
 
-        public long Count()
-            => Edges.Count();
+        public ulong Count()
+        {
+            return Edges.Count();
+        }
 
         public IEnumerable<IEdge> Get(IEnumerable<ulong> ids)
-            => Edges.Where(edge => ids.Contains(edge.Id));
+        {
+            return GetEdges().Where(edge => ids.Contains(edge.Id));
+        }
 
         public IEnumerator<IEdge> GetEnumerator()
-            => Edges.GetEnumerator();
+        {
+            return GetEdges().GetEnumerator();
+        }
 
         IEnumerator IEnumerable.GetEnumerator()
-            => GetEnumerator();
+        {
+            return GetEnumerator();
+        }
+
+        private IEnumerable<IEdge> GetEdges()
+        {
+            return Buffer ??= Edges.Where(IsContainedEdge).ToArray();
+        }
+
+        private bool IsContainedEdge(IEdge edge)
+        {
+            return edge.FromVertex.Id == Vertex.Id || edge.ToVertex.Id == Vertex.Id;
+        }
+
+        public void OnCompleted()
+        {
+            // do nothing
+        }
+
+        public void OnError(Exception error)
+        {
+            // do nothing
+        }
+
+        public void OnNext(IEdge value)
+        {
+            if (IsContainedEdge(value))
+                Buffer = null;
+        }
     }
 }

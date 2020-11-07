@@ -14,7 +14,7 @@ namespace Graphene.InMemory
             AvailableIds = new UniqueNumberSet(1ul, ulong.MaxValue);
         }
 
-        public long Size => Vertices.Count() + Edges.Count();
+        public ulong Size => Vertices.Count() + Edges.Count();
 
         public IVertexRepository Vertices => MemoryVertices;
 

@@ -12,7 +12,7 @@ namespace Graphene.InMemory
             IngoingEdges = new MemoryRelativeEdgeRepository.Ingoing(edges, this);
             OutgoingEdges = new MemoryRelativeEdgeRepository.Outgoing(edges, this);
             BidirectionalEdges = new MemoryRelativeEdgeRepository.Bidirectional(edges, this);
-            Edges = new MemoryCombinedEdgeRepository(edges, this);
+            Edges = new MemoryReadOnlyEdgeRepository.Combined(edges, this);
         }
 
         public IVertexEdgeRepository IngoingEdges { get; }

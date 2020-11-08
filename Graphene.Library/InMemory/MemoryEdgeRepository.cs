@@ -2,23 +2,24 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Graphene.InMemory.Utility;
 
 namespace Graphene.InMemory
 {
-    public class MemoryEdgeRepository : IRepository<IEdge>, IObservable<IEdge>
+    public class MemoryEdgeRepository : IRepository<IEdge>, IObservable<CollectionChange<IEdge>>
     {
         internal MemoryEdgeRepository(MemoryGraph graph)
         {
             Graph = graph ?? throw new ArgumentNullException(nameof(graph));
             Edges = new SortedDictionary<ulong, MemoryEdge>();
-            Observers = new List<IObserver<IEdge>>();
+            Observers = new List<IObserver<CollectionChange<IEdge>>>();
         }
 
         private MemoryGraph Graph { get; }
 
         private IDictionary<ulong, MemoryEdge> Edges { get; }
         
-        private IList<IObserver<IEdge>> Observers { get; }
+        private IList<IObserver<CollectionChange<IEdge>>> Observers { get; }
 
         public MemoryEdge Create(IVertex fromVertex, IVertex toVertex, bool directed)
         {
@@ -31,16 +32,18 @@ namespace Graphene.InMemory
             var id = Graph.TakeId();
             var result = new MemoryEdge(Graph, fromVertex, toVertex, directed, id);
             Edges.Add(id, result);
-            NotifyObservers(result);
+            NotifyObservers(new[] { new CollectionChange<IEdge>(result, CollectionChangeMode.Addition) });
             return result;
         }
 
         public void Clear()
         {
+            NotifyObservers(Edges.Select(edge =>
+                new CollectionChange<IEdge>(edge.Value, CollectionChangeMode.Removal)).ToArray());
+            
             foreach (var (key, value) in Edges)
             {
                 Graph.FreeId(key);
-                NotifyObservers(value);
             }
 
             Edges.Clear();
@@ -58,11 +61,14 @@ namespace Graphene.InMemory
 
         public void Delete(IEnumerable<IEdge> items)
         {
-            foreach (var item in items)
+            var enumerable = items as IEdge[] ?? items.ToArray();
+            NotifyObservers(enumerable.Select(item =>
+                new CollectionChange<IEdge>(item, CollectionChangeMode.Removal)).ToArray());
+            
+            foreach (var item in enumerable)
             {
                 Edges.Remove(item.Id);
                 Graph.FreeId(item.Id);
-                NotifyObservers(item);
             }
         }
 
@@ -81,24 +87,27 @@ namespace Graphene.InMemory
             return GetEnumerator();
         }
 
-        public IDisposable Subscribe(IObserver<IEdge> observer)
+        public IDisposable Subscribe(IObserver<CollectionChange<IEdge>> observer)
         {
             Observers.Add(observer);
             return new Subscription(Observers, observer);
         }
 
-        private void NotifyObservers(IEdge edge)
+        private void NotifyObservers(IEnumerable<CollectionChange<IEdge>> changes)
         {
             foreach (var observer in Observers)
             {
-                observer.OnNext(edge);
+                foreach (var change in changes)
+                {
+                    observer.OnNext(change);
+                }
                 observer.OnCompleted();
             }
         }
 
         private class Subscription : IDisposable
         {
-            public Subscription(IList<IObserver<IEdge>> observerList, IObserver<IEdge> subscriber)
+            public Subscription(IList<IObserver<CollectionChange<IEdge>>> observerList, IObserver<CollectionChange<IEdge>> subscriber)
             {
                 ObserverList = observerList ?? throw new ArgumentNullException(nameof(observerList));
                 Subscriber = subscriber ?? throw new ArgumentNullException(nameof(subscriber));
@@ -109,9 +118,9 @@ namespace Graphene.InMemory
                 Dispose();
             }
             
-            private IList<IObserver<IEdge>> ObserverList { get; }
+            private IList<IObserver<CollectionChange<IEdge>>> ObserverList { get; }
             
-            private IObserver<IEdge> Subscriber { get; }
+            private IObserver<CollectionChange<IEdge>> Subscriber { get; }
             
             private bool Disposed { get; set; }
             

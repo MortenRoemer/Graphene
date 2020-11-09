@@ -1,3 +1,4 @@
+using System;
 using Graphene.InMemory.Utility;
 using Xunit;
 
@@ -69,6 +70,21 @@ namespace Graphene.Test
             }
             
             Assert.True(queue.Capacity > startCapacity);
+        }
+        
+        [Fact]
+        public void ClearShouldWorkCorrectly()
+        {
+            var queue = new PriorityQueue<int, char>();
+            queue.Insert(1, 'a');
+            queue.Insert(2, 'b');
+            queue.Insert(3, 'c');
+            
+            queue.Clear();
+            Assert.ThrowsAny<Exception>(() => queue.PeekMin());
+            Assert.ThrowsAny<Exception>(() => queue.RemoveMin());
+            Assert.ThrowsAny<Exception>(() => queue.PeekMax());
+            Assert.ThrowsAny<Exception>(() => queue.RemoveMax());
         }
     }
 }

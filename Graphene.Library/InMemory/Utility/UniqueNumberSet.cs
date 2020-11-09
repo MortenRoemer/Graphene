@@ -1,89 +1,88 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 
 namespace Graphene.InMemory.Utility
 {
     public class UniqueNumberSet
     {
+        private const int STANDARD_CAPACITY = 10;
+        
         public UniqueNumberSet()
         {
-            Segments = new List<Segment>();
+            Segments = new Segment[STANDARD_CAPACITY];
         }
 
-        public UniqueNumberSet(ulong from, ulong to)
+        public UniqueNumberSet(ulong from, ulong to) : this()
         {
-            Segments = new List<Segment>
-            {
-                new Segment(from, to)
-            };
+            AppendSegment(new Segment(from, to));
         }
 
         private static readonly ThreadLocal<Random> RandomGenerator = new ThreadLocal<Random>(() => new Random(), trackAllValues: false);
 
-        private static readonly ThreadLocal<byte[]> SampleBuffer = new ThreadLocal<byte[]>(() => new byte[8], trackAllValues: false);
+        private Memory<Segment> Segments { get; set; }
+        
+        private int SegmentCount { get; set; }
 
-        private readonly IList<Segment> Segments;
+        private int Capacity => Segments.Length;
 
-        public ulong Count => Segments.Aggregate(0uL, (sum, segment) => sum + segment.Count);
-
-        public bool IsEmpty => Segments.Count <= 0;
+        public bool IsEmpty => SegmentCount <= 0;
 
         public void Add(ulong number)
         {
             if (FindSegment(number, out var index))
                 return;
 
+            var segments = Segments.Span;
+
             if (index == 0)
             {
-                if (Segments.Count <= 0)
+                if (SegmentCount <= 0)
                 {
-                    Segments.Add(new Segment(number, number));
+                    AppendSegment(new Segment(number, number));
                     return;
                 }
 
-                var segment = Segments[0];
+                var segment = segments[0];
 
                 if (number == segment.Min - 1)
-                    Segments[0] = new Segment(number, segment.Max);
+                    segments[0] = new Segment(number, segment.Max);
                 else 
-                    Segments.Insert(0, new Segment(number, number));
+                    InsertSegment(0, new Segment(number, number));
 
                 return;
             }
 
-            if (index >= Segments.Count)
+            if (index >= SegmentCount)
             {
-                var segment = Segments[Segments.Count - 1];
+                var segment = segments[^1];
 
                 if (number == segment.Max + 1)
-                    Segments[Segments.Count - 1] = new Segment(segment.Min, number);
+                    segments[^1] = new Segment(segment.Min, number);
                 else
-                    Segments.Add(new Segment(number, number));
+                    AppendSegment(new Segment(number, number));
 
                 return;
             }
 
-            var previosSegment = Segments[index - 1];
-            var nextSegment = Segments[index];
+            var previousSegment = segments[index - 1];
+            var nextSegment = segments[index];
 
-            if (previosSegment.Max + 1 == number && nextSegment.Min - 1 == number)
+            if (previousSegment.Max + 1 == number && nextSegment.Min - 1 == number)
             {
-                Segments[index - 1] = new Segment(previosSegment.Min, nextSegment.Max);
-                Segments.RemoveAt(index);
+                segments[index - 1] = new Segment(previousSegment.Min, nextSegment.Max);
+                RemoveSegment(index);
             }
-            else if (previosSegment.Max + 1 == number)
+            else if (previousSegment.Max + 1 == number)
             {
-                Segments[index - 1] = new Segment(previosSegment.Min, number);
+                segments[index - 1] = new Segment(previousSegment.Min, number);
             }
             else if (nextSegment.Min - 1 == number)
             {
-                Segments[index] = new Segment(number, nextSegment.Max);
+                segments[index] = new Segment(number, nextSegment.Max);
             }
             else
             {
-                Segments.Insert(index, new Segment(number, number));
+                InsertSegment(index, new Segment(number, number));
             }
         }
 
@@ -95,12 +94,13 @@ namespace Graphene.InMemory.Utility
         private bool FindSegment(ulong number, out int index)
         {
             var left = 0;
-            var right = Segments.Count - 1;
+            var right = SegmentCount - 1;
+            var segments = Segments.Span;
 
             while (left <= right)
             {
                 var middle = left + (right - left) / 2;
-                var segment = Segments[middle];
+                var segment = segments[middle];
 
                 if (segment.Contains(number))
                 {
@@ -122,38 +122,76 @@ namespace Graphene.InMemory.Utility
             if (!FindSegment(number, out var index))
                 return;
 
-            var segment = Segments[index];
+            var segments = Segments.Span;
+            var segment = segments[index];
 
             if (!segment.Contains(number))
                 throw new InvalidOperationException($"number {number} cannot be removed from segment [{segment.Min}-{segment.Max}]");
 
             if (number == segment.Min && number == segment.Max)
-                Segments.RemoveAt(index);
+                RemoveSegment(index);
             else if (number == segment.Min)
-                Segments[index] = new Segment(segment.Min + 1, segment.Max);
+                segments[index] = new Segment(segment.Min + 1, segment.Max);
             else if (number == segment.Max)
-                Segments[index] = new Segment(segment.Min, segment.Max - 1);
+                segments[index] = new Segment(segment.Min, segment.Max - 1);
             else
             {
-                Segments[index] = new Segment(segment.Min, number - 1);
-                Segments.Insert(index + 1, new Segment(number + 1, segment.Max));
+                segments[index] = new Segment(segment.Min, number - 1);
+                InsertSegment(index + 1, new Segment(number + 1, segment.Max));
             }
         }
 
         public ulong SampleRandom()
         {
-            if (Segments.Count <= 0)
+            if (SegmentCount <= 0)
                 throw new InvalidOperationException("no more numbers to sample");
-
+            
             var randomGenerator = RandomGenerator.Value;
-            var randomIndex = randomGenerator.Next(Segments.Count);
-            var segment = Segments[randomIndex];
+            var randomIndex = randomGenerator.Next(SegmentCount);
+            var segment = Segments.Span[randomIndex];
             var result = segment.GetRandom();
             Remove(result);
             return result;
         }
 
-        private struct Segment
+        private void AppendSegment(Segment segment)
+        {
+            EnsureCapacity();
+            Segments.Span[SegmentCount++] = segment;
+        }
+
+        private void InsertSegment(int index, Segment segment)
+        {
+            EnsureCapacity();
+            var blockSize = SegmentCount - index;
+            var source = Segments.Slice(index, blockSize);
+            var target = Segments.Slice(index + 1);
+            source.CopyTo(target);
+            Segments.Span[index] = segment;
+            SegmentCount++;
+        }
+
+        private void RemoveSegment(int index)
+        {
+            var blockSize = SegmentCount - index - 1;
+            var source = Segments.Slice(index + 1, blockSize);
+            var target = Segments.Slice(index);
+            source.CopyTo(target);
+            SegmentCount--;
+        }
+
+        private void EnsureCapacity()
+        {
+            if (Capacity > SegmentCount)
+                return;
+
+            var source = Segments.Slice(0, SegmentCount);
+            Memory<Segment> target = new Segment[Capacity * 2];
+            source.CopyTo(target);
+            Segments = target;
+        }
+
+        private readonly struct Segment
         {
             public Segment(ulong min, ulong max)
             {
@@ -168,17 +206,17 @@ namespace Graphene.InMemory.Utility
 
             public ulong Max { get; }
 
-            public ulong Count => Max - Min + 1;
+            private ulong Count => Max - Min + 1;
 
             public bool Contains(ulong number)
             {
                 return Min <= number && number <= Max;
             }
-            
-            public ulong GetRandom()
+
+            public unsafe ulong GetRandom()
             {
                 var randomGenerator = RandomGenerator.Value;
-                var buffer = SampleBuffer.Value;
+                Span<byte> buffer = stackalloc byte[8];
                 randomGenerator.NextBytes(buffer);
                 var sample = (BitConverter.ToUInt64(buffer) % Count) + Min;
                 return sample;

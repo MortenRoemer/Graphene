@@ -8,13 +8,13 @@ namespace Graphene.InMemory.Utility
     {
         private const int STANDARD_CAPACITY = 10;
 
-        private Entry[] Entries = new Entry[STANDARD_CAPACITY];
+        private Memory<Entry> Entries { get; set; } = new Entry[STANDARD_CAPACITY];
 
-        public int Capacity => Entries.GetLength(0);
+        public int Capacity => Entries.Length;
 
-        public int Count { get; private set; } = 0;
+        public int Count { get; private set; }
 
-        private int Beginning { get; set; } = 0;
+        private int Beginning { get; set; }
 
         public bool IsEmpty => Count <= 0; 
 
@@ -31,36 +31,44 @@ namespace Graphene.InMemory.Utility
 
             if (Beginning > 0)
             {
-                Array.Copy(Entries, Beginning, Entries, 0, Count);
+                var source = Entries.Slice(Beginning, Count);
+                var target = Entries.Slice(0, Count);
+                source.CopyTo(target);
                 Beginning = 0;
             }
             else
             {
-                var newEntries = new Entry[Capacity * 2];
-                Array.Copy(Entries, Beginning, newEntries, 0, Count);
+                
+                var source = Entries.Slice(Beginning, Count);
+                Memory<Entry> target = new Entry[Capacity * 2];
+                source.CopyTo(target);
                 Beginning = 0;
-                Entries = newEntries;
+                Entries = target;
             }
         }
 
         public void Insert(TPriority priority, TPayLoad payLoad)
         {
             EnsureCapacity();
+            var entries = Entries.Span;
 
-            for(int index = Beginning; index < Beginning + Count; index++)
+            for(var index = Beginning; index < Beginning + Count; index++)
             {
-                var entry = Entries[index];
+                var entry = entries[index];
 
-                if (priority.CompareTo(entry.Priority) < 0)
-                {
-                    Array.Copy(Entries, index, Entries, index + 1, Count - (index - Beginning));
-                    Entries[index] = new Entry(priority, payLoad);
-                    Count++;
-                    return;
-                }
+                if (priority.CompareTo(entry.Priority) >= 0)
+                    continue;
+                
+                var blockSize = Count - index - Beginning;
+                var source = entries.Slice(index, blockSize);
+                var target = entries.Slice(index + 1, blockSize);
+                source.CopyTo(target);
+                entries[index] = new Entry(priority, payLoad);
+                Count++;
+                return;
             }
 
-            Entries[Beginning + Count] = new Entry(priority, payLoad);
+            entries[Beginning + Count] = new Entry(priority, payLoad);
             Count++;
         }
 
@@ -69,7 +77,7 @@ namespace Graphene.InMemory.Utility
             if (Count <= 0)
                 throw new InvalidOperationException();
 
-            return Entries[Beginning].PayLoad;
+            return Entries.Span[Beginning].PayLoad;
         }
 
         public TPayLoad PeekMax()
@@ -77,7 +85,7 @@ namespace Graphene.InMemory.Utility
             if (Count <= 0)
                 throw new InvalidOperationException();
 
-            return Entries[Beginning + Count - 1].PayLoad;
+            return Entries.Span[Beginning + Count - 1].PayLoad;
         }
 
         public TPayLoad RemoveMin()
@@ -105,7 +113,7 @@ namespace Graphene.InMemory.Utility
             return GetEnumerator();
         }
 
-        private struct Entry
+        private readonly struct Entry
         {
             public Entry(TPriority priority, TPayLoad payLoad)
             {
@@ -126,11 +134,11 @@ namespace Graphene.InMemory.Utility
                 Index = backend.Beginning - 1;
             }
 
-            private PriorityQueue<TPriority, TPayLoad> Backend;
+            private PriorityQueue<TPriority, TPayLoad> Backend { get; set; }
 
-            private int Index;
+            private int Index { get; set; }
 
-            private bool Disposed;
+            private bool Disposed { get; set; }
 
             public TPayLoad Current
             {
@@ -139,7 +147,7 @@ namespace Graphene.InMemory.Utility
                     if (Disposed)
                         throw new ObjectDisposedException(nameof(Enumerator));
 
-                    return Backend.Entries[Index].PayLoad;
+                    return Backend.Entries.Span[Index].PayLoad;
                 }
             }
 

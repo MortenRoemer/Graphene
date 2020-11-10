@@ -14,7 +14,7 @@ namespace Graphene.InMemory
 
         private Lazy<IDictionary<string, object>> Attributes { get; }
 
-        public long Count => Attributes.IsValueCreated ? Attributes.Value.Count : 0;
+        public int Count => Attributes.IsValueCreated ? Attributes.Value.Count : 0;
 
         public IEnumerable<string> Names => Attributes.IsValueCreated ? Attributes.Value.Keys : Enumerable.Empty<string>();
 

@@ -4,7 +4,7 @@ namespace Graphene
 {
     public interface IAttributeSet : IEnumerable<KeyValuePair<string, object>>
     {
-        long Count { get; }
+        int Count { get; }
 
         IEnumerable<string> Names { get; }
 

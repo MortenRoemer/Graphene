@@ -10,59 +10,42 @@ namespace Graphene.Test
         [Fact]
         public void MinimalGraphShouldHaveOneVertex()
         {
-            var graph = RandomGraphs.GetRandomGraph(1, 0.5d, () => new MemoryGraph(), RandomGraphs.EdgeType.Hybrid,false);
+            var graph = new MemoryGraph();
+            RandomGraphs.RandomizeGraph(1, 0.5d, graph, EdgeGenerationRule.NoEdges);
             Assert.Equal(1uL, graph.Vertices.Count());
         }
 
         [Fact]
         public void NegativeGraphSizesShouldNotWork()
         {
-            Assert.ThrowsAny<Exception>(() => RandomGraphs.GetRandomGraph(-42, 0.5d, () => new MemoryGraph(), RandomGraphs.EdgeType.Hybrid,false));
+            var graph = new MemoryGraph();
+            Assert.ThrowsAny<Exception>(() => RandomGraphs.RandomizeGraph(-42, 0.5d, graph, EdgeGenerationRule.NoEdges));
         }
 
         [Fact]
-        public void EmptyGraphShouldWorkAndHaveNoVerticies()
+        public void EmptyGraphShouldWorkAndHaveNoVertices()
         {
-            var graph = RandomGraphs.GetRandomGraph(0, 0.5d, () => new MemoryGraph(), RandomGraphs.EdgeType.Hybrid,false);
+            var graph = new MemoryGraph();
+            RandomGraphs.RandomizeGraph(0, 0.5d, graph, EdgeGenerationRule.NoEdges);
             Assert.Equal(0uL, graph.Vertices.Count());
         }
 
         [Theory]
-        [InlineData(10,false,45uL,9uL)]
-        [InlineData(10,true,55uL,10uL)]
-        public void CompleteBidirectionalGraphsShouldHaveAllEdges(int edgeCount, bool selfdirected, ulong expectedTotalEdgeCount, ulong expectedVertexEdgeCount)
+        [InlineData(10, EdgeGenerationRule.AllowUndirected, 45uL, 9uL)]
+        [InlineData(10, EdgeGenerationRule.AllowUndirected | EdgeGenerationRule.AllowEdgesToItself, 55uL, 10uL)]
+        [InlineData(10, EdgeGenerationRule.AllowDirected, 90uL, 18uL)]
+        [InlineData(10, EdgeGenerationRule.AllowDirected | EdgeGenerationRule.AllowEdgesToItself, 100uL, 19uL)]
+        [InlineData(10, EdgeGenerationRule.AllowDirected | EdgeGenerationRule.AllowUndirected, 135uL, 27uL)]
+        [InlineData(10, EdgeGenerationRule.AllowDirected | EdgeGenerationRule.AllowUndirected | EdgeGenerationRule.AllowEdgesToItself, 155uL, 29uL)]
+        public void CompleteGraphsShouldHaveAllEdges(int edgeCount, EdgeGenerationRule edgeGenerationRule, ulong expectedTotalEdgeCount, ulong expectedVertexEdgeCount)
         {
-            var graph = RandomGraphs.GetRandomGraph(edgeCount, 1d, () => new MemoryGraph(), RandomGraphs.EdgeType.BidirectionalOnly,selfdirected);
+            var graph = new MemoryGraph();
+            RandomGraphs.RandomizeGraph(edgeCount, 1d, graph, edgeGenerationRule);
             Assert.Equal(expectedTotalEdgeCount, graph.Edges.Count());
+            
             foreach(var vertex in graph.Vertices)
             {
-                Assert.Equal(expectedVertexEdgeCount, vertex.BidirectionalEdges.Count());
-            }
-        }
-
-        [Theory]
-        [InlineData(10, false, 90uL, 18uL)]
-        [InlineData(10, true, 100uL, 20uL)]
-        public void CompleteDirectionalGraphsShouldHaveAllEdges(int edgeCount, bool selfdirected, ulong expectedTotalEdgeCount, ulong expectedVertexEdgeCount)
-        {
-            var graph = RandomGraphs.GetRandomGraph(edgeCount, 1d, () => new MemoryGraph(), RandomGraphs.EdgeType.DirectedOnly,selfdirected);
-            Assert.Equal(expectedTotalEdgeCount, graph.Edges.Count());
-            foreach (var vertex in graph.Vertices)
-            {
-                Assert.Equal(expectedVertexEdgeCount, vertex.IngoingEdges.Count()+vertex.OutgoingEdges.Count());
-            }
-        }
-
-        [Theory]
-        [InlineData(10, false, 135uL, 27uL)]
-        [InlineData(10, true, 155uL, 30uL)]
-        public void CompleteHybridGraphsShouldHaveAllEdges(int edgeCount, bool selfdirected, ulong expectedTotalEdgeCount, ulong expectedVertexEdgeCount)
-        {
-            var graph = RandomGraphs.GetRandomGraph(edgeCount, 1d, () => new MemoryGraph(), RandomGraphs.EdgeType.Hybrid, selfdirected);
-            Assert.Equal(expectedTotalEdgeCount, graph.Edges.Count());
-            foreach (var vertex in graph.Vertices)
-            {
-                Assert.Equal(expectedVertexEdgeCount, vertex.IngoingEdges.Count() + vertex.OutgoingEdges.Count() + vertex.BidirectionalEdges.Count());
+                Assert.Equal(expectedVertexEdgeCount, vertex.Edges.Count());
             }
         }
     }

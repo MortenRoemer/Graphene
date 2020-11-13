@@ -12,7 +12,7 @@ namespace Graphene.Test
         {
             var graph = new MemoryGraph();
             RandomGraphs.RandomizeGraph(1, 0.5d, graph, EdgeGenerationRule.NoEdges);
-            Assert.Equal(1uL, graph.Vertices.Count());
+            Assert.Equal(1, graph.Vertices.Count());
         }
 
         [Fact]
@@ -27,17 +27,17 @@ namespace Graphene.Test
         {
             var graph = new MemoryGraph();
             RandomGraphs.RandomizeGraph(0, 0.5d, graph, EdgeGenerationRule.NoEdges);
-            Assert.Equal(0uL, graph.Vertices.Count());
+            Assert.Equal(0, graph.Vertices.Count());
         }
 
         [Theory]
-        [InlineData(10, EdgeGenerationRule.AllowUndirected, 45uL, 9uL)]
-        [InlineData(10, EdgeGenerationRule.AllowUndirected | EdgeGenerationRule.AllowEdgesToItself, 55uL, 10uL)]
-        [InlineData(10, EdgeGenerationRule.AllowDirected, 90uL, 18uL)]
-        [InlineData(10, EdgeGenerationRule.AllowDirected | EdgeGenerationRule.AllowEdgesToItself, 100uL, 19uL)]
-        [InlineData(10, EdgeGenerationRule.AllowDirected | EdgeGenerationRule.AllowUndirected, 135uL, 27uL)]
-        [InlineData(10, EdgeGenerationRule.AllowDirected | EdgeGenerationRule.AllowUndirected | EdgeGenerationRule.AllowEdgesToItself, 155uL, 29uL)]
-        public void CompleteGraphsShouldHaveAllEdges(int edgeCount, EdgeGenerationRule edgeGenerationRule, ulong expectedTotalEdgeCount, ulong expectedVertexEdgeCount)
+        [InlineData(10, EdgeGenerationRule.AllowUndirected, 45, 9)]
+        [InlineData(10, EdgeGenerationRule.AllowUndirected | EdgeGenerationRule.AllowEdgesToItself, 55, 10)]
+        [InlineData(10, EdgeGenerationRule.AllowDirected, 90, 18)]
+        [InlineData(10, EdgeGenerationRule.AllowDirected | EdgeGenerationRule.AllowEdgesToItself, 100, 19)]
+        [InlineData(10, EdgeGenerationRule.AllowDirected | EdgeGenerationRule.AllowUndirected, 135, 27)]
+        [InlineData(10, EdgeGenerationRule.AllowDirected | EdgeGenerationRule.AllowUndirected | EdgeGenerationRule.AllowEdgesToItself, 155, 29)]
+        public void CompleteGraphsShouldHaveAllEdges(int edgeCount, EdgeGenerationRule edgeGenerationRule, int expectedTotalEdgeCount, int expectedVertexEdgeCount)
         {
             var graph = new MemoryGraph();
             RandomGraphs.RandomizeGraph(edgeCount, 1d, graph, edgeGenerationRule);

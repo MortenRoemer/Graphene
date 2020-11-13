@@ -12,7 +12,7 @@ namespace Graphene.InMemory.Utility
             Segments = new Segment[STANDARD_CAPACITY];
         }
 
-        public UniqueNumberSet(ulong from, ulong to) : this()
+        public UniqueNumberSet(int from, int to) : this()
         {
             AppendSegment(new Segment(from, to));
         }
@@ -27,7 +27,7 @@ namespace Graphene.InMemory.Utility
 
         public bool IsEmpty => SegmentCount <= 0;
 
-        public void Add(ulong number)
+        public void Add(int number)
         {
             if (FindSegment(number, out var index))
                 return;
@@ -86,12 +86,12 @@ namespace Graphene.InMemory.Utility
             }
         }
 
-        public bool Contains(ulong number)
+        public bool Contains(int number)
         {
             return FindSegment(number, out _);
         }
 
-        private bool FindSegment(ulong number, out int index)
+        private bool FindSegment(int number, out int index)
         {
             var left = 0;
             var right = SegmentCount - 1;
@@ -117,7 +117,7 @@ namespace Graphene.InMemory.Utility
             return false;
         }
 
-        public void Remove(ulong number)
+        public void Remove(int number)
         {
             if (!FindSegment(number, out var index))
                 return;
@@ -141,7 +141,7 @@ namespace Graphene.InMemory.Utility
             }
         }
 
-        public ulong SampleRandom()
+        public int SampleRandom()
         {
             if (SegmentCount <= 0)
                 throw new InvalidOperationException("no more numbers to sample");
@@ -193,7 +193,7 @@ namespace Graphene.InMemory.Utility
 
         private readonly struct Segment
         {
-            public Segment(ulong min, ulong max)
+            public Segment(int min, int max)
             {
                 if (min > max)
                     throw new ArgumentException($"segment min {min} is greater than {max}");
@@ -202,24 +202,21 @@ namespace Graphene.InMemory.Utility
                 Max = max;
             }
 
-            public ulong Min { get; }
+            public int Min { get; }
 
-            public ulong Max { get; }
+            public int Max { get; }
 
-            private ulong Count => Max - Min + 1;
+            private int Count => Max - Min + 1;
 
-            public bool Contains(ulong number)
+            public bool Contains(int number)
             {
                 return Min <= number && number <= Max;
             }
 
-            public unsafe ulong GetRandom()
+            public int GetRandom()
             {
                 var randomGenerator = RandomGenerator.Value;
-                Span<byte> buffer = stackalloc byte[8];
-                randomGenerator.NextBytes(buffer);
-                var sample = (BitConverter.ToUInt64(buffer) % Count) + Min;
-                return sample;
+                return randomGenerator.Next(Min - 1, Max) + 1;
             }
         }
     }

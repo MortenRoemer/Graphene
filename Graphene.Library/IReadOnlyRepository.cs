@@ -2,22 +2,22 @@ using System.Collections.Generic;
 
 namespace Graphene
 {
-    public interface IReadOnlyRepository<T> : IEnumerable<T>
+    public interface IReadOnlyRepository<out T> : IEnumerable<T>
     {
-        ulong Count();
+        int Count();
 
-        IEnumerable<T> Get(IEnumerable<ulong> ids);
+        IEnumerable<T> Get(IEnumerable<int> ids);
 
-        bool Contains(IEnumerable<ulong> ids);
+        bool Contains(IEnumerable<int> ids);
     }
 
     public static class ReadOnlyRepositoryExtension {
-        public static T Get<T>(this IReadOnlyRepository<T> repository, ulong id) {
+        public static T Get<T>(this IReadOnlyRepository<T> repository, int id) {
             using var enumerator = repository.Get(new[] { id }).GetEnumerator();
             return enumerator.MoveNext() ? enumerator.Current : default;
         }
 
-        public static bool Contains<T>(this IReadOnlyRepository<T> repository, ulong id) {
+        public static bool Contains<T>(this IReadOnlyRepository<T> repository, int id) {
             return repository.Contains(new[] {id});
         }
     }

@@ -19,13 +19,13 @@ namespace Graphene.InMemory
 
         private IEnumerable<IVertex> Vertices { get; }
 
-        public bool Contains(IEnumerable<ulong> ids)
+        public bool Contains(IEnumerable<int> ids)
             => ids.All(id => id == Edge.FromVertex.Id || id == Edge.ToVertex.Id);
 
-        public ulong Count()
-            => (ulong)Vertices.Count();
+        public int Count()
+            => Vertices.Count();
 
-        public IEnumerable<IVertex> Get(IEnumerable<ulong> ids)
+        public IEnumerable<IVertex> Get(IEnumerable<int> ids)
             => Vertices.Where(vertex => ids.Contains(vertex.Id));
 
         public IEnumerator<IVertex> GetEnumerator()

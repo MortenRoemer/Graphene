@@ -11,13 +11,13 @@ namespace Graphene.InMemory
         internal MemoryEdgeRepository(MemoryGraph graph)
         {
             Graph = graph ?? throw new ArgumentNullException(nameof(graph));
-            Edges = new SortedDictionary<ulong, MemoryEdge>();
+            Edges = new SortedDictionary<int, MemoryEdge>();
             Observers = new List<IObserver<CollectionChange<IEdge>>>();
         }
 
         private MemoryGraph Graph { get; }
 
-        private IDictionary<ulong, MemoryEdge> Edges { get; }
+        private IDictionary<int, MemoryEdge> Edges { get; }
         
         private IList<IObserver<CollectionChange<IEdge>>> Observers { get; }
 
@@ -49,14 +49,14 @@ namespace Graphene.InMemory
             Edges.Clear();
         }
 
-        public bool Contains(IEnumerable<ulong> ids)
+        public bool Contains(IEnumerable<int> ids)
         {
             return ids.All(id => Edges.ContainsKey(id));
         }
 
-        public ulong Count()
+        public int Count()
         {
-            return (ulong)Edges.Count;
+            return Edges.Count;
         }
 
         public void Delete(IEnumerable<IEdge> items)
@@ -72,7 +72,7 @@ namespace Graphene.InMemory
             }
         }
 
-        public IEnumerable<IEdge> Get(IEnumerable<ulong> ids)
+        public IEnumerable<IEdge> Get(IEnumerable<int> ids)
         {
             return ids.Select(id => Edges[id]);
         }

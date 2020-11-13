@@ -4,7 +4,7 @@ namespace Graphene
     {
         IGraph Graph { get; }
 
-        ulong Id { get; }
+        int Id { get; }
 
         string Label { get; set; }
 

@@ -15,7 +15,7 @@ namespace Graphene.Test
             Assert.Empty(graph.Vertices);
             Assert.NotNull(graph.Edges);
             Assert.Empty(graph.Edges);
-            Assert.Equal(0uL, graph.Size);
+            Assert.Equal(0, graph.Size);
         }
 
         [Fact]
@@ -196,7 +196,7 @@ namespace Graphene.Test
             _ = va.BidirectionalEdges.Add(vb);
             _ = va.IngoingEdges.Add(vb);
             _ = va.OutgoingEdges.Add(vb);
-            Assert.Equal(3uL, va.Edges.Count());
+            Assert.Equal(3, va.Edges.Count());
         }
 
         [Fact]
@@ -206,9 +206,9 @@ namespace Graphene.Test
             IVertex va = graph.Vertices.Create();
             IVertex vb = graph.Vertices.Create();
             IEdge ea = va.BidirectionalEdges.Add(vb);
-            Assert.Equal(2uL, ea.Vertices.Count());
+            Assert.Equal(2, ea.Vertices.Count());
             IEdge eb = va.BidirectionalEdges.Add(va);
-            Assert.Equal(1uL, eb.Vertices.Count());
+            Assert.Equal(1, eb.Vertices.Count());
         }
     }
 }

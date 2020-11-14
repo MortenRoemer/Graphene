@@ -10,13 +10,13 @@ namespace Graphene.InMemory
         internal MemoryVertexRepository(MemoryGraph graph, MemoryEdgeRepository edges)
         {
             Graph = graph ?? throw new ArgumentNullException(nameof(graph));
-            Vertices = new SortedDictionary<ulong, MemoryVertex>();
+            Vertices = new SortedDictionary<int, MemoryVertex>();
             Edges = edges ?? throw new ArgumentNullException(nameof(edges));
         }
 
         private MemoryGraph Graph { get; }
 
-        private IDictionary<ulong, MemoryVertex> Vertices { get; }
+        private IDictionary<int, MemoryVertex> Vertices { get; }
 
         private MemoryEdgeRepository Edges { get; }
 
@@ -29,14 +29,14 @@ namespace Graphene.InMemory
             Edges.Clear();
         }
 
-        public bool Contains(IEnumerable<ulong> ids)
+        public bool Contains(IEnumerable<int> ids)
         {
             return ids.All(id => Vertices.ContainsKey(id));
         }
 
-        public ulong Count()
+        public int Count()
         {
-            return (ulong)Vertices.Count;
+            return Vertices.Count;
         }
 
         public IVertex Create()
@@ -63,7 +63,7 @@ namespace Graphene.InMemory
             }
         }
 
-        public IEnumerable<IVertex> Get(IEnumerable<ulong> ids)
+        public IEnumerable<IVertex> Get(IEnumerable<int> ids)
         {
             return ids.Select(id => Vertices[id]);
         }

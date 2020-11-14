@@ -21,17 +21,17 @@ namespace Graphene.InMemory
         
         protected Lazy<Cache> EdgeCache { get; }
 
-        public bool Contains(IEnumerable<ulong> ids)
+        public bool Contains(IEnumerable<int> ids)
         {
             return ids.All(id => EdgeCache.Value.Buffer.ContainsKey(id));
         }
 
-        public ulong Count()
+        public int Count()
         {
-            return (ulong)EdgeCache.Value.Buffer.LongCount();
+            return EdgeCache.Value.Buffer.Count;
         }
 
-        public IEnumerable<IEdge> Get(IEnumerable<ulong> ids)
+        public IEnumerable<IEdge> Get(IEnumerable<int> ids)
         {
             return ids.Select(id => EdgeCache.Value.Buffer[id]);
         }
@@ -64,7 +64,7 @@ namespace Graphene.InMemory
         {
             public Cache(MemoryEdgeRepository edges, Func<IEdge, bool> predicate)
             {
-                Buffer = new SortedDictionary<ulong, IEdge>();
+                Buffer = new Dictionary<int, IEdge>();
                 Predicate = predicate ?? throw new ArgumentNullException(nameof(predicate));
                 PopulateBuffer(edges);
                 Subscription = edges.Subscribe(this);
@@ -75,7 +75,7 @@ namespace Graphene.InMemory
                 Subscription.Dispose();
             }
             
-            public IDictionary<ulong, IEdge> Buffer { get; }
+            public IDictionary<int, IEdge> Buffer { get; }
 
             private Func<IEdge, bool> Predicate { get; }
             

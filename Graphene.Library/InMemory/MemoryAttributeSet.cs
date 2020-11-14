@@ -14,7 +14,7 @@ namespace Graphene.InMemory
 
         private Lazy<IDictionary<string, object>> Attributes { get; }
 
-        public long Count => Attributes.IsValueCreated ? Attributes.Value.Count : 0;
+        public int Count => Attributes.IsValueCreated ? Attributes.Value.Count : 0;
 
         public IEnumerable<string> Names => Attributes.IsValueCreated ? Attributes.Value.Keys : Enumerable.Empty<string>();
 
@@ -51,10 +51,7 @@ namespace Graphene.InMemory
 
         public T GetOrDefault<T>(string name, T defaultValue)
         {
-            if (TryGet(name, out T result))
-                return result;
-
-            return defaultValue;
+            return TryGet(name, out T result) ? result : defaultValue;
         }
 
         IEnumerator IEnumerable.GetEnumerator()

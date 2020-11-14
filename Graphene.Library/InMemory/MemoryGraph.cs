@@ -11,10 +11,10 @@ namespace Graphene.InMemory
         {
             MemoryEdges = new MemoryEdgeRepository(this);
             MemoryVertices = new MemoryVertexRepository(this, MemoryEdges);
-            AvailableIds = new UniqueNumberSet(1ul, ulong.MaxValue);
+            AvailableIds = new UniqueNumberSet(1, int.MaxValue);
         }
 
-        public ulong Size => Vertices.Count() + Edges.Count();
+        public int Size => Vertices.Count() + Edges.Count();
 
         public IVertexRepository Vertices => MemoryVertices;
 
@@ -41,7 +41,7 @@ namespace Graphene.InMemory
 
         public void Merge(IGraph other)
         {
-             var mappedIds = new Dictionary<ulong, ulong>();
+             var mappedIds = new Dictionary<int, int>();
 
             foreach (var vertex in other.Vertices)
             {
@@ -59,12 +59,12 @@ namespace Graphene.InMemory
             {
                 IEdge newEdge;
                 var fromVertex = Vertices.Get(mappedIds[edge.FromVertex.Id]);
-                var ToVertex = Vertices.Get(mappedIds[edge.ToVertex.Id]);
+                var toVertex = Vertices.Get(mappedIds[edge.ToVertex.Id]);
 
                 if (edge.Directed)
-                    newEdge = fromVertex.OutgoingEdges.Add(ToVertex);
+                    newEdge = fromVertex.OutgoingEdges.Add(toVertex);
                 else
-                    newEdge = fromVertex.BidirectionalEdges.Add(ToVertex);
+                    newEdge = fromVertex.BidirectionalEdges.Add(toVertex);
 
                 newEdge.Label = edge.Label;
 
@@ -80,12 +80,12 @@ namespace Graphene.InMemory
             return new BuilderRoot(this);
         }
 
-        internal ulong TakeId()
+        internal int TakeId()
         {
             return AvailableIds.SampleRandom();
         }
 
-        internal void FreeId(ulong id)
+        internal void FreeId(int id)
         {
             AvailableIds.Add(id);
         }

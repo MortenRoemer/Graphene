@@ -7,38 +7,30 @@ namespace Graphene.InMemory.Query
 {
     internal class SearchGraph
     {
-        private SearchGraph(IReadOnlyDictionary<ulong, Vertex> vertices, bool hasNegativeWeights)
+        private SearchGraph(IReadOnlyDictionary<int, Vertex> vertices, bool hasNegativeWeights)
         {
             Vertices = vertices ?? throw new ArgumentNullException(nameof(vertices));
             HasNegativeWeights = hasNegativeWeights;
         }
 
-        private readonly IReadOnlyDictionary<ulong, Vertex> Vertices;
+        private IReadOnlyDictionary<int, Vertex> Vertices { get; }
 
-        private readonly bool HasNegativeWeights;
+        private bool HasNegativeWeights { get; }
 
         public static SearchGraph CreateForRoute(
             IGraph graph,
             BuilderRoute routeDefinition,
-            IEnumerable<ulong> essentialVertices,
+            IEnumerable<int> essentialVertices,
             Func<IEdge, double> weightFunction
         )
         {
-            var vertices = new Dictionary<ulong, Vertex>();
             var hasNegativeWeights = false;
-            var essentialVertexSet = new SortedSet<ulong>(essentialVertices);
+            var essentialVertexSet = new HashSet<int>(essentialVertices);
 
-            foreach (
-                var vertex in graph.Vertices
-                .Where(
-                    vertex => 
-                    essentialVertexSet.Contains(vertex.Id) ||
-                    (routeDefinition.VertexFilter?.Contains(vertex) ?? true)
-                )
-            )
-            {
-                vertices.Add(vertex.Id, new Vertex { Origin = vertex });
-            }
+            var vertices = graph.Vertices
+                .Where(vertex =>
+                    essentialVertexSet.Contains(vertex.Id) || (routeDefinition.VertexFilter?.Contains(vertex) ?? true))
+                .ToDictionary(vertex => vertex.Id, vertex => new Vertex {Origin = vertex});
 
             foreach (var vertex in vertices.Values)
             {
@@ -92,12 +84,12 @@ namespace Graphene.InMemory.Query
             return new SearchGraph(vertices, hasNegativeWeights);
         }
 
-        private static ulong GetOtherVertexId(IEdge edge, ulong origin)
+        private static int GetOtherVertexId(IEdge edge, int origin)
             => edge.FromVertex.Id == origin
                 ? edge.ToVertex.Id
                 : edge.FromVertex.Id;
 
-        public bool FindMinRoute(ulong fromVertex, ulong toVertex, out IEnumerable<IEntity> result)
+        public bool FindMinRoute(int fromVertex, int toVertex, out IEnumerable<IEntity> result)
         {
             if (HasNegativeWeights)
                 throw new NotImplementedException();
@@ -105,10 +97,10 @@ namespace Graphene.InMemory.Query
             return FindWithDjikstra(fromVertex, toVertex, out result);
         }
 
-        private bool FindWithDjikstra(ulong fromVertex, ulong toVertex, out IEnumerable<IEntity> result)
+        private bool FindWithDjikstra(int fromVertex, int toVertex, out IEnumerable<IEntity> result)
         {
             var queue = new PriorityQueue<double, DjikstraVertex>();
-            var visitedVertices = new HashSet<ulong>();
+            var visitedVertices = new HashSet<int>();
 
             if (Vertices.TryGetValue(fromVertex, out var startVertex))
                 queue.Insert(0, new DjikstraVertex {Vertex = startVertex});

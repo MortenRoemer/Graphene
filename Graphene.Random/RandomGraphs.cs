@@ -1,40 +1,52 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace Graphene.Random
 {
     public static class RandomGraphs
     {
-        public delegate IGraph GraphConstructor();
-        public enum edgeType {bidirectedOnly, directedOnly, hybrid};
-        public static IGraph GetRandomGraph(int vertexCount, double edgeProbability, GraphConstructor graphConstructor, edgeType edgeType, bool allowSelfdirectedEdges)
+        private static readonly ThreadLocal<System.Random> Randomizer =
+            new ThreadLocal<System.Random>(() => new System.Random(), false);
+        
+        public static void RandomizeGraph(int vertexCount, double edgeProbability, IGraph graph, EdgeGenerationRule edgeGenerationRule)
         {
-            if (vertexCount < 0) throw new ArgumentOutOfRangeException();
-            var graph = graphConstructor();
-            var randomiser = new System.Random();
-            for(int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++)
+            if (vertexCount < 0)
+                throw new ArgumentOutOfRangeException();
+            
+            graph.Clear();
+            var randomizer = Randomizer.Value;
+
+            for(var vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++)
             {
                 var newVertex = graph.Vertices.Create();
-                foreach(var vertex in graph.Vertices.Where(vertex=>vertex.Id != newVertex.Id || allowSelfdirectedEdges))
+                IEnumerable<IVertex> vertices = graph.Vertices;
+
+                if (!HasRule(EdgeGenerationRule.AllowEdgesToItself, edgeGenerationRule))
+                    vertices = vertices.Where(vertex => vertex.Id != newVertex.Id);
+                
+                foreach(var vertex in vertices)
                 {
-                    switch (edgeType)
+                    if (HasRule(EdgeGenerationRule.AllowUndirected, edgeGenerationRule) &&
+                        randomizer.NextDouble() < edgeProbability)
+                        vertex.BidirectionalEdges.Add(newVertex);
+
+                    if (HasRule(EdgeGenerationRule.AllowDirected, edgeGenerationRule))
                     {
-                        case edgeType.bidirectedOnly:
-                            if (randomiser.NextDouble() < edgeProbability) vertex.BidirectionalEdges.Add(newVertex);
-                            break;
-                        case edgeType.directedOnly:
-                            if (randomiser.NextDouble() < edgeProbability) vertex.IngoingEdges.Add(newVertex);
-                            if (!(vertex.Id == newVertex.Id) && randomiser.NextDouble() < edgeProbability) vertex.OutgoingEdges.Add(newVertex);
-                            break;
-                        case edgeType.hybrid:
-                            if (randomiser.NextDouble() < edgeProbability) vertex.IngoingEdges.Add(newVertex);
-                            if (!(vertex.Id == newVertex.Id) && randomiser.NextDouble() < edgeProbability) vertex.OutgoingEdges.Add(newVertex);
-                            if (randomiser.NextDouble() < edgeProbability) vertex.BidirectionalEdges.Add(newVertex);
-                            break;
-                    }                                        
+                        if (randomizer.NextDouble() < edgeProbability)
+                            vertex.IngoingEdges.Add(newVertex);
+
+                        if (vertex.Id != newVertex.Id && randomizer.NextDouble() < edgeProbability)
+                            vertex.OutgoingEdges.Add(newVertex);
+                    }
                 }
             }
-            return graph;
+        }
+
+        private static bool HasRule(EdgeGenerationRule expected, EdgeGenerationRule ruleSet)
+        {
+            return (ruleSet & expected) > 0;
         }
     }
 }

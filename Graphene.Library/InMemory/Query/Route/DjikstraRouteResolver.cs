@@ -4,7 +4,7 @@ using System.Linq;
 using Graphene.InMemory.Utility;
 using Graphene.Query.Route;
 
-namespace Graphene.InMemory.Query
+namespace Graphene.InMemory.Query.Route
 {
     public static class DjikstraRouteResolver
     {

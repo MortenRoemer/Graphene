@@ -1,13 +1,13 @@
 namespace Graphene
 {
-    public interface IVertex : IEntity
+    public interface IVertex : IEntity, IReadOnlyVertex
     {
-        IReadOnlyRepository<IEdge> Edges { get; }
+        new IReadOnlyRepository<IEdge> Edges { get; }
+        
+        new IVertexEdgeRepository IngoingEdges { get; }
 
-        IVertexEdgeRepository IngoingEdges { get; }
+        new IVertexEdgeRepository OutgoingEdges { get; }
 
-        IVertexEdgeRepository OutgoingEdges { get; }
-
-        IVertexEdgeRepository BidirectionalEdges { get; }
+        new IVertexEdgeRepository BidirectionalEdges { get; }
     }
 }

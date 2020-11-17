@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Graphene.InMemory.Query;
 using Graphene.InMemory.Utility;
@@ -15,10 +16,12 @@ namespace Graphene.InMemory
         }
 
         public int Size => Vertices.Count() + Edges.Count();
+        
+        IReadOnlyRepository<IReadOnlyVertex> IReadOnlyGraph.Vertices => Vertices;
 
         public IVertexRepository Vertices => MemoryVertices;
 
-        public IReadOnlyRepository<IEdge> Edges => MemoryEdges;
+        public IReadOnlyRepository<IReadOnlyEdge> Edges => MemoryEdges;
 
         private MemoryVertexRepository MemoryVertices { get; }
 
@@ -39,7 +42,7 @@ namespace Graphene.InMemory
             return result;
         }
 
-        public void Merge(IGraph other)
+        public void Merge(IReadOnlyGraph other)
         {
              var mappedIds = new Dictionary<int, int>();
 
@@ -75,9 +78,9 @@ namespace Graphene.InMemory
             }
         }
 
-        public IQueryBuilderRoot Select()
+        public IQueryRoot Select()
         {
-            return new BuilderRoot(this);
+            return new QueryRoot(this);
         }
 
         internal int TakeId()

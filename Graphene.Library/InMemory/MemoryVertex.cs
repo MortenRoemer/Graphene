@@ -15,6 +15,14 @@ namespace Graphene.InMemory
             Edges = new MemoryReadOnlyEdgeRepository.Combined(edges, this);
         }
 
+        IReadOnlyRepository<IReadOnlyEdge> IReadOnlyVertex.Edges => Edges;
+
+        IReadOnlyRepository<IReadOnlyEdge> IReadOnlyVertex.IngoingEdges => IngoingEdges;
+
+        IReadOnlyRepository<IReadOnlyEdge> IReadOnlyVertex.OutgoingEdges => OutgoingEdges;
+
+        IReadOnlyRepository<IReadOnlyEdge> IReadOnlyVertex.BidirectionalEdges => BidirectionalEdges;
+
         public IVertexEdgeRepository IngoingEdges { get; }
 
         public IVertexEdgeRepository OutgoingEdges { get; }
@@ -23,9 +31,12 @@ namespace Graphene.InMemory
 
         public IGraph Graph { get; }
 
+        IReadOnlyGraph IReadOnlyEntity.Graph => Graph;
+
         public int Id { get; }
 
         public string Label { get; set; }
+        IReadOnlyAttributeSet IReadOnlyEntity.Attributes => Attributes;
 
         public IAttributeSet Attributes { get; }
         

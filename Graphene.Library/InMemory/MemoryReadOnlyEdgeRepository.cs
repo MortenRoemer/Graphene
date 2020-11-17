@@ -70,11 +70,6 @@ namespace Graphene.InMemory
                 Subscription = edges.Subscribe(this);
             }
 
-            ~Cache()
-            {
-                Subscription.Dispose();
-            }
-            
             public IDictionary<int, IEdge> Buffer { get; }
 
             private Func<IEdge, bool> Predicate { get; }

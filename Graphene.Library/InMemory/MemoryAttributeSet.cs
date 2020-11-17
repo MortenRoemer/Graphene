@@ -14,6 +14,12 @@ namespace Graphene.InMemory
 
         private Lazy<IDictionary<string, object>> Attributes { get; }
 
+        public object this[string name]
+        {
+            get => TryGet(name, out object result) ? result : throw new KeyNotFoundException($"attribute with name {name} is not present");
+            set => Set(name, value);
+        }
+
         public int Count => Attributes.IsValueCreated ? Attributes.Value.Count : 0;
 
         public IEnumerable<string> Names => Attributes.IsValueCreated ? Attributes.Value.Keys : Enumerable.Empty<string>();
@@ -51,7 +57,14 @@ namespace Graphene.InMemory
 
         public T GetOrDefault<T>(string name, T defaultValue)
         {
-            return TryGet(name, out T result) ? result : defaultValue;
+            try
+            {
+                return TryGet(name, out T result) ? result : defaultValue;
+            }
+            catch (InvalidCastException)
+            {
+                return defaultValue;
+            }
         }
 
         IEnumerator IEnumerable.GetEnumerator()

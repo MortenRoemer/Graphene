@@ -1,13 +1,11 @@
 namespace Graphene
 {
-    public interface IEntity
+    public interface IEntity : IReadOnlyEntity
     {
-        IGraph Graph { get; }
+        new IGraph Graph { get; }
 
-        int Id { get; }
+        new string Label { get; set; }
 
-        string Label { get; set; }
-
-        IAttributeSet Attributes { get; }
+        new IAttributeSet Attributes { get; }
     }
 }

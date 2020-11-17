@@ -15,6 +15,12 @@ namespace Graphene.InMemory
             Vertices = new MemoryCombinedVertexRepository(this);
         }
 
+        IReadOnlyRepository<IReadOnlyVertex> IReadOnlyEdge.Vertices => Vertices;
+
+        IReadOnlyVertex IReadOnlyEdge.FromVertex => FromVertex;
+
+        IReadOnlyVertex IReadOnlyEdge.ToVertex => ToVertex;
+
         public IVertex FromVertex { get; }
 
         public IVertex ToVertex { get; }
@@ -23,9 +29,12 @@ namespace Graphene.InMemory
 
         public IGraph Graph { get; }
 
+        IReadOnlyGraph IReadOnlyEntity.Graph => Graph;
+
         public int Id { get; }
 
         public string Label { get; set; }
+        IReadOnlyAttributeSet IReadOnlyEntity.Attributes => Attributes;
 
         public IAttributeSet Attributes { get; }
 

@@ -51,20 +51,28 @@ namespace Graphene.InMemory
             }
 
             var found = Attributes.Value.TryGetValue(name, out var result);
-            value = (T)result;
-            return found;
+
+            if (!found)
+            {
+                value = default;
+                return false;
+            }
+            
+            try
+            {
+                value = (T)result;
+                return true;
+            }
+            catch (InvalidCastException)
+            {
+                value = default;
+                return false;
+            }
         }
 
         public T GetOrDefault<T>(string name, T defaultValue)
         {
-            try
-            {
-                return TryGet(name, out T result) ? result : defaultValue;
-            }
-            catch (InvalidCastException)
-            {
-                return defaultValue;
-            }
+            return TryGet(name, out T result) ? result : defaultValue;
         }
 
         IEnumerator IEnumerable.GetEnumerator()

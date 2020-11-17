@@ -11,11 +11,10 @@ namespace Graphene.InMemory.Query
         }
         
         private IReadOnlyGraph Graph { get; }
-
-
+        
         public Graphene.Query.Route.IRoot Route()
         {
-            throw new NotImplementedException();
+            return new Route.Root(Graph);
         }
 
         public Graphene.Query.SubGraph.IRoot SubGraph()

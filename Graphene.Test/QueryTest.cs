@@ -11,6 +11,27 @@ namespace Graphene.Test
         private static readonly Lazy<IGraph> ExampleGraph = new Lazy<IGraph>(CreateExampleGraph, LazyThreadSafetyMode.ExecutionAndPublication);
 
         [Fact]
+        public void RouteVertexToVertexTest()
+        {
+            var graph = ExampleGraph.Value;
+            var hamburgId = GetVertexWithName(graph, "hamburg");
+            var berlinId = GetVertexWithName(graph, "berlin");
+
+            var route = graph.Select()
+                .Route()
+                .FromVertex(hamburgId)
+                .WithMinimalEdges()
+                .ToVertex(berlinId)
+                .Resolve();
+            
+            Assert.True(route.Found);
+            Assert.Equal(1, route.Steps.Count);
+            Assert.Equal("hamburg", route.Origin.Attributes.GetOrDefault("name", string.Empty));
+            Assert.Equal("a24", route.Steps[0].Edge.Attributes.GetOrDefault("name", string.Empty));
+            Assert.Equal("berlin", route.Steps[0].Vertex.Attributes.GetOrDefault("name", string.Empty));
+        }
+        
+        [Fact]
         public void SubGraphSelectVerticesTest()
         {
             var graph = ExampleGraph.Value;
@@ -139,7 +160,7 @@ namespace Graphene.Test
             hamburg.Attributes["population"] = 1_899_160;
 
             var munich = graph.Vertices.Create("city");
-            munich.Attributes["name"] = munich;
+            munich.Attributes["name"] = nameof(munich);
             munich.Attributes["population"] = 1_484_226;
             
             var a24 = hamburg.BidirectionalEdges.Add(berlin, "autobahn");
@@ -155,6 +176,14 @@ namespace Graphene.Test
             a9.Attributes["distance"] = 584.81;
 
             return graph;
+        }
+
+        private static int GetVertexWithName(IReadOnlyGraph graph, string expectedName)
+        {
+            return graph.Vertices
+                .Where(vertex => vertex.Attributes.TryGet("name", out string name) && name.Equals(expectedName))
+                .Select(vertex => vertex.Id)
+                .First();
         }
     }
 }

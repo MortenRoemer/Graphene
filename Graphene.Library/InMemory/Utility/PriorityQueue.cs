@@ -49,6 +49,7 @@ namespace Graphene.InMemory.Utility
 
         public void Insert(TPriority priority, TPayLoad payLoad)
         {
+            RemoveExistingIfHigher(priority, payLoad);
             EnsureCapacity();
             var entries = Entries.Span;
 
@@ -101,6 +102,29 @@ namespace Graphene.InMemory.Utility
             var result = PeekMax();
             Count--;
             return result;
+        }
+
+        private void RemoveExistingIfHigher(TPriority priority, TPayLoad payLoad)
+        {
+            var entries = Entries.Span;
+            
+            for (var index = Beginning; index < Beginning + Count; index++)
+            {
+                var currentEntry = entries[index];
+
+                if (!currentEntry.PayLoad.Equals(payLoad))
+                    continue;
+                
+                if (currentEntry.Priority.CompareTo(priority) <= 0)
+                    return;
+                    
+                var blockSize = Count - index - Beginning - 1;
+                var source = entries.Slice(index + 1, blockSize);
+                var target = entries.Slice(index, blockSize);
+                source.CopyTo(target);
+                Count--;
+                return;
+            }
         }
 
         public IEnumerator<TPayLoad> GetEnumerator()

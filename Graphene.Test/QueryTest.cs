@@ -11,7 +11,7 @@ namespace Graphene.Test
         private static readonly Lazy<IGraph> ExampleGraph = new Lazy<IGraph>(CreateExampleGraph, LazyThreadSafetyMode.ExecutionAndPublication);
 
         [Fact]
-        public void RouteVertexToVertexTest()
+        public void RouteVertexWithMinimalEdgesToVertexTest()
         {
             var graph = ExampleGraph.Value;
             var hamburgId = GetVertexWithName(graph, "hamburg");
@@ -25,7 +25,28 @@ namespace Graphene.Test
                 .Resolve();
             
             Assert.True(route.Found);
-            Assert.Equal(1, route.Steps.Count);
+            Assert.Equal(1, route.Metric);
+            Assert.Equal("hamburg", route.Origin.Attributes.GetOrDefault("name", string.Empty));
+            Assert.Equal("a24", route.Steps[0].Edge.Attributes.GetOrDefault("name", string.Empty));
+            Assert.Equal("berlin", route.Steps[0].Vertex.Attributes.GetOrDefault("name", string.Empty));
+        }
+        
+        [Fact]
+        public void RouteVertexWithMinimalMetricToVertexTest()
+        {
+            var graph = ExampleGraph.Value;
+            var hamburgId = GetVertexWithName(graph, "hamburg");
+            var berlinId = GetVertexWithName(graph, "berlin");
+
+            var route = graph.Select()
+                .Route()
+                .FromVertex(hamburgId)
+                .WithMinimalMetric(edge => edge.Attributes.GetOrDefault("distance", 0.0f))
+                .ToVertex(berlinId)
+                .Resolve();
+            
+            Assert.True(route.Found);
+            Assert.Equal(237.46f, route.Metric);
             Assert.Equal("hamburg", route.Origin.Attributes.GetOrDefault("name", string.Empty));
             Assert.Equal("a24", route.Steps[0].Edge.Attributes.GetOrDefault("name", string.Empty));
             Assert.Equal("berlin", route.Steps[0].Vertex.Attributes.GetOrDefault("name", string.Empty));
@@ -102,7 +123,7 @@ namespace Graphene.Test
         public void SubGraphEdgesFilterTest()
         {
             static bool Filter(IReadOnlyEdge edge) =>
-                edge.Attributes.TryGet("distance", out double distance) && distance < 300.00;
+                edge.Attributes.TryGet("distance", out float distance) && distance < 300.00f;
 
             var graph = ExampleGraph.Value;
 
@@ -126,7 +147,7 @@ namespace Graphene.Test
         public void SubGraphVertexWithEdgesFilterTest()
         {
             static bool Filter(IReadOnlyEdge edge) =>
-                edge.Attributes.TryGet("distance", out double distance) && distance < 300.00;
+                edge.Attributes.TryGet("distance", out float distance) && distance < 300.00f;
 
             var graph = ExampleGraph.Value;
 
@@ -165,15 +186,15 @@ namespace Graphene.Test
             
             var a24 = hamburg.BidirectionalEdges.Add(berlin, "autobahn");
             a24.Attributes["name"] = nameof(a24);
-            a24.Attributes["distance"] = 237.46;
+            a24.Attributes["distance"] = 237.46f;
 
             var a7 = hamburg.BidirectionalEdges.Add(munich, "autobahn");
             a7.Attributes["name"] = nameof(a7);
-            a7.Attributes["distance"] = 777.52;
+            a7.Attributes["distance"] = 777.52f;
 
             var a9 = berlin.BidirectionalEdges.Add(munich, "autobahn");
             a9.Attributes["name"] = nameof(a9);
-            a9.Attributes["distance"] = 584.81;
+            a9.Attributes["distance"] = 584.81f;
 
             return graph;
         }

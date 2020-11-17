@@ -1,3 +1,4 @@
+using System;
 using Graphene.Query.Route;
 
 namespace Graphene.InMemory.Query.Route
@@ -17,6 +18,14 @@ namespace Graphene.InMemory.Query.Route
         public IWithMinimalEdges WithMinimalEdges()
         {
             return new WithMinimalEdges(this);
+        }
+
+        public IWithMinimalMetric WithMinimalMetric(Func<IReadOnlyEdge, float> metricFunction)
+        {
+            if (metricFunction is null)
+                throw new ArgumentNullException(nameof(metricFunction));
+            
+            return new WithMinimalMetric(this, metricFunction);
         }
     }
 }

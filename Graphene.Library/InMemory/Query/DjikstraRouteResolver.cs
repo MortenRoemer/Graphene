@@ -4,34 +4,27 @@ using System.Linq;
 using Graphene.InMemory.Utility;
 using Graphene.Query.Route;
 
-namespace Graphene.InMemory.Query.Route
+namespace Graphene.InMemory.Query
 {
-    public class ToVertex : IToVertex
+    public static class DjikstraRouteResolver
     {
-        internal ToVertex(WithMinimalEdges withMinimalEdges, int vertexId)
+        internal static RouteResult<TMetric> SolveForMinimalMetric<TMetric>(
+            IReadOnlyVertex origin,
+            IReadOnlyVertex target,
+            Func<IReadOnlyEdge, bool> edgeFilter, 
+            Func<IReadOnlyEdge, TMetric> metricFunction,
+            Func<TMetric, TMetric, TMetric> accumulatorFunction
+        ) where TMetric : IComparable<TMetric>
         {
-            WithMinimalEdges = withMinimalEdges;
-            VertexId = vertexId;
-        }
-        
-        private WithMinimalEdges WithMinimalEdges { get; }
-        
-        private int VertexId { get; }
-        
-        public IRouteResult Resolve()
-        {
-            var graph = WithMinimalEdges.FromVertex.Root.Graph;
-            var origin = graph.Vertices.Get(WithMinimalEdges.FromVertex.VertexId);
-            var edgeFilter = WithMinimalEdges.Filter;
-            var queue = new PriorityQueue<int, Node>();
-            queue.Insert(0, new Node {Vertex = origin});
+            var queue = new PriorityQueue<TMetric, Node<TMetric>>();
+            queue.Insert(default, new Node<TMetric> {Vertex = origin});
             var visitedNodes = new HashSet<int>();
 
             while (!queue.IsEmpty)
             {
                 var currentNode = queue.RemoveMin();
 
-                if (currentNode.Vertex.Id == VertexId)
+                if (currentNode.Vertex.Id == target.Id)
                     return PackageResult(currentNode);
                 
                 if (visitedNodes.Contains(currentNode.Vertex.Id))
@@ -54,22 +47,22 @@ namespace Graphene.InMemory.Query.Route
                     if (visitedNodes.Contains(otherVertex.Id))
                         continue;
 
-                    var newNode = new Node
+                    var newNode = new Node<TMetric>
                     {
                         Vertex = otherVertex,
-                        Distance = currentNode.Distance + 1,
+                        Metric = accumulatorFunction(currentNode.Metric, metricFunction(edge)),
                         Previous = currentNode,
                         PreviousEdge = edge
                     };
                     
-                    queue.Insert(newNode.Distance, newNode);
+                    queue.Insert(newNode.Metric, newNode);
                 }
             }
             
-            return new RouteResult(false, origin, Array.Empty<RouteStep>());
+            return new RouteResult<TMetric>(false, origin, Array.Empty<RouteStep>(), default);
         }
 
-        private static IRouteResult PackageResult(Node node)
+        private static RouteResult<TMetric> PackageResult<TMetric>(Node<TMetric> node)
         {
             var stepStack = new Stack<RouteStep>();
             var currentNode = node;
@@ -80,16 +73,16 @@ namespace Graphene.InMemory.Query.Route
                 currentNode = currentNode.Previous;
             }
             
-            return new RouteResult(true, currentNode.Vertex, stepStack.ToArray());
+            return new RouteResult<TMetric>(true, currentNode.Vertex, stepStack.ToArray(), node.Metric);
         }
 
-        private class Node
+        private class Node<TMetric>
         {
             public IReadOnlyVertex Vertex { get; set; }
             
-            public int Distance { get; set; }
+            public TMetric Metric { get; set; }
             
-            public Node Previous { get; set; }
+            public Node<TMetric> Previous { get; set; }
             
             public IReadOnlyEdge PreviousEdge { get; set; }
         }

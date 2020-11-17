@@ -60,7 +60,7 @@ namespace Graphene.InMemory.Utility
                 if (priority.CompareTo(entry.Priority) >= 0)
                     continue;
                 
-                var blockSize = Count - index - Beginning;
+                var blockSize = Count - index;
                 var source = entries.Slice(index, blockSize);
                 var target = entries.Slice(index + 1, blockSize);
                 source.CopyTo(target);
@@ -118,7 +118,7 @@ namespace Graphene.InMemory.Utility
                 if (currentEntry.Priority.CompareTo(priority) <= 0)
                     return;
                     
-                var blockSize = Count - index - Beginning - 1;
+                var blockSize = Count - index - 1;
                 var source = entries.Slice(index + 1, blockSize);
                 var target = entries.Slice(index, blockSize);
                 source.CopyTo(target);

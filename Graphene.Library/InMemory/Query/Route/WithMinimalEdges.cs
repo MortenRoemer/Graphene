@@ -14,9 +14,9 @@ namespace Graphene.InMemory.Query.Route
         
         internal Func<IReadOnlyEdge, bool> Filter { get; private set; }
         
-        public IToVertex ToVertex(int vertexId)
+        public IToVertex<int> ToVertex(int vertexId)
         {
-            return new ToVertex(this, vertexId);
+            return new WithMinimalEdgesToVertex(this, vertexId);
         }
 
         public IWithMinimalEdges Where(Func<IReadOnlyEdge, bool> filter)

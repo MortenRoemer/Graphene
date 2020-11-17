@@ -1,15 +1,15 @@
 using System.Collections.Generic;
-using Graphene.Query.Route;
 
-namespace Graphene.InMemory.Query.Route
+namespace Graphene.Query.Route
 {
-    public class RouteResult : IRouteResult
+    public readonly struct RouteResult<TMetric>
     {
-        internal RouteResult(bool found, IReadOnlyVertex origin, IReadOnlyList<RouteStep> steps)
+        internal RouteResult(bool found, IReadOnlyVertex origin, IReadOnlyList<RouteStep> steps, TMetric metric)
         {
             Found = found;
             Origin = origin;
             Steps = steps;
+            Metric = metric;
         }
         
         public bool Found { get; }
@@ -17,5 +17,7 @@ namespace Graphene.InMemory.Query.Route
         public IReadOnlyVertex Origin { get; }
         
         public IReadOnlyList<RouteStep> Steps { get; }
+
+        public TMetric Metric { get; }
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,7 +7,7 @@ namespace Graphene.InMemory.Query
 {
     public class MemoryVertexView : IReadOnlyRepository<IReadOnlyVertex>
     {
-        public MemoryVertexView(IReadOnlyRepository<IReadOnlyVertex> backend, IEnumerable<int> range)
+        internal MemoryVertexView(IReadOnlyRepository<IReadOnlyVertex> backend, IEnumerable<int> range)
         {
             Backend = backend;
             Range = range is ISet<int> set ? set : new HashSet<int>(range);
@@ -33,11 +34,17 @@ namespace Graphene.InMemory.Query
 
         public IEnumerable<IReadOnlyVertex> Get(IEnumerable<int> ids)
         {
+            if (ids is null)
+                throw new ArgumentNullException(nameof(ids));
+            
             return Backend.Get(ids.Where(id => Range.Contains(id)));
         }
 
         public bool Contains(IEnumerable<int> ids)
         {
+            if (ids is null)
+                throw new ArgumentNullException(nameof(ids));
+            
             return ids.All(id => Range.Contains(id));
         }
     }

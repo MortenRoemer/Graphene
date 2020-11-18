@@ -206,8 +206,6 @@ namespace Graphene.InMemory.Utility
 
             public int Max { get; }
 
-            private int Count => Max - Min + 1;
-
             public bool Contains(int number)
             {
                 return Min <= number && number <= Max;

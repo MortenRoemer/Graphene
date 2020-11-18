@@ -46,6 +46,9 @@ namespace Graphene.InMemory.Query.SubGraph
 
         public IVerticesWithEdges Where(Func<IReadOnlyEdge, bool> filter)
         {
+            if (filter is null)
+                throw new ArgumentNullException(nameof(filter));
+            
             Filter = Filter is null ? filter : edge => Filter(edge) && filter(edge);
             return this;
         }

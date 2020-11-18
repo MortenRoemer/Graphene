@@ -49,6 +49,12 @@ namespace Graphene.InMemory.Utility
 
         public void Insert(TPriority priority, TPayLoad payLoad)
         {
+            if (priority is null)
+                throw new ArgumentNullException(nameof(priority));
+            
+            if (payLoad is null)
+                throw new ArgumentNullException(nameof(payLoad));
+            
             RemoveExistingIfHigher(priority, payLoad);
             EnsureCapacity();
             var entries = Entries.Span;

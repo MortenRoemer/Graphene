@@ -6,6 +6,6 @@ namespace Graphene.Query.Route
     {
         IWithMinimalEdges WithMinimalEdges();
 
-        IWithMinimalMetric WithMinimalMetric(Func<IReadOnlyEdge, float> metricFunction);
+        IWithMinimalMetric<TMetric> WithMinimalMetric<TMetric>(Func<IReadOnlyEdge, TMetric> metricFunction, Func<TMetric, TMetric, TMetric> accumulatorFunction) where TMetric : IComparable<TMetric>;
     }
 }

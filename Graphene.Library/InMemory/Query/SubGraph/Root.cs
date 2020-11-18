@@ -20,6 +20,9 @@ namespace Graphene.InMemory.Query.SubGraph
 
         public IVertices Vertices(IEnumerable<int> ids)
         {
+            if (ids is null)
+                throw new ArgumentNullException(nameof(ids));
+            
             return new Vertices(this, ids);
         }
 
@@ -30,6 +33,9 @@ namespace Graphene.InMemory.Query.SubGraph
 
         public IEdges Edges(IEnumerable<int> ids)
         {
+            if (ids is null)
+                throw new ArgumentNullException(nameof(ids));
+            
             return new Edges(this, ids);
         }
     }

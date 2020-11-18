@@ -20,11 +20,12 @@ namespace Graphene.InMemory.Query.Route
             var origin = graph.Vertices.Get(WithMinimalEdges.FromVertex.VertexId);
             var target = graph.Vertices.Get(VertexId);
 
-            return DjikstraRouteResolver.SolveForMinimalMetric(
+            return RouteResolver.SolveForMinimalMetric(
                 origin,
                 target,
                 WithMinimalEdges.Filter,
                 edge => 1,
+                (from, to) => 0,
                 ((first,second) => first + second)
             );
         }

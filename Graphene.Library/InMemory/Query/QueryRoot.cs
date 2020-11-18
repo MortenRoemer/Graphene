@@ -7,7 +7,7 @@ namespace Graphene.InMemory.Query
     {
         internal QueryRoot(IReadOnlyGraph graph)
         {
-            Graph = graph ?? throw new ArgumentNullException(nameof(graph));
+            Graph = graph;
         }
         
         private IReadOnlyGraph Graph { get; }

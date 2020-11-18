@@ -39,11 +39,17 @@ namespace Graphene.InMemory
 
         public void Set(string name, object value)
         {
+            if (name is null)
+                throw new ArgumentNullException(nameof(name));
+            
             Attributes.Value[name] = value;
         }
 
         public bool TryGet<T>(string name, out T value)
         {
+            if (name is null)
+                throw new ArgumentNullException(nameof(name));
+            
             if (!Attributes.IsValueCreated)
             {
                 value = default;

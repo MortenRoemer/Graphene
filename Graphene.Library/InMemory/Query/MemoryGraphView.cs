@@ -22,7 +22,9 @@ namespace Graphene.InMemory.Query
         
         public IGraph Clone()
         {
-            throw new System.NotImplementedException();
+            var newGraph = new MemoryGraph();
+            newGraph.Merge(Backend);
+            return newGraph;
         }
 
         public IQueryRoot Select()

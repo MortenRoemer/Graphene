@@ -20,12 +20,15 @@ namespace Graphene.InMemory.Query.Route
             return new WithMinimalEdges(this);
         }
 
-        public IWithMinimalMetric WithMinimalMetric(Func<IReadOnlyEdge, float> metricFunction)
+        public IWithMinimalMetric<TMetric> WithMinimalMetric<TMetric>(Func<IReadOnlyEdge, TMetric> metricFunction, Func<TMetric, TMetric, TMetric> accumulatorFunction) where TMetric : IComparable<TMetric>
         {
             if (metricFunction is null)
                 throw new ArgumentNullException(nameof(metricFunction));
             
-            return new WithMinimalMetric(this, metricFunction);
+            if (accumulatorFunction is null)
+                throw new ArgumentNullException(nameof(accumulatorFunction));
+            
+            return new WithMinimalMetric<TMetric>(this, metricFunction, accumulatorFunction);
         }
     }
 }

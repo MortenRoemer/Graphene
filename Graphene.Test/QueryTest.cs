@@ -41,7 +41,9 @@ namespace Graphene.Test
             var route = graph.Select()
                 .Route()
                 .FromVertex(hamburgId)
-                .WithMinimalMetric(edge => edge.Attributes.GetOrDefault("distance", 0.0f))
+                .WithMinimalMetric(
+                    edge => edge.Attributes.GetOrDefault("distance", float.PositiveInfinity),
+                    (first, second) => first + second)
                 .ToVertex(berlinId)
                 .Resolve();
             

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,11 +34,17 @@ namespace Graphene.InMemory.Query
 
         public IEnumerable<IReadOnlyEdge> Get(IEnumerable<int> ids)
         {
+            if (ids is null)
+                throw new ArgumentNullException(nameof(ids));
+            
             return Backend.Get(ids.Where(Range.Contains));
         }
 
         public bool Contains(IEnumerable<int> ids)
         {
+            if (ids is null)
+                throw new ArgumentNullException(nameof(ids));
+            
             return ids.All(Range.Contains);
         }
     }

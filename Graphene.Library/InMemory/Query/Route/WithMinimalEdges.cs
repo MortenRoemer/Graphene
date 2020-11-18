@@ -16,11 +16,17 @@ namespace Graphene.InMemory.Query.Route
         
         public IToVertex<int> ToVertex(int vertexId)
         {
+            if (!FromVertex.Root.Graph.Vertices.Contains(vertexId))
+                throw new ArgumentException($"vertex with id {vertexId} does not exist");
+            
             return new WithMinimalEdgesToVertex(this, vertexId);
         }
 
         public IWithMinimalEdges Where(Func<IReadOnlyEdge, bool> filter)
         {
+            if (filter is null)
+                throw new ArgumentNullException(nameof(filter));
+            
             Filter = Filter is null ? filter : edge => Filter(edge) && filter(edge);
             return this;
         }

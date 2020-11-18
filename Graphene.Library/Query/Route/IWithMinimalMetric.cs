@@ -2,10 +2,12 @@ using System;
 
 namespace Graphene.Query.Route
 {
-    public interface IWithMinimalMetric
+    public interface IWithMinimalMetric<TMetric> where TMetric : IComparable<TMetric>
     {
-        IToVertex<float> ToVertex(int index);
+        IToVertex<TMetric> ToVertex(int index);
 
-        IWithMinimalMetric Where(Func<IReadOnlyEdge, bool> filter);
+        IWithMinimalMetric<TMetric> Where(Func<IReadOnlyEdge, bool> filter);
+
+        IWithMinimalMetric<TMetric> WithHeuristic(Func<IReadOnlyVertex, IReadOnlyVertex, TMetric> heuristicFunction);
     }
 }

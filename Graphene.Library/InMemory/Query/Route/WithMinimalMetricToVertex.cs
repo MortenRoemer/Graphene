@@ -1,31 +1,33 @@
+using System;
 using Graphene.Query.Route;
 
 namespace Graphene.InMemory.Query.Route
 {
-    public class WithMinimalMetricToVertex : IToVertex<float>
+    public class WithMinimalMetricToVertex<TMetric> : IToVertex<TMetric> where TMetric : IComparable<TMetric>
     {
-        internal WithMinimalMetricToVertex(WithMinimalMetric withMinimalMetric, int targetId)
+        internal WithMinimalMetricToVertex(WithMinimalMetric<TMetric> withMinimalMetric, int targetId)
         {
             WithMinimalMetric = withMinimalMetric;
             TargetId = targetId;
         }
         
-        private WithMinimalMetric WithMinimalMetric { get; }
+        private WithMinimalMetric<TMetric> WithMinimalMetric { get; }
         
         private int TargetId { get; }
         
-        public RouteResult<float> Resolve()
+        public RouteResult<TMetric> Resolve()
         {
             var graph = WithMinimalMetric.FromVertex.Root.Graph;
             var origin = graph.Vertices.Get(WithMinimalMetric.FromVertex.VertexId);
             var target = graph.Vertices.Get(TargetId);
 
-            return DjikstraRouteResolver.SolveForMinimalMetric(
+            return RouteResolver.SolveForMinimalMetric(
                 origin,
                 target,
                 WithMinimalMetric.Filter,
                 WithMinimalMetric.MetricFunction,
-                ((first, second) => first + second)
+                WithMinimalMetric.Heuristic ?? ((from, to) => default),
+                WithMinimalMetric.Accumulator
             );
         }
     }

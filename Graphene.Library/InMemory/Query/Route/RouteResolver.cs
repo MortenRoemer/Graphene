@@ -6,13 +6,14 @@ using Graphene.Query.Route;
 
 namespace Graphene.InMemory.Query.Route
 {
-    public static class DjikstraRouteResolver
+    public static class RouteResolver
     {
         internal static RouteResult<TMetric> SolveForMinimalMetric<TMetric>(
             IReadOnlyVertex origin,
             IReadOnlyVertex target,
-            Func<IReadOnlyEdge, bool> edgeFilter, 
+            Func<IReadOnlyEdge, bool> edgeFilter,
             Func<IReadOnlyEdge, TMetric> metricFunction,
+            Func<IReadOnlyVertex, IReadOnlyVertex, TMetric> heuristicFunction,
             Func<TMetric, TMetric, TMetric> accumulatorFunction
         ) where TMetric : IComparable<TMetric>
         {
@@ -55,7 +56,7 @@ namespace Graphene.InMemory.Query.Route
                         PreviousEdge = edge
                     };
                     
-                    queue.Insert(newNode.Metric, newNode);
+                    queue.Insert(accumulatorFunction(newNode.Metric, heuristicFunction(newNode.Vertex, target)), newNode);
                 }
             }
             

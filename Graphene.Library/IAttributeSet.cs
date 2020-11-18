@@ -2,17 +2,9 @@ using System.Collections.Generic;
 
 namespace Graphene
 {
-    public interface IAttributeSet : IEnumerable<KeyValuePair<string, object>>
+    public interface IAttributeSet : IReadOnlyAttributeSet
     {
-        int Count { get; }
-
-        IEnumerable<string> Names { get; }
-
-        IEnumerable<object> Values { get; }
-
-        bool TryGet<T>(string name, out T value);
-
-        T GetOrDefault<T>(string name, T defaultValue);
+        new object this[string name] { get; set; }
 
         void Set(string name, object value);
 

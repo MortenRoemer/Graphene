@@ -2,14 +2,12 @@ using System;
 
 namespace Graphene
 {
-    public interface IEdge : IEntity
+    public interface IEdge : IEntity, IReadOnlyEdge
     {
-        IReadOnlyRepository<IVertex> Vertices { get; }
+        new IReadOnlyRepository<IVertex> Vertices { get; }
 
-        IVertex FromVertex { get; }
+        new IVertex FromVertex { get; }
 
-        IVertex ToVertex { get; }
-
-        bool Directed { get; }
+        new IVertex ToVertex { get; }
     }
 }

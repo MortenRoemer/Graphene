@@ -2,20 +2,14 @@
 
 namespace Graphene
 {
-    public interface IGraph
+    public interface IGraph : IReadOnlyGraph
     {
-        int Size { get; }
-
-        IVertexRepository Vertices { get; }
-
-        IReadOnlyRepository<IEdge> Edges { get; }
+        new IVertexRepository Vertices { get; }
+        
+        new IReadOnlyRepository<IReadOnlyEdge> Edges { get; }
 
         void Clear();
 
-        IGraph Clone();
-
-        void Merge(IGraph other);
-
-        IQueryBuilderRoot Select();
+        void Merge(IReadOnlyGraph other);
     }
 }

@@ -11,6 +11,34 @@ namespace Graphene.Test
         private static readonly Lazy<IGraph> ExampleGraph = new Lazy<IGraph>(CreateExampleGraph, LazyThreadSafetyMode.ExecutionAndPublication);
 
         [Fact]
+        public void VerticesTest()
+        {
+            var graph = ExampleGraph.Value;
+
+            Assert.True(graph.Select()
+                .Vertices()
+                .Where(vertex => vertex.Label == "city")
+                .Resolve(out var result));
+            
+            Assert.True(result.Entities.All(vertex => vertex.Label == "city"));
+            Assert.False(result.FindNextPage(out result));
+        }
+        
+        [Fact]
+        public void EdgesTest()
+        {
+            var graph = ExampleGraph.Value;
+
+            Assert.True(graph.Select()
+                .Edges()
+                .Where(edge => edge.Label == "autobahn")
+                .Resolve(out var result));
+            
+            Assert.True(result.Entities.All(edge => edge.Label == "autobahn"));
+            Assert.False(result.FindNextPage(out result));
+        }
+        
+        [Fact]
         public void RouteVertexWithMinimalEdgesToVertexTest()
         {
             var graph = ExampleGraph.Value;

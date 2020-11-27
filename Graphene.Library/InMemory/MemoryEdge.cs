@@ -49,5 +49,16 @@ namespace Graphene.InMemory
         {
             return Id.GetHashCode();
         }
+
+        public IEdge Promote()
+        {
+            return this;
+        }
+
+        public bool TryPromote(out IEdge target)
+        {
+            target = this;
+            return true;
+        }
     }
 }

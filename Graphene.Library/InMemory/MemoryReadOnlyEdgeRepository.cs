@@ -23,7 +23,12 @@ namespace Graphene.InMemory
 
         public bool Contains(IEnumerable<int> ids)
         {
-            return ids.All(id => EdgeCache.Value.Buffer.ContainsKey(id));
+            return ids.All(Contains);
+        }
+
+        public bool Contains(int id)
+        {
+            return EdgeCache.Value.Buffer.ContainsKey(id);
         }
 
         public int Count()
@@ -33,7 +38,12 @@ namespace Graphene.InMemory
 
         public IEnumerable<IEdge> Get(IEnumerable<int> ids)
         {
-            return ids.Select(id => EdgeCache.Value.Buffer[id]);
+            return ids.Select(Get);
+        }
+        
+        public IEdge Get(int id)
+        {
+            return EdgeCache.Value.Buffer[id];
         }
 
         public IEnumerator<IEdge> GetEnumerator()

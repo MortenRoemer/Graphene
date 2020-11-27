@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Graphene.InMemory
 {
     public abstract class MemoryRelativeEdgeRepository : MemoryReadOnlyEdgeRepository, IVertexEdgeRepository
@@ -12,15 +14,20 @@ namespace Graphene.InMemory
         }
 
         public abstract IEdge Add(IVertex other, string label);
+        
+        public void Delete(IEnumerable<int> ids)
+        {
+            Edges.Delete(ids);
+        }
+
+        public void Delete(int id)
+        {
+            Edges.Delete(id);
+        }
 
         public void Clear()
         {
             Edges.Delete(EdgeCache.Value.Buffer.Values);
-        }
-
-        public void Delete(IEdge edge)
-        {
-            Edges.Delete(edge);
         }
 
         public sealed class Ingoing : MemoryRelativeEdgeRepository

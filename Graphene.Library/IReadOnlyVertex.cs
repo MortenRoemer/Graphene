@@ -1,6 +1,6 @@
 namespace Graphene
 {
-    public interface IReadOnlyVertex : IReadOnlyEntity
+    public interface IReadOnlyVertex : IReadOnlyEntity, IPromotable<IVertex>
     {
         IReadOnlyRepository<IReadOnlyEdge> Edges { get; }
 

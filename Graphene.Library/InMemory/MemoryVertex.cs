@@ -51,6 +51,17 @@ namespace Graphene.InMemory
         {
             return Id.GetHashCode();
         }
+        
+        public IVertex Promote()
+        {
+            return this;
+        }
+
+        public bool TryPromote(out IVertex target)
+        {
+            target = this;
+            return true;
+        }
 
         public static bool operator ==(MemoryVertex left, MemoryVertex right) => left?.Id == right?.Id;
         public static bool operator !=(MemoryVertex left, MemoryVertex right) => !(left == right);

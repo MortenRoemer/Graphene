@@ -1,5 +1,3 @@
-using System;
-
 namespace Graphene
 {
     public interface IEdge : IEntity, IReadOnlyEdge

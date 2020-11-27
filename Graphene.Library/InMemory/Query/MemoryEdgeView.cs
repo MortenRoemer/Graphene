@@ -40,12 +40,22 @@ namespace Graphene.InMemory.Query
             return Backend.Get(ids.Where(Range.Contains));
         }
 
+        public IReadOnlyEdge Get(int id)
+        {
+            return Range.Contains(id) ? Backend.Get(id) : throw new ArgumentException($"id {id} does not exist");
+        }
+
         public bool Contains(IEnumerable<int> ids)
         {
             if (ids is null)
                 throw new ArgumentNullException(nameof(ids));
             
             return ids.All(Range.Contains);
+        }
+
+        public bool Contains(int id)
+        {
+            return Range.Contains(id);
         }
     }
 }

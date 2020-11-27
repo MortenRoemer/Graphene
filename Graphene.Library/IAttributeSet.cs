@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace Graphene
 {
     public interface IAttributeSet : IReadOnlyAttributeSet

@@ -41,7 +41,7 @@ namespace Graphene.InMemory
             NotifyObservers(Edges.Select(edge =>
                 new CollectionChange<IEdge>(edge.Value, CollectionChangeMode.Removal)).ToArray());
             
-            foreach (var (key, value) in Edges)
+            foreach (var key in Edges.Keys)
             {
                 Graph.FreeId(key);
             }
@@ -51,7 +51,12 @@ namespace Graphene.InMemory
 
         public bool Contains(IEnumerable<int> ids)
         {
-            return ids.All(id => Edges.ContainsKey(id));
+            return ids.All(Contains);
+        }
+
+        public bool Contains(int id)
+        {
+            return Edges.ContainsKey(id);
         }
 
         public int Count()
@@ -59,22 +64,29 @@ namespace Graphene.InMemory
             return Edges.Count;
         }
 
-        public void Delete(IEnumerable<IEdge> items)
+        public void Delete(IEnumerable<int> ids)
         {
-            var enumerable = items as IEdge[] ?? items.ToArray();
-            NotifyObservers(enumerable.Select(item =>
-                new CollectionChange<IEdge>(item, CollectionChangeMode.Removal)).ToArray());
-            
-            foreach (var item in enumerable)
+            foreach (var id in ids)
             {
-                Edges.Remove(item.Id);
-                Graph.FreeId(item.Id);
+                Delete(id);
             }
+        }
+
+        public void Delete(int id)
+        {
+            NotifyObservers(new CollectionChange<IEdge>(Get(id), CollectionChangeMode.Removal));
+            Edges.Remove(id);
+            Graph.FreeId(id);
         }
 
         public IEnumerable<IEdge> Get(IEnumerable<int> ids)
         {
-            return ids.Select(id => Edges[id]);
+            return ids.Select(Get);
+        }
+        
+        public IEdge Get(int id)
+        {
+            return Edges[id];
         }
 
         public IEnumerator<IEdge> GetEnumerator()
@@ -95,12 +107,17 @@ namespace Graphene.InMemory
 
         private void NotifyObservers(IEnumerable<CollectionChange<IEdge>> changes)
         {
+            foreach (var change in changes)
+            {
+                NotifyObservers(change);
+            }
+        }
+        
+        private void NotifyObservers(CollectionChange<IEdge> change)
+        {
             foreach (var observer in Observers)
             {
-                foreach (var change in changes)
-                {
-                    observer.OnNext(change);
-                }
+                observer.OnNext(change);
                 observer.OnCompleted();
             }
         }

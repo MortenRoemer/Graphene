@@ -34,6 +34,11 @@ namespace Graphene.InMemory
             return ids.All(id => Vertices.ContainsKey(id));
         }
 
+        public bool Contains(int id)
+        {
+            return Vertices.ContainsKey(id);
+        }
+
         public int Count()
         {
             return Vertices.Count;
@@ -54,18 +59,28 @@ namespace Graphene.InMemory
             return vertex;
         }
 
-        public void Delete(IEnumerable<IVertex> items)
+        public void Delete(IEnumerable<int> ids)
         {
-            foreach (var item in items)
+            foreach (var id in ids)
             {
-                Vertices.Remove(item.Id);
-                Graph.FreeId(item.Id);
+                Delete(id);
             }
+        }
+        
+        public void Delete(int id)
+        {
+            Vertices.Remove(id);
+            Graph.FreeId(id);
         }
 
         public IEnumerable<IVertex> Get(IEnumerable<int> ids)
         {
-            return ids.Select(id => Vertices[id]);
+            return ids.Select(Get);
+        }
+        
+        public IVertex Get(int id)
+        {
+            return Vertices[id];
         }
 
         public IEnumerator<IVertex> GetEnumerator()

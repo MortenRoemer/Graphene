@@ -1,4 +1,5 @@
-using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Graphene {
 
@@ -7,9 +8,23 @@ namespace Graphene {
 
         IEdge Add(IVertex other, string label);
 
-        void Delete(IEdge edge);
+        void Delete(IEnumerable<int> ids);
+        
+        void Delete(int id);
 
         void Clear();
     }
 
+    public static class VertexEdgeRepositoryExtension
+    {
+        public static void Delete(this IVertexEdgeRepository repository, IEnumerable<IReadOnlyEdge> edges)
+        {
+            repository.Delete(edges.Select(edge => edge.Id));
+        }
+
+        public static void Delete(this IVertexEdgeRepository repository, IReadOnlyEdge edge)
+        {
+            repository.Delete(edge.Id);
+        }
+    }
 }

@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using Graphene.InMemory;
+using Graphene.Test.Utility;
 using Xunit;
 
 namespace Graphene.Test
@@ -72,6 +73,32 @@ namespace Graphene.Test
                 .WithMinimalMetric(
                     edge => edge.Attributes.GetOrDefault("distance", float.PositiveInfinity),
                     (first, second) => first + second)
+                .ToVertex(berlinId)
+                .Resolve();
+            
+            Assert.True(route.Found);
+            Assert.Equal(237.46f, route.Metric);
+            Assert.Equal("hamburg", route.Origin.Attributes.GetOrDefault("name", string.Empty));
+            Assert.Equal("a24", route.Steps[0].Edge.Attributes.GetOrDefault("name", string.Empty));
+            Assert.Equal("berlin", route.Steps[0].Vertex.Attributes.GetOrDefault("name", string.Empty));
+        }
+        
+        [Fact]
+        public void RouteVertexWithMinimalMetricAndHeuristicToVertexTest()
+        {
+            var graph = ExampleGraph.Value;
+            var hamburgId = GetVertexWithName(graph, "hamburg");
+            var berlinId = GetVertexWithName(graph, "berlin");
+
+            var route = graph.Select()
+                .Route()
+                .FromVertex(hamburgId)
+                .WithMinimalMetric(
+                    edge => edge.Attributes.GetOrDefault("distance", float.PositiveInfinity),
+                    (first, second) => first + second)
+                .WithHeuristic((fromVertex, toVertex) =>
+                    (float) fromVertex.Attributes.GetOrDefault("position", new Coordinate())
+                        .CalcDistanceTo(toVertex.Attributes.GetOrDefault("position", new Coordinate())) / 1000)
                 .ToVertex(berlinId)
                 .Resolve();
             
@@ -205,14 +232,17 @@ namespace Graphene.Test
             var berlin = graph.Vertices.Create("city");
             berlin.Attributes["name"] = nameof(berlin);
             berlin.Attributes["population"] = 3_669_491;
+            berlin.Attributes["position"] = new Coordinate(52.518611, 13.408333);
 
             var hamburg = graph.Vertices.Create("city");
             hamburg.Attributes["name"] = nameof(hamburg);
             hamburg.Attributes["population"] = 1_899_160;
+            hamburg.Attributes["position"] = new Coordinate(53.550556, 9.993333);
 
             var munich = graph.Vertices.Create("city");
             munich.Attributes["name"] = nameof(munich);
             munich.Attributes["population"] = 1_484_226;
+            munich.Attributes["position"] = new Coordinate(48.139609,11.565949);
             
             var a24 = hamburg.BidirectionalEdges.Add(berlin, "autobahn");
             a24.Attributes["name"] = nameof(a24);

@@ -20,7 +20,7 @@ namespace Graphene.InMemory.Query.Entity
                 return false;
             }
 
-            return Query.Resolve(PageSize, Entities[^1].Id, out nextPage);
+            return Query.Resolve(PageSize, Entities[Entities.Count - 1].Id, out nextPage);
         }
     }
 }

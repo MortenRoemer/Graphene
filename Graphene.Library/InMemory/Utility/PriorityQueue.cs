@@ -8,7 +8,7 @@ namespace Graphene.InMemory.Utility
     {
         private const int STANDARD_CAPACITY = 10;
 
-        private Memory<Entry> Entries { get; set; } = new Entry[STANDARD_CAPACITY];
+        private Entry[] Entries { get; set; } = new Entry[STANDARD_CAPACITY];
 
         public int Capacity => Entries.Length;
 
@@ -31,17 +31,13 @@ namespace Graphene.InMemory.Utility
 
             if (Beginning > 0)
             {
-                var source = Entries.Slice(Beginning, Count);
-                var target = Entries.Slice(0, Count);
-                source.CopyTo(target);
+                Array.Copy(Entries, Beginning, Entries, 0, Count);
                 Beginning = 0;
             }
             else
             {
-                
-                var source = Entries.Slice(Beginning, Count);
-                Memory<Entry> target = new Entry[Capacity * 2];
-                source.CopyTo(target);
+                var target = new Entry[Capacity * 2];
+                Array.Copy(Entries, Beginning, Entries, 0, Count);
                 Beginning = 0;
                 Entries = target;
             }
@@ -57,25 +53,22 @@ namespace Graphene.InMemory.Utility
             
             RemoveExistingIfHigher(priority, payLoad);
             EnsureCapacity();
-            var entries = Entries.Span;
 
             for(var index = Beginning; index < Beginning + Count; index++)
             {
-                var entry = entries[index];
+                var entry = Entries[index];
 
                 if (priority.CompareTo(entry.Priority) >= 0)
                     continue;
                 
                 var blockSize = Count - index;
-                var source = entries.Slice(index, blockSize);
-                var target = entries.Slice(index + 1, blockSize);
-                source.CopyTo(target);
-                entries[index] = new Entry(priority, payLoad);
+                Array.Copy(Entries, index, Entries,  index + 1, blockSize);
+                Entries[index] = new Entry(priority, payLoad);
                 Count++;
                 return;
             }
 
-            entries[Beginning + Count] = new Entry(priority, payLoad);
+            Entries[Beginning + Count] = new Entry(priority, payLoad);
             Count++;
         }
 
@@ -84,7 +77,7 @@ namespace Graphene.InMemory.Utility
             if (Count <= 0)
                 throw new InvalidOperationException();
 
-            return Entries.Span[Beginning].PayLoad;
+            return Entries[Beginning].PayLoad;
         }
 
         public TPayLoad PeekMax()
@@ -92,7 +85,7 @@ namespace Graphene.InMemory.Utility
             if (Count <= 0)
                 throw new InvalidOperationException();
 
-            return Entries.Span[Beginning + Count - 1].PayLoad;
+            return Entries[Beginning + Count - 1].PayLoad;
         }
 
         public TPayLoad RemoveMin()
@@ -112,11 +105,9 @@ namespace Graphene.InMemory.Utility
 
         private void RemoveExistingIfHigher(TPriority priority, TPayLoad payLoad)
         {
-            var entries = Entries.Span;
-            
             for (var index = Beginning; index < Beginning + Count; index++)
             {
-                var currentEntry = entries[index];
+                var currentEntry = Entries[index];
 
                 if (!currentEntry.PayLoad.Equals(payLoad))
                     continue;
@@ -125,9 +116,7 @@ namespace Graphene.InMemory.Utility
                     return;
                     
                 var blockSize = Count - index - 1;
-                var source = entries.Slice(index + 1, blockSize);
-                var target = entries.Slice(index, blockSize);
-                source.CopyTo(target);
+                Array.Copy(Entries, index + 1, Entries, index, blockSize);
                 Count--;
                 return;
             }
@@ -177,7 +166,7 @@ namespace Graphene.InMemory.Utility
                     if (Disposed)
                         throw new ObjectDisposedException(nameof(Enumerator));
 
-                    return Backend.Entries.Span[Index].PayLoad;
+                    return Backend.Entries[Index].PayLoad;
                 }
             }
 

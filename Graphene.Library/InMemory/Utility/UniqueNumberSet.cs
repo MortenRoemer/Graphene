@@ -17,9 +17,9 @@ namespace Graphene.InMemory.Utility
             AppendSegment(new Segment(from, to));
         }
 
-        private static readonly ThreadLocal<Random> RandomGenerator = new ThreadLocal<Random>(() => new Random(), trackAllValues: false);
+        private static readonly ThreadLocal<Random> _randomGenerator = new ThreadLocal<Random>(() => new Random(), trackAllValues: false);
 
-        private Memory<Segment> Segments { get; set; }
+        private Segment[] Segments { get; set; }
         
         private int SegmentCount { get; set; }
 
@@ -32,8 +32,6 @@ namespace Graphene.InMemory.Utility
             if (FindSegment(number, out var index))
                 return;
 
-            var segments = Segments.Span;
-
             if (index == 0)
             {
                 if (SegmentCount <= 0)
@@ -42,10 +40,10 @@ namespace Graphene.InMemory.Utility
                     return;
                 }
 
-                var segment = segments[0];
+                var segment = Segments[0];
 
                 if (number == segment.Min - 1)
-                    segments[0] = new Segment(number, segment.Max);
+                    Segments[0] = new Segment(number, segment.Max);
                 else 
                     InsertSegment(0, new Segment(number, number));
 
@@ -54,31 +52,31 @@ namespace Graphene.InMemory.Utility
 
             if (index >= SegmentCount)
             {
-                var segment = segments[^1];
+                var segment = Segments[Segments.Length - 1];
 
                 if (number == segment.Max + 1)
-                    segments[^1] = new Segment(segment.Min, number);
+                    Segments[Segments.Length - 1] = new Segment(segment.Min, number);
                 else
                     AppendSegment(new Segment(number, number));
 
                 return;
             }
 
-            var previousSegment = segments[index - 1];
-            var nextSegment = segments[index];
+            var previousSegment = Segments[index - 1];
+            var nextSegment = Segments[index];
 
             if (previousSegment.Max + 1 == number && nextSegment.Min - 1 == number)
             {
-                segments[index - 1] = new Segment(previousSegment.Min, nextSegment.Max);
+                Segments[index - 1] = new Segment(previousSegment.Min, nextSegment.Max);
                 RemoveSegment(index);
             }
             else if (previousSegment.Max + 1 == number)
             {
-                segments[index - 1] = new Segment(previousSegment.Min, number);
+                Segments[index - 1] = new Segment(previousSegment.Min, number);
             }
             else if (nextSegment.Min - 1 == number)
             {
-                segments[index] = new Segment(number, nextSegment.Max);
+                Segments[index] = new Segment(number, nextSegment.Max);
             }
             else
             {
@@ -95,12 +93,11 @@ namespace Graphene.InMemory.Utility
         {
             var left = 0;
             var right = SegmentCount - 1;
-            var segments = Segments.Span;
 
             while (left <= right)
             {
                 var middle = left + (right - left) / 2;
-                var segment = segments[middle];
+                var segment = Segments[middle];
 
                 if (segment.Contains(number))
                 {
@@ -121,9 +118,8 @@ namespace Graphene.InMemory.Utility
         {
             if (!FindSegment(number, out var index))
                 return;
-
-            var segments = Segments.Span;
-            var segment = segments[index];
+            
+            var segment = Segments[index];
 
             if (!segment.Contains(number))
                 throw new InvalidOperationException($"number {number} cannot be removed from segment [{segment.Min}-{segment.Max}]");
@@ -131,12 +127,12 @@ namespace Graphene.InMemory.Utility
             if (number == segment.Min && number == segment.Max)
                 RemoveSegment(index);
             else if (number == segment.Min)
-                segments[index] = new Segment(segment.Min + 1, segment.Max);
+                Segments[index] = new Segment(segment.Min + 1, segment.Max);
             else if (number == segment.Max)
-                segments[index] = new Segment(segment.Min, segment.Max - 1);
+                Segments[index] = new Segment(segment.Min, segment.Max - 1);
             else
             {
-                segments[index] = new Segment(segment.Min, number - 1);
+                Segments[index] = new Segment(segment.Min, number - 1);
                 InsertSegment(index + 1, new Segment(number + 1, segment.Max));
             }
         }
@@ -146,9 +142,9 @@ namespace Graphene.InMemory.Utility
             if (SegmentCount <= 0)
                 throw new InvalidOperationException("no more numbers to sample");
             
-            var randomGenerator = RandomGenerator.Value;
+            var randomGenerator = _randomGenerator.Value;
             var randomIndex = randomGenerator.Next(SegmentCount);
-            var segment = Segments.Span[randomIndex];
+            var segment = Segments[randomIndex];
             var result = segment.GetRandom();
             Remove(result);
             return result;
@@ -157,26 +153,22 @@ namespace Graphene.InMemory.Utility
         private void AppendSegment(Segment segment)
         {
             EnsureCapacity();
-            Segments.Span[SegmentCount++] = segment;
+            Segments[SegmentCount++] = segment;
         }
 
         private void InsertSegment(int index, Segment segment)
         {
             EnsureCapacity();
             var blockSize = SegmentCount - index;
-            var source = Segments.Slice(index, blockSize);
-            var target = Segments.Slice(index + 1);
-            source.CopyTo(target);
-            Segments.Span[index] = segment;
+            Array.Copy(Segments, index, Segments, index + 1, blockSize);
+            Segments[index] = segment;
             SegmentCount++;
         }
 
         private void RemoveSegment(int index)
         {
             var blockSize = SegmentCount - index - 1;
-            var source = Segments.Slice(index + 1, blockSize);
-            var target = Segments.Slice(index);
-            source.CopyTo(target);
+            Array.Copy(Segments, index + 1, Segments, index, blockSize);
             SegmentCount--;
         }
 
@@ -184,11 +176,10 @@ namespace Graphene.InMemory.Utility
         {
             if (Capacity > SegmentCount)
                 return;
-
-            var source = Segments.Slice(0, SegmentCount);
-            Memory<Segment> target = new Segment[Capacity * 2];
-            source.CopyTo(target);
-            Segments = target;
+            
+            var newSegments = new Segment[Capacity * 2];
+            Array.Copy(Segments, 0, newSegments, 0, SegmentCount);
+            Segments = newSegments;
         }
 
         private readonly struct Segment
@@ -213,7 +204,7 @@ namespace Graphene.InMemory.Utility
 
             public int GetRandom()
             {
-                var randomGenerator = RandomGenerator.Value;
+                var randomGenerator = _randomGenerator.Value;
                 return randomGenerator.Next(Min - 1, Max) + 1;
             }
         }

@@ -44,18 +44,11 @@ namespace Graphene.InMemory
             return Vertices.Count;
         }
 
-        public IVertex Create()
-        {
-            var vertex = new MemoryVertex(Graph, Edges, Graph.TakeId());
-            Vertices.Add(vertex.Id, vertex); 
-            return vertex;
-        }
-
         public IVertex Create(string label)
         {
-            var vertex = new MemoryVertex(Graph, Edges, Graph.TakeId());
+            var vertex = new MemoryVertex(Graph, Edges, Graph.TakeId(), label);
             Vertices.Add(vertex.Id, vertex);
-            vertex.Label = label;
+            Graph.DataVersion++;
             return vertex;
         }
 
@@ -71,6 +64,7 @@ namespace Graphene.InMemory
         {
             Vertices.Remove(id);
             Graph.FreeId(id);
+            Graph.DataVersion++;
         }
 
         public IEnumerable<IVertex> Get(IEnumerable<int> ids)

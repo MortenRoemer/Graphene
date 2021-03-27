@@ -6,32 +6,38 @@ using Graphene.Query.Route;
 
 namespace Graphene.InMemory.Query.Route
 {
-    public static class RouteResolver
+    public class RouteResolver<TMetric> where TMetric : IComparable<TMetric>
     {
-        internal static RouteResult<TMetric> SolveForMinimalMetric<TMetric>(
+        private readonly PriorityQueue<TMetric, Node> _queue = new();
+
+        private readonly HashSet<int> _visitedNodes = new();
+
+        private readonly Stack<RouteStep> _stepStack = new();
+        
+        public RouteResult<TMetric> SolveForMinimalMetric(
             IReadOnlyVertex origin,
             IReadOnlyVertex target,
             Func<IReadOnlyEdge, bool> edgeFilter,
             Func<IReadOnlyEdge, TMetric> metricFunction,
             Func<IReadOnlyVertex, IReadOnlyVertex, TMetric> heuristicFunction,
             Func<TMetric, TMetric, TMetric> accumulatorFunction
-        ) where TMetric : IComparable<TMetric>
+        )
         {
-            var queue = new PriorityQueue<TMetric, Node<TMetric>>();
-            queue.Insert(default, new Node<TMetric> {Vertex = origin});
-            var visitedNodes = new HashSet<int>();
+            _queue.Clear();
+            _queue.Insert(default, new Node {Vertex = origin});
+            _visitedNodes.Clear();
 
-            while (!queue.IsEmpty)
+            while (!_queue.IsEmpty)
             {
-                var currentNode = queue.RemoveMin();
+                var currentNode = _queue.RemoveMin();
 
                 if (currentNode.Vertex.Id == target.Id)
                     return PackageResult(currentNode);
                 
-                if (visitedNodes.Contains(currentNode.Vertex.Id))
+                if (_visitedNodes.Contains(currentNode.Vertex.Id))
                     continue;
 
-                visitedNodes.Add(currentNode.Vertex.Id);
+                _visitedNodes.Add(currentNode.Vertex.Id);
 
                 var edges = currentNode.Vertex.OutgoingEdges
                     .Concat(currentNode.Vertex.BidirectionalEdges);
@@ -45,10 +51,10 @@ namespace Graphene.InMemory.Query.Route
                         ? edge.ToVertex
                         : edge.FromVertex;
                     
-                    if (visitedNodes.Contains(otherVertex.Id))
+                    if (_visitedNodes.Contains(otherVertex.Id))
                         continue;
 
-                    var newNode = new Node<TMetric>
+                    var newNode = new Node
                     {
                         Vertex = otherVertex,
                         Metric = accumulatorFunction(currentNode.Metric, metricFunction(edge)),
@@ -56,34 +62,34 @@ namespace Graphene.InMemory.Query.Route
                         PreviousEdge = edge
                     };
                     
-                    queue.Insert(accumulatorFunction(newNode.Metric, heuristicFunction(newNode.Vertex, target)), newNode);
+                    _queue.Insert(accumulatorFunction(newNode.Metric, heuristicFunction(newNode.Vertex, target)), newNode);
                 }
             }
             
             return new RouteResult<TMetric>(false, origin, Array.Empty<RouteStep>(), default);
         }
 
-        private static RouteResult<TMetric> PackageResult<TMetric>(Node<TMetric> node)
+        private RouteResult<TMetric> PackageResult(Node node)
         {
-            var stepStack = new Stack<RouteStep>();
+            _stepStack.Clear();
             var currentNode = node;
 
             while (currentNode.Previous != null)
             {
-                stepStack.Push(new RouteStep(currentNode.PreviousEdge, currentNode.Vertex));
+                _stepStack.Push(new RouteStep(currentNode.PreviousEdge, currentNode.Vertex));
                 currentNode = currentNode.Previous;
             }
             
-            return new RouteResult<TMetric>(true, currentNode.Vertex, stepStack.ToArray(), node.Metric);
+            return new RouteResult<TMetric>(true, currentNode.Vertex, _stepStack.ToArray(), node.Metric);
         }
 
-        private class Node<TMetric>
+        private class Node
         {
             public IReadOnlyVertex Vertex { get; set; }
             
             public TMetric Metric { get; set; }
             
-            public Node<TMetric> Previous { get; set; }
+            public Node Previous { get; set; }
             
             public IReadOnlyEdge PreviousEdge { get; set; }
         }

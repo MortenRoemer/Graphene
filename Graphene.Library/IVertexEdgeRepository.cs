@@ -4,9 +4,8 @@ using System.Linq;
 namespace Graphene {
 
     public interface IVertexEdgeRepository : IReadOnlyRepository<IEdge> {
-        IEdge Add(IVertex other);
-
-        IEdge Add(IVertex other, string label);
+        
+        IEdge Add(IVertex other, string label = null);
 
         void Delete(IEnumerable<int> ids);
         

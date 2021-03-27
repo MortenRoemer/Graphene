@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Graphene.InMemory.Query;
 using Graphene.InMemory.Utility;
@@ -13,6 +12,7 @@ namespace Graphene.InMemory
             MemoryEdges = new MemoryEdgeRepository(this);
             MemoryVertices = new MemoryVertexRepository(this, MemoryEdges);
             AvailableIds = new UniqueNumberSet(1, int.MaxValue);
+            QueryRoot = new QueryRoot(this);
         }
 
         public int Size => Vertices.Count() + Edges.Count();
@@ -28,6 +28,10 @@ namespace Graphene.InMemory
         private MemoryEdgeRepository MemoryEdges { get; }
 
         private UniqueNumberSet AvailableIds { get; }
+        
+        private QueryRoot QueryRoot { get; }
+        
+        public int DataVersion { get; internal set; }
 
         public void Clear()
         {
@@ -48,10 +52,9 @@ namespace Graphene.InMemory
 
             foreach (var vertex in other.Vertices)
             {
-                var newVertex = Vertices.Create();
+                var newVertex = Vertices.Create(vertex.Label);
                 mappedIds.Add(vertex.Id, newVertex.Id);
-                newVertex.Label = vertex.Label;
-                
+
                 foreach (var attribute in vertex.Attributes)
                 {
                     newVertex.Attributes.Set(attribute.Key, attribute.Value);
@@ -60,16 +63,12 @@ namespace Graphene.InMemory
 
             foreach (var edge in other.Edges)
             {
-                IEdge newEdge;
                 var fromVertex = Vertices.Get(mappedIds[edge.FromVertex.Id]);
                 var toVertex = Vertices.Get(mappedIds[edge.ToVertex.Id]);
 
-                if (edge.Directed)
-                    newEdge = fromVertex.OutgoingEdges.Add(toVertex);
-                else
-                    newEdge = fromVertex.BidirectionalEdges.Add(toVertex);
-
-                newEdge.Label = edge.Label;
+                var newEdge = edge.Directed 
+                    ? fromVertex.OutgoingEdges.Add(toVertex, edge.Label) 
+                    : fromVertex.BidirectionalEdges.Add(toVertex, edge.Label);
 
                 foreach (var attribute in edge.Attributes)
                 {
@@ -80,7 +79,7 @@ namespace Graphene.InMemory
 
         public IQueryRoot Select()
         {
-            return new QueryRoot(this);
+            return QueryRoot;
         }
 
         internal int TakeId()

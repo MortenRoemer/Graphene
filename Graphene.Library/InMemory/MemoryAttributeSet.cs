@@ -7,11 +7,14 @@ namespace Graphene.InMemory
 {
     public class MemoryAttributeSet : IAttributeSet
     {
-        internal MemoryAttributeSet()
+        internal MemoryAttributeSet(MemoryGraph graph)
         {
+            Graph = graph;
             Attributes = new Lazy<IDictionary<string, object>>(() => new SortedDictionary<string, object>(), isThreadSafe: false);
         }
 
+        private MemoryGraph Graph { get; }
+        
         private Lazy<IDictionary<string, object>> Attributes { get; }
 
         public object this[string name]
@@ -28,8 +31,11 @@ namespace Graphene.InMemory
 
         public void Clear()
         {
-            if (Attributes.IsValueCreated)
-                Attributes.Value.Clear();
+            if (!Attributes.IsValueCreated)
+                return;
+            
+            Attributes.Value.Clear();
+            Graph.DataVersion++;
         }
 
         public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
@@ -43,6 +49,7 @@ namespace Graphene.InMemory
                 throw new ArgumentNullException(nameof(name));
             
             Attributes.Value[name] = value;
+            Graph.DataVersion++;
         }
 
         public bool TryGet<T>(string name, out T value)

@@ -2,8 +2,6 @@ namespace Graphene
 {
     public interface IVertexRepository : IRepository<IVertex>
     {
-        IVertex Create();
-
-        IVertex Create(string label);
+        IVertex Create(string label = null);
     }
 }

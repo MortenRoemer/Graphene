@@ -4,14 +4,15 @@ namespace Graphene.InMemory
 {
     public class MemoryEdge : IEdge
     {
-        internal MemoryEdge(MemoryGraph graph, IVertex fromVertex, IVertex toVertex, bool directed, int id)
+        internal MemoryEdge(MemoryGraph graph, IVertex fromVertex, IVertex toVertex, bool directed, int id, string label)
         {
-            Graph = graph ?? throw new ArgumentNullException(nameof(graph));
-            FromVertex = fromVertex ?? throw new ArgumentNullException(nameof(fromVertex));
-            ToVertex = toVertex ?? throw new ArgumentNullException(nameof(toVertex));
+            Graph = graph;
+            FromVertex = fromVertex;
+            ToVertex = toVertex;
             Directed = directed;
             Id = id;
-            Attributes = new MemoryAttributeSet();
+            Label = label;
+            Attributes = new MemoryAttributeSet(graph);
             Vertices = new MemoryCombinedVertexRepository(this);
         }
 
@@ -33,7 +34,8 @@ namespace Graphene.InMemory
 
         public int Id { get; }
 
-        public string Label { get; set; }
+        public string Label { get; }
+        
         IReadOnlyAttributeSet IReadOnlyEntity.Attributes => Attributes;
 
         public IAttributeSet Attributes { get; }

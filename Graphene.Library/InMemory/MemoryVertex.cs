@@ -4,11 +4,12 @@ namespace Graphene.InMemory
 {
     public class MemoryVertex : IVertex
     {
-        internal MemoryVertex(MemoryGraph graph, MemoryEdgeRepository edges, int id)
+        internal MemoryVertex(MemoryGraph graph, MemoryEdgeRepository edges, int id, string label)
         {
             Graph = graph ?? throw new ArgumentNullException(nameof(graph));
             Id = id;
-            Attributes = new MemoryAttributeSet();
+            Label = label;
+            Attributes = new MemoryAttributeSet(graph);
             IngoingEdges = new MemoryRelativeEdgeRepository.Ingoing(edges, this);
             OutgoingEdges = new MemoryRelativeEdgeRepository.Outgoing(edges, this);
             BidirectionalEdges = new MemoryRelativeEdgeRepository.Bidirectional(edges, this);
@@ -35,7 +36,8 @@ namespace Graphene.InMemory
 
         public int Id { get; }
 
-        public string Label { get; set; }
+        public string Label { get; }
+        
         IReadOnlyAttributeSet IReadOnlyEntity.Attributes => Attributes;
 
         public IAttributeSet Attributes { get; }

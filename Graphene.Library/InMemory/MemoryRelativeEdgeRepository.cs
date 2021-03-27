@@ -8,12 +8,7 @@ namespace Graphene.InMemory
         {
         }
 
-        public IEdge Add(IVertex other)
-        {
-            return Add(other, label: null);
-        }
-
-        public abstract IEdge Add(IVertex other, string label);
+        public abstract IEdge Add(IVertex other, string label = null);
         
         public void Delete(IEnumerable<int> ids)
         {
@@ -38,8 +33,7 @@ namespace Graphene.InMemory
 
             public override IEdge Add(IVertex other, string label)
             {
-                var edge = Edges.Create(other, Vertex, directed: true);
-                edge.Label = label;
+                var edge = Edges.Create(other, Vertex, directed: true, label);
                 return edge;
             }
 
@@ -57,8 +51,7 @@ namespace Graphene.InMemory
 
             public override IEdge Add(IVertex other, string label)
             {
-                var edge = Edges.Create(Vertex, other, directed: true);
-                edge.Label = label;
+                var edge = Edges.Create(Vertex, other, directed: true, label);
                 return edge;
             }
 
@@ -76,8 +69,7 @@ namespace Graphene.InMemory
 
             public override IEdge Add(IVertex other, string label)
             {
-                var edge = Edges.Create(Vertex, other, directed: false);
-                edge.Label = label;
+                var edge = Edges.Create(Vertex, other, directed: false, label);
                 return edge;
             }
 

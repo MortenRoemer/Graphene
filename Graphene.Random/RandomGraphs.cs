@@ -30,15 +30,15 @@ namespace Graphene.Random
                 {
                     if (HasRule(EdgeGenerationRule.AllowUndirected, edgeGenerationRule) &&
                         randomizer.NextDouble() < edgeProbability)
-                        vertex.BidirectionalEdges.Add(newVertex);
+                        vertex.BidirectionalEdges.Add(newVertex, null);
 
                     if (HasRule(EdgeGenerationRule.AllowDirected, edgeGenerationRule))
                     {
                         if (randomizer.NextDouble() < edgeProbability)
-                            vertex.IngoingEdges.Add(newVertex);
+                            vertex.IngoingEdges.Add(newVertex, null);
 
                         if (vertex.Id != newVertex.Id && randomizer.NextDouble() < edgeProbability)
-                            vertex.OutgoingEdges.Add(newVertex);
+                            vertex.OutgoingEdges.Add(newVertex, null);
                     }
                 }
             }

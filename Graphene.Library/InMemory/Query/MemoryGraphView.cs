@@ -15,7 +15,9 @@ namespace Graphene.InMemory.Query
         private IReadOnlyGraph Backend { get; }
         
         public int Size => Vertices.Count() + Edges.Count();
-        
+
+        public int DataVersion => Backend.DataVersion;
+
         public IReadOnlyRepository<IReadOnlyVertex> Vertices { get; }
         
         public IReadOnlyRepository<IReadOnlyEdge> Edges { get; }

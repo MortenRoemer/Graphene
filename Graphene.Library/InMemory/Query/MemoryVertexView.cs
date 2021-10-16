@@ -32,7 +32,7 @@ namespace Graphene.InMemory.Query
             return Range.Count;
         }
 
-        public IEnumerable<IReadOnlyVertex> Get(IEnumerable<int> ids)
+        public IEnumerable<IReadOnlyVertex> Get(IEnumerable<int>? ids)
         {
             if (ids is null)
                 throw new ArgumentNullException(nameof(ids));
@@ -40,17 +40,14 @@ namespace Graphene.InMemory.Query
             return Backend.Get(ids.Where(id => Range.Contains(id)));
         }
 
-        public IReadOnlyVertex Get(int id)
+        public IReadOnlyVertex? Get(int id)
         {
             return Range.Contains(id) ? Backend.Get(id) : throw new ArgumentException($"id {id} does not exist");
         }
 
-        public bool Contains(IEnumerable<int> ids)
+        public bool Contains(IEnumerable<int>? ids)
         {
-            if (ids is null)
-                throw new ArgumentNullException(nameof(ids));
-            
-            return ids.All(id => Range.Contains(id));
+            return ids?.All(id => Range.Contains(id)) ?? true;
         }
 
         public bool Contains(int id)

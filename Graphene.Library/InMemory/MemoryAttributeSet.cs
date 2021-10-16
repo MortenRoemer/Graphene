@@ -10,16 +10,16 @@ namespace Graphene.InMemory
         internal MemoryAttributeSet(MemoryGraph graph)
         {
             Graph = graph;
-            Attributes = new Lazy<IDictionary<string, object>>(() => new SortedDictionary<string, object>(), isThreadSafe: false);
+            Attributes = new Lazy<IDictionary<string, object?>>(() => new SortedDictionary<string, object?>(), isThreadSafe: false);
         }
 
         private MemoryGraph Graph { get; }
         
-        private Lazy<IDictionary<string, object>> Attributes { get; }
+        private Lazy<IDictionary<string, object?>> Attributes { get; }
 
-        public object this[string name]
+        public object? this[string name]
         {
-            get => TryGet(name, out object result) ? result : throw new KeyNotFoundException($"attribute with name {name} is not present");
+            get => TryGet(name, out object? result) ? result : throw new KeyNotFoundException($"attribute with name {name} is not present");
             set => Set(name, value);
         }
 
@@ -27,7 +27,7 @@ namespace Graphene.InMemory
 
         public IEnumerable<string> Names => Attributes.IsValueCreated ? Attributes.Value.Keys : Enumerable.Empty<string>();
 
-        public IEnumerable<object> Values => Attributes.IsValueCreated ? Attributes.Value.Values : Enumerable.Empty<object>();
+        public IEnumerable<object> Values => Attributes.IsValueCreated ? Attributes.Value.Values! : Enumerable.Empty<object>();
 
         public void Clear()
         {
@@ -40,10 +40,12 @@ namespace Graphene.InMemory
 
         public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
         {
-            return Attributes.IsValueCreated ? Attributes.Value.GetEnumerator() : Enumerable.Empty<KeyValuePair<string, object>>().GetEnumerator();
+            return Attributes.IsValueCreated 
+                ? Attributes.Value.GetEnumerator()! 
+                : Enumerable.Empty<KeyValuePair<string, object>>().GetEnumerator();
         }
 
-        public void Set(string name, object value)
+        public void Set(string name, object? value)
         {
             if (name is null)
                 throw new ArgumentNullException(nameof(name));
@@ -52,7 +54,7 @@ namespace Graphene.InMemory
             Graph.DataVersion++;
         }
 
-        public bool TryGet<T>(string name, out T value)
+        public bool TryGet<T>(string name, out T? value)
         {
             if (name is null)
                 throw new ArgumentNullException(nameof(name));
@@ -73,7 +75,7 @@ namespace Graphene.InMemory
             
             try
             {
-                value = (T)result;
+                value = (T?)result;
                 return true;
             }
             catch (InvalidCastException)
@@ -83,9 +85,9 @@ namespace Graphene.InMemory
             }
         }
 
-        public T GetOrDefault<T>(string name, T defaultValue)
+        public T? GetOrDefault<T>(string name, T? defaultValue)
         {
-            return TryGet(name, out T result) ? result : defaultValue;
+            return TryGet(name, out T? result) ? result : defaultValue;
         }
 
         IEnumerator IEnumerable.GetEnumerator()

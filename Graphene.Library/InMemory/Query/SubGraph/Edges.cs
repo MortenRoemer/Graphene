@@ -7,7 +7,7 @@ namespace Graphene.InMemory.Query.SubGraph
 {
     public class Edges : IEdges
     {
-        internal Edges(Root root, IEnumerable<int> range)
+        internal Edges(Root root, IEnumerable<int>? range)
         {
             Root = root;
             Range = range;
@@ -15,7 +15,7 @@ namespace Graphene.InMemory.Query.SubGraph
 
         private Root Root { get; }
 
-        private IEnumerable<int> Range { get; }
+        private IEnumerable<int>? Range { get; }
 
         private Func<IReadOnlyEdge, bool> Filter { get; set; }
         

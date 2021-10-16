@@ -4,7 +4,7 @@ namespace Graphene
 {
     public interface IReadOnlyAttributeSet : IEnumerable<KeyValuePair<string, object>>
     {
-        object this[string name] { get; }
+        T? Get<T>(string name);
         
         int Count { get; }
 
@@ -12,8 +12,8 @@ namespace Graphene
 
         IEnumerable<object> Values { get; }
 
-        bool TryGet<T>(string name, out T value);
+        bool TryGet<T>(string name, out T? value);
 
-        T GetOrDefault<T>(string name, T defaultValue);
+        T? GetOrDefault<T>(string name, T? defaultValue);
     }
 }

@@ -7,7 +7,7 @@ namespace Graphene.InMemory.Query.Entity
 {
     public class Edges : IEdges
     {
-        internal Edges(IReadOnlyGraph graph, IEnumerable<int> range)
+        internal Edges(IReadOnlyGraph graph, IEnumerable<int>? range)
         {
             Graph = graph;
             Range = range;
@@ -15,9 +15,9 @@ namespace Graphene.InMemory.Query.Entity
         
         private IReadOnlyGraph Graph { get; }
         
-        private IEnumerable<int> Range { get; }
+        private IEnumerable<int>? Range { get; }
         
-        private Func<IReadOnlyEdge, bool> Filter { get; set; }
+        private Func<IReadOnlyEdge, bool>? Filter { get; set; }
         
         public IEdges Where(Func<IReadOnlyEdge, bool> filter)
         {
@@ -52,7 +52,7 @@ namespace Graphene.InMemory.Query.Entity
 
             edgeSource = edgeSource.SkipWhile(edge => edge.Id <= offset);
 
-            if (Filter != null)
+            if (Filter is not null)
                 edgeSource = edgeSource.Where(Filter);
 
             var entities = edgeSource.Take(pageSize).ToArray();

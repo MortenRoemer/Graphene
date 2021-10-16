@@ -143,7 +143,7 @@ namespace Graphene.InMemory.Utility
                 throw new InvalidOperationException("no more numbers to sample");
             
             var randomGenerator = _randomGenerator.Value;
-            var randomIndex = randomGenerator.Next(SegmentCount);
+            var randomIndex = randomGenerator!.Next(SegmentCount);
             var segment = Segments[randomIndex];
             var result = segment.GetRandom();
             Remove(result);
@@ -205,7 +205,7 @@ namespace Graphene.InMemory.Utility
             public int GetRandom()
             {
                 var randomGenerator = _randomGenerator.Value;
-                return randomGenerator.Next(Min - 1, Max) + 1;
+                return randomGenerator!.Next(Min - 1, Max) + 1;
             }
         }
     }

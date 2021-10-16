@@ -6,10 +6,10 @@ namespace Graphene.Query.SubGraph
     {
         IVertices Vertices();
         
-        IVertices Vertices(IEnumerable<int> ids);
+        IVertices Vertices(IEnumerable<int>? ids);
 
         IEdges Edges();
 
-        IEdges Edges(IEnumerable<int> ids);
+        IEdges Edges(IEnumerable<int>? ids);
     }
 }

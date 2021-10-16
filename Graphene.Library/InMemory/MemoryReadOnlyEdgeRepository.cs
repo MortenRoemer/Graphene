@@ -21,9 +21,9 @@ namespace Graphene.InMemory
         
         protected Lazy<Cache> EdgeCache { get; }
 
-        public bool Contains(IEnumerable<int> ids)
+        public bool Contains(IEnumerable<int>? ids)
         {
-            return ids.All(Contains);
+            return ids is null || ids.All(Contains);
         }
 
         public bool Contains(int id)
@@ -36,12 +36,14 @@ namespace Graphene.InMemory
             return EdgeCache.Value.Buffer.Count;
         }
 
-        public IEnumerable<IEdge> Get(IEnumerable<int> ids)
+        public IEnumerable<IEdge?> Get(IEnumerable<int>? ids)
         {
-            return ids.Select(Get);
+            return ids is null 
+                ? Array.Empty<IEdge>() 
+                : ids.Select(Get);
         }
         
-        public IEdge Get(int id)
+        public IEdge? Get(int id)
         {
             return EdgeCache.Value.Buffer[id];
         }

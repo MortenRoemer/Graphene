@@ -1,15 +1,12 @@
-﻿using Graphene.Query;
+﻿using System.Threading.Tasks;
+using Graphene.Transactions;
 
 namespace Graphene
 {
     public interface IGraph : IReadOnlyGraph
     {
-        new IVertexRepository Vertices { get; }
-        
-        new IReadOnlyRepository<IReadOnlyEdge> Edges { get; }
+        Task Execute(IAction action);
 
-        void Clear();
-
-        void Merge(IReadOnlyGraph other);
+        Task Clear();
     }
 }

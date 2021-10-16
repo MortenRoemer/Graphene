@@ -7,7 +7,7 @@ namespace Graphene.InMemory.Query.Entity
 {
     public class Vertices : IVertices
     {
-        public Vertices(IReadOnlyGraph graph, IEnumerable<int> range)
+        public Vertices(IReadOnlyGraph graph, IEnumerable<int>? range)
         {
             Graph = graph;
             Range = range;
@@ -15,9 +15,9 @@ namespace Graphene.InMemory.Query.Entity
         
         private IReadOnlyGraph Graph { get; }
         
-        private IEnumerable<int> Range { get; }
+        private IEnumerable<int>? Range { get; }
         
-        private Func<IReadOnlyVertex, bool> Filter { get; set; }
+        private Func<IReadOnlyVertex, bool>? Filter { get; set; }
         
         public IVertices Where(Func<IReadOnlyVertex, bool> filter)
         {

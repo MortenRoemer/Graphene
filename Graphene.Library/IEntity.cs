@@ -1,9 +1,21 @@
+using System;
+
 namespace Graphene
 {
     public interface IEntity : IReadOnlyEntity
     {
-        new IGraph Graph { get; }
+        new Guid Id { get; set; }
 
+        new string Label { get; set; }
+        
         new IAttributeSet Attributes { get; }
+    }
+
+    public static class EntityExtension
+    {
+        public static void Set(this IEntity entity, string name, object? value)
+        {
+            entity.Attributes.Set(name, value);
+        }
     }
 }

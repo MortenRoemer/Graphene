@@ -20,7 +20,7 @@ namespace Graphene.InMemory.Query
             return new Vertices(Graph, null);
         }
 
-        public IVertices Vertices(IEnumerable<int> range)
+        public IVertices Vertices(IEnumerable<int>? range)
         {
             if (range is null)
                 throw new ArgumentNullException(nameof(range));
@@ -33,7 +33,7 @@ namespace Graphene.InMemory.Query
             return new Edges(Graph, null);
         }
 
-        public IEdges Edges(IEnumerable<int> range)
+        public IEdges Edges(IEnumerable<int>? range)
         {
             if (range is null)
                 throw new ArgumentNullException(nameof(range));

@@ -9,6 +9,6 @@ namespace Graphene.Query.SubGraph
 
         IVerticesWithEdges WithEdges();
         
-        IVerticesWithEdges WithEdges(IEnumerable<int> ids);
+        IVerticesWithEdges WithEdges(IEnumerable<int>? ids);
     }
 }

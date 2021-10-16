@@ -7,7 +7,7 @@ namespace Graphene.InMemory.Query.SubGraph
 {
     public class VerticesWithEdges : IVerticesWithEdges
     {
-        internal VerticesWithEdges(Vertices vertices, IEnumerable<int> range)
+        internal VerticesWithEdges(Vertices vertices, IEnumerable<int>? range)
         {
             Vertices = vertices;
             Range = range;
@@ -15,9 +15,9 @@ namespace Graphene.InMemory.Query.SubGraph
         
         private Vertices Vertices { get; }
         
-        private IEnumerable<int> Range { get; }
+        private IEnumerable<int>? Range { get; }
         
-        private Func<IReadOnlyEdge, bool> Filter { get; set; }
+        private Func<IReadOnlyEdge, bool>? Filter { get; set; }
         
         public IReadOnlyGraph Resolve()
         {

@@ -7,7 +7,7 @@ namespace Graphene.InMemory.Query.SubGraph
 {
     public class Vertices : IVertices
     {
-        internal Vertices(Root root, IEnumerable<int> range)
+        internal Vertices(Root root, IEnumerable<int>? range)
         {
             Root = root;
             Range = range;
@@ -15,7 +15,7 @@ namespace Graphene.InMemory.Query.SubGraph
         
         internal Root Root { get; }
         
-        internal IEnumerable<int> Range { get; }
+        internal IEnumerable<int>? Range { get; }
         
         internal Func<IReadOnlyVertex, bool> Filter { get; private set; }
         
@@ -45,7 +45,7 @@ namespace Graphene.InMemory.Query.SubGraph
             return new VerticesWithEdges(this, null);
         }
 
-        public IVerticesWithEdges WithEdges(IEnumerable<int> ids)
+        public IVerticesWithEdges WithEdges(IEnumerable<int>? ids)
         {
             if (ids is null)
                 throw new ArgumentNullException(nameof(ids));

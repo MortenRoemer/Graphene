@@ -4,7 +4,7 @@ namespace Graphene.InMemory
 {
     public class MemoryVertex : IVertex
     {
-        internal MemoryVertex(MemoryGraph graph, MemoryEdgeRepository edges, int id, string label)
+        internal MemoryVertex(MemoryGraph graph, MemoryEdgeRepository edges, int id, string? label = null)
         {
             Graph = graph ?? throw new ArgumentNullException(nameof(graph));
             Id = id;
@@ -36,7 +36,7 @@ namespace Graphene.InMemory
 
         public int Id { get; }
 
-        public string Label { get; }
+        public string? Label { get; }
         
         IReadOnlyAttributeSet IReadOnlyEntity.Attributes => Attributes;
 
@@ -44,7 +44,7 @@ namespace Graphene.InMemory
         
         public IReadOnlyRepository<IEdge> Edges { get; }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return obj is IVertex other && this.Id == other.Id;
         }

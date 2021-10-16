@@ -19,8 +19,8 @@ namespace Graphene.InMemory
 
         private IEnumerable<IVertex> Vertices { get; }
 
-        public bool Contains(IEnumerable<int> ids)
-            => ids.All(Contains);
+        public bool Contains(IEnumerable<int>? ids)
+            => ids is null || ids.All(Contains);
 
         public bool Contains(int id)
             => id == Edge.FromVertex.Id || id == Edge.ToVertex.Id;
@@ -28,10 +28,10 @@ namespace Graphene.InMemory
         public int Count()
             => Vertices.Count();
 
-        public IEnumerable<IVertex> Get(IEnumerable<int> ids)
+        public IEnumerable<IVertex> Get(IEnumerable<int>? ids)
             => Vertices.Where(vertex => ids.Contains(vertex.Id));
 
-        public IVertex Get(int id)
+        public IVertex? Get(int id)
             => Vertices.FirstOrDefault(vertex => vertex.Id == id);
         
         public IEnumerator<IVertex> GetEnumerator()

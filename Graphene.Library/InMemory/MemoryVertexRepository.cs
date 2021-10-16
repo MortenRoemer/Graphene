@@ -29,9 +29,9 @@ namespace Graphene.InMemory
             Edges.Clear();
         }
 
-        public bool Contains(IEnumerable<int> ids)
+        public bool Contains(IEnumerable<int>? ids)
         {
-            return ids.All(id => Vertices.ContainsKey(id));
+            return ids?.All(id => Vertices.ContainsKey(id)) ?? true;
         }
 
         public bool Contains(int id)
@@ -44,7 +44,7 @@ namespace Graphene.InMemory
             return Vertices.Count;
         }
 
-        public IVertex Create(string label)
+        public IVertex Create(string? label = null)
         {
             var vertex = new MemoryVertex(Graph, Edges, Graph.TakeId(), label);
             Vertices.Add(vertex.Id, vertex);
@@ -52,7 +52,7 @@ namespace Graphene.InMemory
             return vertex;
         }
 
-        public void Delete(IEnumerable<int> ids)
+        public void Delete(IEnumerable<int>? ids)
         {
             foreach (var id in ids)
             {
@@ -67,7 +67,7 @@ namespace Graphene.InMemory
             Graph.DataVersion++;
         }
 
-        public IEnumerable<IVertex> Get(IEnumerable<int> ids)
+        public IEnumerable<IVertex> Get(IEnumerable<int>? ids)
         {
             return ids.Select(Get);
         }

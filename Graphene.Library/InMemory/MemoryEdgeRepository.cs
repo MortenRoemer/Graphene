@@ -21,7 +21,7 @@ namespace Graphene.InMemory
         
         private IList<IObserver<CollectionChange<IEdge>>> Observers { get; }
 
-        public MemoryEdge Create(IVertex fromVertex, IVertex toVertex, bool directed, string label)
+        public MemoryEdge Create(IVertex fromVertex, IVertex toVertex, bool directed, string? label)
         {
             if (!Graph.Vertices.Contains(fromVertex.Id))
                 throw new ArgumentException($"{nameof(fromVertex)} with id {fromVertex.Id} does not exist in this graph");
@@ -51,9 +51,9 @@ namespace Graphene.InMemory
             Graph.DataVersion++;
         }
 
-        public bool Contains(IEnumerable<int> ids)
+        public bool Contains(IEnumerable<int>? ids)
         {
-            return ids.All(Contains);
+            return ids?.All(Contains) ?? true;
         }
 
         public bool Contains(int id)
@@ -66,7 +66,7 @@ namespace Graphene.InMemory
             return Edges.Count;
         }
 
-        public void Delete(IEnumerable<int> ids)
+        public void Delete(IEnumerable<int>? ids)
         {
             foreach (var id in ids)
             {
@@ -82,7 +82,7 @@ namespace Graphene.InMemory
             Graph.DataVersion++;
         }
 
-        public IEnumerable<IEdge> Get(IEnumerable<int> ids)
+        public IEnumerable<IEdge> Get(IEnumerable<int>? ids)
         {
             return ids.Select(Get);
         }

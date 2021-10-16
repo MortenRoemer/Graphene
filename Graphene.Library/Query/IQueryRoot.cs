@@ -10,7 +10,7 @@ namespace Graphene.Query
 
         Entity.IEdges Edges();
         
-        Entity.IEdges Edges(IEnumerable<int> range);
+        Entity.IEdges Edges(IEnumerable<int>? range);
         
         Route.IRoot Route();
         

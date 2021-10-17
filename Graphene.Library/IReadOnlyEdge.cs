@@ -1,10 +1,12 @@
+using System;
+
 namespace Graphene
 {
     public interface IReadOnlyEdge : IReadOnlyEntity
     {
-        IReadOnlyVertex FromVertex { get; }
+        Guid FromVertex { get; }
 
-        IReadOnlyVertex ToVertex { get; }
+        Guid ToVertex { get; }
 
         bool Directed { get; }
     }

@@ -2,12 +2,8 @@ using System;
 
 namespace Graphene
 {
-    public interface IReadOnlyEntity
+    public interface IReadOnlyEntity : IEntityReference
     {
-        Guid Id { get; }
-
-        string Label { get; }
-
         IReadOnlyAttributeSet Attributes { get; }
     }
 

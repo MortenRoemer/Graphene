@@ -12,7 +12,9 @@ namespace Graphene.Random
         
         public static void RandomizeGraph(int vertexCount, double edgeProbability, IGraph graph, EdgeGenerationRule edgeGenerationRule)
         {
-            if (vertexCount < 0)
+            throw new NotImplementedException();
+
+            /*if (vertexCount < 0)
                 throw new ArgumentOutOfRangeException();
             
             graph.Clear();
@@ -41,7 +43,7 @@ namespace Graphene.Random
                             vertex.OutgoingEdges.Add(newVertex, null);
                     }
                 }
-            }
+            }*/
         }
 
         private static bool HasRule(EdgeGenerationRule expected, EdgeGenerationRule ruleSet)

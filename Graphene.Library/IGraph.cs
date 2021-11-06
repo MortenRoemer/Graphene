@@ -5,7 +5,7 @@ namespace Graphene
 {
     public interface IGraph : IReadOnlyGraph
     {
-        Task Execute(IAction action);
+        Task Execute(Transaction transaction);
 
         Task Clear();
     }

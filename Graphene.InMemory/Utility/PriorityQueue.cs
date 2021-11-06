@@ -6,9 +6,9 @@ namespace Graphene.InMemory.Utility
 {
     public class PriorityQueue<TPriority, TPayLoad> : IEnumerable<TPayLoad> where TPriority : IComparable<TPriority>
     {
-        private const int STANDARD_CAPACITY = 10;
+        private const int StandardCapacity = 10;
 
-        private Entry[] Entries { get; set; } = new Entry[STANDARD_CAPACITY];
+        private Entry[] Entries { get; set; } = new Entry[StandardCapacity];
 
         public int Capacity => Entries.Length;
 

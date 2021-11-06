@@ -1,5 +1,7 @@
-using System;
+using FluentAssertions;
 using Graphene.InMemory;
+using Graphene.Transactions;
+using System;
 using Xunit;
 
 namespace Graphene.Test
@@ -7,51 +9,111 @@ namespace Graphene.Test
     public class MemoryGraphTest
     {
         [Fact]
-        public void NewGraphShouldBeEmpty()
+        public async void CreatingVerticesAndEdgesShouldWork()
         {
-            IReadOnlyGraph graph = new MemoryGraph();
-            var anyVertices = graph.Select().Vertices().Resolve(out _);
-            Assert.False(anyVertices);
-            var anyEdges = graph.Select().Edges().Resolve(out _);
-            Assert.False(anyEdges);
+            var graph = new MemoryGraph(nameof(CreatingVerticesAndEdgesShouldWork));
+            var mike = new MemoryVertex("Person");
+            var samantha = new MemoryVertex("Person");
+            var relationship = new MemoryEdge("Friendship", mike.Id, samantha.Id, false);
+            
+            await graph.Execute(new Transaction
+            {
+                mike.ToCreateVertexAction(),
+                samantha.ToCreateVertexAction(),
+                relationship.ToCreateEdgeAction()
+            });
+
+            var createdPersons = await graph.FindVertices(2, vertex => vertex.Label == "Person");
+            createdPersons.Results.Should().HaveCount(2);
+
+            var createdFriendships = await graph.FindEdges(1, edge => edge.Label == "Friendship");
+            createdFriendships.Results.Should().HaveCount(1);
         }
 
         [Fact]
-        public void AttributeClearShouldWork()
+        public async void EmptyGuidsShouldBeRejected()
         {
-            var graph = new MemoryGraph();
-            var entity = graph.Vertices.Create();
-            var previousDataVersion = graph.DataVersion;
-            entity.Attributes.Set("value", 1);
-            Assert.NotEqual(previousDataVersion, graph.DataVersion);
-            previousDataVersion = graph.DataVersion;
-            entity.Attributes.Clear();
-            Assert.NotEqual(previousDataVersion, graph.DataVersion);
-            Assert.Empty(entity.Attributes);
+            var graph = new MemoryGraph(nameof(EmptyGuidsShouldBeRejected));
+            var mike = new MemoryVertex("Person", Guid.Empty);
+            var relationship = new MemoryEdge("Love", mike.Id, mike.Id, false, Guid.Empty);
+            Exception? exception = null;
+            
+            try
+            {
+                await graph.Execute(new Transaction
+                {
+                    mike.ToCreateVertexAction(),
+                    relationship.ToCreateEdgeAction()
+                });
+            }
+            catch (Exception caughtException)
+            {
+                exception = caughtException;
+            }
+            
+            exception.Should().BeOfType<GraphActionException>();
+            exception!.Message.Should().Contain("empty Guid is not valid");
         }
 
         [Fact]
-        public void GenericEdgeEnumerationShouldGiveAllEdgesForAVertex()
+        public async void UpdatingEntitiesShouldWork()
         {
-            IGraph graph = new MemoryGraph();
-            IVertex va = graph.Vertices.Create();
-            IVertex vb = graph.Vertices.Create();
-            _ = va.BidirectionalEdges.Add(vb, null);
-            _ = va.IngoingEdges.Add(vb, null);
-            _ = va.OutgoingEdges.Add(vb, null);
-            Assert.Equal(3, va.Edges.Count());
+            var graph = new MemoryGraph(nameof(UpdatingEntitiesShouldWork));
+            var mike = new MemoryVertex("Person")
+                .WithAttribute("Name", "Mike")
+                .WithAttribute("Age", 18);
+            var relationship = new MemoryEdge("Love", mike.Id, mike.Id, false)
+                .WithAttribute("Intensity", "High")
+                .WithAttribute("Awareness", 0);
+
+            await graph.Execute(new Transaction
+            {
+                mike.ToCreateVertexAction(),
+                relationship.ToCreateEdgeAction()
+            });
+
+            var mikePatch = mike.Patch()
+                .WithAttribute("Age", 21);
+            var relationshipPatch = relationship.Patch()
+                .WithAttribute("Intensity", "Low");
+
+            await graph.Execute(new Transaction
+            {
+                mikePatch.ToUpdateVertexAction(),
+                relationshipPatch.ToUpdateEdgeAction()
+            });
+
+            var patchedMike = await graph.Get(mike.Id);
+            patchedMike.Get<string>("Name").Should().Be("Mike");
+            patchedMike.Get<int>("Age").Should().Be(21);
+
+            var patchedRelationship = await graph.Get(relationship.Id);
+            patchedRelationship.Get<string>("Intensity").Should().Be("Low");
+            patchedRelationship.Get<int>("Awareness").Should().Be(0);
         }
 
         [Fact]
-        public void GenericVertexEnumerationShouldGiveAllVerticesForAnEdge()
+        public async void UpdatesToMissingEntitiesShouldFail()
         {
-            IGraph graph = new MemoryGraph();
-            IVertex va = graph.Vertices.Create();
-            IVertex vb = graph.Vertices.Create();
-            IEdge ea = va.BidirectionalEdges.Add(vb, null);
-            Assert.Equal(2, ea.Vertices.Count());
-            IEdge eb = va.BidirectionalEdges.Add(va, null);
-            Assert.Equal(1, eb.Vertices.Count());
+            var graph = new MemoryGraph(nameof(UpdatesToMissingEntitiesShouldFail));
+            var misguidedPatch = new MemoryVertex("Person")
+                .WithAttribute("Age", 18);
+            Exception? exception = null;
+
+            try
+            {
+                await graph.Execute(new Transaction
+                {
+                    misguidedPatch.ToUpdateVertexAction()
+                });
+            }
+            catch (Exception caughtException)
+            {
+                exception = caughtException;
+            }
+            
+            exception.Should().BeOfType<GraphActionException>();
+            exception!.Message.Should().Contain("there is no vertex with id");
         }
     }
 }

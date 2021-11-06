@@ -1,6 +1,6 @@
 namespace Graphene.Transactions
 {
-    public class UpdateEdge
+    public class UpdateEdge : IAction
     {
         public UpdateEdge(IReadOnlyEdge target)
         {

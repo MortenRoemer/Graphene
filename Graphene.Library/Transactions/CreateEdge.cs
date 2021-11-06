@@ -1,6 +1,6 @@
 namespace Graphene.Transactions
 {
-    public class CreateEdge
+    public class CreateEdge : IAction
     {
         public CreateEdge(IReadOnlyEdge target)
         {

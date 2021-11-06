@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Graphene
 {
-    public interface IReadOnlyAttributeSet : IEnumerable<KeyValuePair<string, object>>
+    public interface IReadOnlyAttributeSet : IEnumerable<KeyValuePair<string, object?>>
     {
         T? Get<T>(string name);
         
@@ -10,7 +10,7 @@ namespace Graphene
 
         IEnumerable<string> Names { get; }
 
-        IEnumerable<object> Values { get; }
+        IEnumerable<object?> Values { get; }
 
         bool TryGet<T>(string name, out T? value);
 

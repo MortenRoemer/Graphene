@@ -4,7 +4,7 @@ namespace Graphene.Query.Route
 {
     public readonly struct RouteResult<TMetric>
     {
-        internal RouteResult(bool found, IReadOnlyVertex origin, IReadOnlyList<RouteStep> steps, TMetric metric)
+        public RouteResult(bool found, IReadOnlyVertex origin, IReadOnlyList<RouteStep> steps, TMetric metric)
         {
             Found = found;
             Origin = origin;

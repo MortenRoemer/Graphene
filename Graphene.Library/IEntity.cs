@@ -4,10 +4,6 @@ namespace Graphene
 {
     public interface IEntity : IReadOnlyEntity
     {
-        new Guid Id { get; init; }
-
-        new string Label { get; init; }
-        
         new IAttributeSet Attributes { get; }
     }
 

@@ -1,6 +1,6 @@
 namespace Graphene.Transactions
 {
-    public class UpdateVertex
+    public class UpdateVertex : IAction
     {
         public UpdateVertex(IReadOnlyVertex target)
         {

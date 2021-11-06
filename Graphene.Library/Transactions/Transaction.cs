@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Graphene.Transactions
 {
-    public class Transaction : IAction, IEnumerable<IAction>
+    public class Transaction : IEnumerable<IAction>
     {
         private List<IAction> Actions { get; } = new();
 

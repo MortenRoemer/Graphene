@@ -90,8 +90,8 @@ namespace Graphene.Test
 
             await graph.Execute(new Transaction
             {
-                hamburgPatch.ToUpdateVertexAction(),
-                a24Patch.ToUpdateEdgeAction()
+                hamburgPatch.ToUpdateEntityAction(),
+                a24Patch.ToUpdateEntityAction()
             });
 
             var patchedHamburg = await graph.Get(HamburgId);
@@ -116,7 +116,7 @@ namespace Graphene.Test
             {
                 await graph.Execute(new Transaction
                 {
-                    misguidedPatch.ToUpdateVertexAction()
+                    misguidedPatch.ToUpdateEntityAction()
                 });
             }
             catch (Exception caughtException)
@@ -125,7 +125,7 @@ namespace Graphene.Test
             }
             
             exception.Should().NotBeNull().And.BeOfType<GraphActionException>();
-            exception!.Message.Should().Contain("there is no vertex with id");
+            exception!.Message.Should().Contain("there is no entity with id");
         }
 
         [Fact]

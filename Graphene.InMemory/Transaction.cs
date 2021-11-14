@@ -40,11 +40,7 @@ namespace Graphene.InMemory
                     state.AssertValidNewId(action, createVertex.Target.Id);
                     state.AddVertex(createVertex.Target.Id);
                     break;
-                
-                case UpdateVertex updateVertex:
-                    state.AssertExistingVertex(action, updateVertex.Target.Id);
-                    break;
-                
+
                 case CreateEdge createEdge:
                     state.AssertValidNewId(action, createEdge.Target.Id);
                     state.AssertExistingVertex(action, createEdge.Target.FromVertex);
@@ -52,15 +48,15 @@ namespace Graphene.InMemory
                     state.AddEdge(createEdge.Target.Id, createEdge.Target.FromVertex, createEdge.Target.ToVertex);
                     break;
                 
-                case UpdateEdge updateEdge:
-                    state.AssertExistingEdge(action, updateEdge.Target.Id);
+                case UpdateEntity updateEntity:
+                    state.AssertExistingEntity(action, updateEntity.Target.Id);
                     break;
                 
                 case DeleteEntity deleteEntity:
                     state.AssertExistingEntity(action, deleteEntity.Target.Id);
                     state.DeleteEntity(deleteEntity.Target.Id);
                     break;
-                
+
                 default:
                     throw new NotImplementedException($"{action.GetType().Name} failed because it is not implemented");
             }
@@ -73,17 +69,13 @@ namespace Graphene.InMemory
                 case CreateVertex createVertex:
                     Graph.CreateVertex(createVertex.Target);
                     break;
-                
-                case UpdateVertex updateVertex:
-                    Graph.UpdateVertex(updateVertex.Target);
-                    break;
-                
+
                 case CreateEdge createEdge:
                     Graph.CreateEdge(createEdge.Target);
                     break;
                 
-                case UpdateEdge updateEdge:
-                    Graph.UpdateEdge(updateEdge.Target);
+                case UpdateEntity updateEntity:
+                    Graph.UpdateEntity(updateEntity.Target);
                     break;
                 
                 case DeleteEntity deleteEntity:
@@ -189,12 +181,6 @@ namespace Graphene.InMemory
             {
                 if (!Entities.TryGetValue(id, out var entityClass) || entityClass != EntityClass.Vertex)
                     throw new GraphActionException(action, $"{action.GetType().Name} failed because there is no vertex with id {id}");
-            }
-            
-            public void AssertExistingEdge(IAction action, Guid id)
-            {
-                if (!Entities.TryGetValue(id, out var entityClass) || entityClass != EntityClass.Edge)
-                    throw new GraphActionException(action, $"{action.GetType().Name} failed because there is no edge with id {id}");
             }
         }
     }

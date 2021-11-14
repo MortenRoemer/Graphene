@@ -8,11 +8,8 @@ namespace Graphene.Transactions
         public static CreateEdge ToCreateEdgeAction(this IReadOnlyEdge edge)
             => new CreateEdge(edge);
 
-        public static UpdateVertex ToUpdateVertexAction(this IReadOnlyVertex vertex)
-            => new UpdateVertex(vertex);
-
-        public static UpdateEdge ToUpdateEdgeAction(this IReadOnlyEdge edge)
-            => new UpdateEdge(edge);
+        public static UpdateEntity ToUpdateEntityAction(this IReadOnlyEntity entity)
+            => new UpdateEntity(entity);
         
         public static DeleteEntity ToDeleteEntityAction(this IEntityReference entityReference)
             => new DeleteEntity(entityReference);

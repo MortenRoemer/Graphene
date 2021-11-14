@@ -134,12 +134,6 @@ namespace Graphene.InMemory
             Entities.Add(vertex.Id, newVertex);
         }
 
-        internal void UpdateVertex(IReadOnlyVertex vertex)
-        {
-            var existingVertex = Entities[vertex.Id];
-            existingVertex.Attributes.PatchWith(vertex.Attributes);
-        }
-
         internal void CreateEdge(IReadOnlyEdge edge)
         {
             var newEdge = new MemoryEdge(edge.Label, edge.FromVertex, edge.ToVertex, edge.Directed, edge.Id);
@@ -148,11 +142,11 @@ namespace Graphene.InMemory
             AddEdgeToVertexLink(newEdge.Id, newEdge.FromVertex);
             AddEdgeToVertexLink(newEdge.Id, newEdge.ToVertex);
         }
-        
-        internal void UpdateEdge(IReadOnlyEdge edge)
+
+        internal void UpdateEntity(IReadOnlyEntity entity)
         {
-            var existingEdge = Entities[edge.Id];
-            existingEdge.Attributes.PatchWith(edge.Attributes);
+            var existingEntity = Entities[entity.Id];
+            existingEntity.Attributes.PatchWith(entity.Attributes);
         }
 
         internal void DeleteEntity(IEntityReference entity)

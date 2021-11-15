@@ -4,7 +4,9 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Graphene.InMemory.Query;
 using Graphene.Query;
+using Graphene.Query.Route;
 
 namespace Graphene.InMemory
 {
@@ -163,7 +165,44 @@ namespace Graphene.InMemory
 
             Entities.Remove(entity.Id);
         }
-        
+
+        internal async Task<RouteResult<TMetric>> FindShortestRoute<TMetric>(MemoryGraph graph,
+            Guid fromVertexId,
+            Guid toVertexId,
+            Func<IReadOnlyEdge, TMetric> metricFunction,
+            Func<TMetric, TMetric, TMetric> accumulatorFunction,
+            TMetric defaultCost,
+            Func<IReadOnlyEdge, bool>? filter,
+            Func<IReadOnlyVertex, IReadOnlyVertex, TMetric> heuristicFunction) where TMetric : IComparable<TMetric>
+        {
+            return await Task.Run(() =>
+            {
+                RouteResult<TMetric> result;
+                Lock.EnterReadLock();
+                try
+                {
+                    var resolver = new RouteResolver<TMetric>(this);
+                    result = resolver.SolveForMinimalMetric(fromVertexId, toVertexId, filter, metricFunction, defaultCost,
+                        heuristicFunction, accumulatorFunction);
+                }
+                finally
+                {
+                    Lock.ExitReadLock();
+                }
+                
+                return result;
+            });
+        }
+
+        internal IEnumerable<IReadOnlyEdge> GetOutgoingEdgesForVertex(Guid fromVertexId,
+            Func<IReadOnlyEdge, bool>? filter)
+        {
+            foreach (var edgeId in EdgesByVertex[fromVertexId])
+            {
+                yield return (Entities[edgeId] as IReadOnlyEdge)!;
+            }
+        }
+
         private void AddEdgeToVertexLink(Guid edgeId, Guid vertexId)
         {
             if (EdgesByVertex.TryGetValue(vertexId, out var edgeIds))

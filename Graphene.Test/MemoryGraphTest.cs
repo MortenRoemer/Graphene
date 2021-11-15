@@ -84,7 +84,7 @@ namespace Graphene.Test
             var hamburgPatch = new MemoryVertex(CityLabel, HamburgId)
                 .WithAttribute(PopulationLabel, 2000000)
                 .WithAttribute("Metropolis", true);
-            var a24Patch = new MemoryEdge(HighwayLabel, HamburgId, BerlinId, false, a24Id)
+            var a24Patch = new MemoryEdge(HighwayLabel, HamburgId, BerlinId, false, A24Id)
                 .WithAttribute(DistanceLabel, 300.0)
                 .WithAttribute("UnderConstruction", true);
 
@@ -99,7 +99,7 @@ namespace Graphene.Test
             patchedHamburg.Get<int>(PopulationLabel).Should().Be(2000000);
             patchedHamburg.Get<bool>("Metropolis").Should().Be(true);
 
-            var patchedA24 = await graph.Get(a24Id);
+            var patchedA24 = await graph.Get(A24Id);
             patchedA24.Get<string>(NameLabel).Should().Be("A24");
             patchedA24.Get<double>(DistanceLabel).Should().Be(300.0);
             patchedA24.Get<bool>("UnderConstruction").Should().Be(true);
@@ -178,9 +178,9 @@ namespace Graphene.Test
         private static readonly Guid HamburgId = Guid.NewGuid();
         private static readonly Guid MunichId = Guid.NewGuid();
         private static readonly Guid BerlinId = Guid.NewGuid();
-        private static readonly Guid a24Id = Guid.NewGuid();
-        private static readonly Guid a9Id = Guid.NewGuid();
-        private static readonly Guid a7Id = Guid.NewGuid();
+        private static readonly Guid A24Id = Guid.NewGuid();
+        private static readonly Guid A9Id = Guid.NewGuid();
+        private static readonly Guid A7Id = Guid.NewGuid();
         
         private static async Task<MemoryGraph> PrepareExampleGraph(string name)
         {
@@ -194,13 +194,13 @@ namespace Graphene.Test
             var munich = new MemoryVertex(CityLabel, MunichId)
                 .WithAttribute(NameLabel, "Munich")
                 .WithAttribute(PopulationLabel, 1472000);
-            var a24 = new MemoryEdge(HighwayLabel, hamburg.Id, berlin.Id, false, a24Id)
+            var a24 = new MemoryEdge(HighwayLabel, hamburg.Id, berlin.Id, false, A24Id)
                 .WithAttribute(NameLabel, "A24")
                 .WithAttribute(DistanceLabel, 289.0);
-            var a9 = new MemoryEdge(HighwayLabel, berlin.Id, munich.Id, false, a9Id)
+            var a9 = new MemoryEdge(HighwayLabel, berlin.Id, munich.Id, false, A9Id)
                 .WithAttribute(NameLabel, "A9")
                 .WithAttribute(DistanceLabel, 585.0);
-            var a7 = new MemoryEdge(HighwayLabel, munich.Id, hamburg.Id, false, a7Id)
+            var a7 = new MemoryEdge(HighwayLabel, munich.Id, hamburg.Id, false, A7Id)
                 .WithAttribute(NameLabel, "A7")
                 .WithAttribute(DistanceLabel, 778.0);
 

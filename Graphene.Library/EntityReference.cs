@@ -17,23 +17,19 @@ namespace Graphene
 
         public override bool Equals(object? obj) =>
             obj is IEntityReference other &&
-            Id == other.Id &&
-            EntityClass == other.EntityClass &&
-            Label == other.Label;
+            Id == other.Id;
 
         public override int GetHashCode() =>
-            Id.GetHashCode() +
-            EntityClass.GetHashCode() +
-            Label.GetHashCode();
+            Id.GetHashCode();
 
         public static bool operator ==(EntityReference left, EntityReference right)
         {
-            return left.Equals(right);
+            return left.Id == right.Id;
         }
 
         public static bool operator !=(EntityReference left, EntityReference right)
         {
-            return !(left == right);
+            return left.Id != right.Id;
         }
     }
 }

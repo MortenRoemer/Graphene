@@ -1,6 +1,6 @@
 namespace Graphene.Transactions
 {
-    public class DeleteEntity : IAction
+    public readonly struct DeleteEntity : IAction
     {
         public DeleteEntity(IEntityReference target)
         {

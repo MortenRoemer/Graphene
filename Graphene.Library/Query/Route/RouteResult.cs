@@ -4,12 +4,12 @@ namespace Graphene.Query.Route
 {
     public readonly struct RouteResult<TMetric>
     {
-        public RouteResult(bool found, IReadOnlyVertex origin, IReadOnlyList<RouteStep> steps, TMetric metric)
+        public RouteResult(bool found, IReadOnlyVertex origin, IReadOnlyList<RouteStep> steps, TMetric cost)
         {
             Found = found;
             Origin = origin;
             Steps = steps;
-            Metric = metric;
+            Cost = cost;
         }
         
         public bool Found { get; }
@@ -18,6 +18,6 @@ namespace Graphene.Query.Route
         
         public IReadOnlyList<RouteStep> Steps { get; }
 
-        public TMetric Metric { get; }
+        public TMetric Cost { get; }
     }
 }

@@ -1,7 +1,9 @@
+using System;
+
 namespace Graphene.Query.Route
 {
     public interface IRoot
     {
-        IFromVertex FromVertex(int vertexId);
+        IFromVertex FromVertex(Guid vertexId);
     }
 }

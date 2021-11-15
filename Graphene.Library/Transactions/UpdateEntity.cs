@@ -1,6 +1,6 @@
 namespace Graphene.Transactions
 {
-    public class UpdateEntity : IAction
+    public readonly struct UpdateEntity : IAction
     {
         public UpdateEntity(IReadOnlyEntity target)
         {

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Graphene.Transactions;
 
 namespace Graphene.InMemory
@@ -91,11 +90,16 @@ namespace Graphene.InMemory
         {
             public ValidationState(IEnumerable<IEntity> entities)
             {
-                Entities = entities.ToDictionary(entity => entity.Id, entity => entity.EntityClass);
+                Entities = new Dictionary<Guid, EntityClass>();
                 EdgeByVertex = new Dictionary<Guid, List<Guid>>();
 
-                foreach (var edge in entities.Where(entity => entity.EntityClass == EntityClass.Edge).Cast<IEdge>())
+                foreach (var entity in entities)
                 {
+                    Entities.Add(entity.Id, entity.EntityClass);
+
+                    if (entity is not IReadOnlyEdge edge)
+                        continue;
+                    
                     if (EdgeByVertex.TryGetValue(edge.FromVertex, out var existingList))
                     {
                         existingList.Add(edge.Id);

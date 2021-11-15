@@ -1,6 +1,6 @@
 namespace Graphene.Transactions
 {
-    public class CreateVertex : IAction
+    public readonly struct CreateVertex : IAction
     {
         public CreateVertex(IReadOnlyVertex target)
         {

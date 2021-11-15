@@ -109,7 +109,7 @@ namespace Graphene.InMemory.Utility
             {
                 var currentEntry = Entries[index];
 
-                if (!currentEntry.PayLoad.Equals(payLoad))
+                if (!currentEntry.PayLoad!.Equals(payLoad))
                     continue;
                 
                 if (currentEntry.Priority.CompareTo(priority) <= 0)
@@ -170,14 +170,13 @@ namespace Graphene.InMemory.Utility
                 }
             }
 
-            object IEnumerator.Current => Current;
+            object IEnumerator.Current => Current!;
 
             public void Dispose()
             {
                 if (Disposed)
                     throw new ObjectDisposedException(nameof(Enumerator));
-
-                Backend = null;
+                
                 Disposed = true;
             }
 

@@ -4,11 +4,23 @@ using Graphene.Query.Route;
 
 namespace Graphene.InMemory.Query
 {
-    public class QueryRoot : IQueryRoot
+    internal class QueryRoot : IQueryRoot, IRoot
     {
+        public QueryRoot(MemoryGraph graph)
+        {
+            Graph = graph;
+        }
+        
+        private MemoryGraph Graph { get; }
+        
         public IRoot Route()
         {
-            throw new NotImplementedException();
+            return this;
+        }
+
+        public IFromVertex FromVertex(Guid vertexId)
+        {
+            return new FromVertex(Graph, vertexId);
         }
     }
 }

@@ -197,9 +197,14 @@ namespace Graphene.InMemory
         internal IEnumerable<IReadOnlyEdge> GetOutgoingEdgesForVertex(Guid fromVertexId,
             Func<IReadOnlyEdge, bool>? filter)
         {
-            foreach (var edgeId in EdgesByVertex[fromVertexId])
+            var edges = EdgesByVertex[fromVertexId].Select(edgeId => Entities[edgeId]).Cast<IReadOnlyEdge>();
+
+            if (filter is not null)
+                edges = edges.Where(filter);
+            
+            foreach (var edge in edges)
             {
-                yield return (Entities[edgeId] as IReadOnlyEdge)!;
+                yield return edge;
             }
         }
 

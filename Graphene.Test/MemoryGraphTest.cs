@@ -3,6 +3,7 @@ using Graphene.InMemory;
 using Graphene.Transactions;
 using System;
 using System.Threading.Tasks;
+using Graphene.Test.Utility;
 using Xunit;
 
 namespace Graphene.Test
@@ -154,6 +155,7 @@ namespace Graphene.Test
             var route = await graph.Select().Route()
                 .FromVertex(HamburgId)
                 .WithMinimalEdges()
+                .Where(edge => edge.Label == HighwayLabel)
                 .ToVertex(BerlinId)
                 .Resolve();
 
@@ -164,11 +166,29 @@ namespace Graphene.Test
         [Fact]
         public async void FindingShortestRouteByDistanceCountShouldWork()
         {
-            var graph = await PrepareExampleGraph(nameof(FindingShortestRouteByEdgeCountShouldWork));
+            var graph = await PrepareExampleGraph(nameof(FindingShortestRouteByDistanceCountShouldWork));
 
             var route = await graph.Select().Route()
                 .FromVertex(HamburgId)
                 .WithMinimalMetric(edge => edge.Get<double>(DistanceLabel), 0.0, (left, right) => left + right)
+                .Where(edge => edge.Label == HighwayLabel)
+                .ToVertex(BerlinId)
+                .Resolve();
+
+            route.Cost.Should().Be(289.0);
+            route.Steps[0].Edge.Id.Should().Be(A24Id);
+        }
+        
+        [Fact]
+        public async void FindingShortestRouteByHeuristicShouldWork()
+        {
+            var graph = await PrepareExampleGraph(nameof(FindingShortestRouteByHeuristicShouldWork));
+
+            var route = await graph.Select().Route()
+                .FromVertex(HamburgId)
+                .WithMinimalMetric(edge => edge.Get<double>(DistanceLabel), 0.0, (left, right) => left + right)
+                .Where(edge => edge.Label == HighwayLabel)
+                .WithHeuristic((fromVertex, toVertex) => fromVertex.Get<Coordinate>(CoordinatesLabel).CalcDistanceTo(toVertex.Get<Coordinate>(CoordinatesLabel)))
                 .ToVertex(BerlinId)
                 .Resolve();
 
@@ -204,6 +224,7 @@ namespace Graphene.Test
         private const string HighwayLabel = "Highway";
         private const string NameLabel = "Name";
         private const string PopulationLabel = "Population";
+        private const string CoordinatesLabel = "Coordinates";
 
         private static readonly Guid HamburgId = Guid.NewGuid();
         private static readonly Guid MunichId = Guid.NewGuid();
@@ -217,13 +238,16 @@ namespace Graphene.Test
             var graph = new MemoryGraph(name);
             var hamburg = new MemoryVertex(CityLabel, HamburgId)
                 .WithAttribute(NameLabel, "Hamburg")
-                .WithAttribute(PopulationLabel, 1841000);
+                .WithAttribute(PopulationLabel, 1841000)
+                .WithAttribute(CoordinatesLabel, new Coordinate(53.55, 9.99));
             var berlin = new MemoryVertex(CityLabel, BerlinId)
                 .WithAttribute(NameLabel, "Berlin")
-                .WithAttribute(PopulationLabel, 3645000);
+                .WithAttribute(PopulationLabel, 3645000)
+                .WithAttribute(CoordinatesLabel, new Coordinate(52.52, 14.41));
             var munich = new MemoryVertex(CityLabel, MunichId)
                 .WithAttribute(NameLabel, "Munich")
-                .WithAttribute(PopulationLabel, 1472000);
+                .WithAttribute(PopulationLabel, 1472000)
+                .WithAttribute(CoordinatesLabel, new Coordinate(48.14, 11.58));
             var a24 = new MemoryEdge(HighwayLabel, hamburg.Id, berlin.Id, false, A24Id)
                 .WithAttribute(NameLabel, "A24")
                 .WithAttribute(DistanceLabel, 289.0);

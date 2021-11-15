@@ -29,7 +29,7 @@ namespace Graphene.InMemory
 
         public IQueryRoot Select()
         {
-            throw new NotImplementedException();
+            return new QueryRoot(this);
         }
 
         public async Task<IReadOnlyEntity> Get(Guid id)

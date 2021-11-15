@@ -145,6 +145,36 @@ namespace Graphene.Test
             var highways = await graph.FindEdges(2, edge => edge.Label == HighwayLabel);
             highways.Results.Should().HaveCount(1);
         }
+
+        [Fact]
+        public async void FindingShortestRouteByEdgeCountShouldWork()
+        {
+            var graph = await PrepareExampleGraph(nameof(FindingShortestRouteByEdgeCountShouldWork));
+
+            var route = await graph.Select().Route()
+                .FromVertex(HamburgId)
+                .WithMinimalEdges()
+                .ToVertex(BerlinId)
+                .Resolve();
+
+            route.Cost.Should().Be(1);
+            route.Steps[0].Edge.Id.Should().Be(A24Id);
+        }
+        
+        [Fact]
+        public async void FindingShortestRouteByDistanceCountShouldWork()
+        {
+            var graph = await PrepareExampleGraph(nameof(FindingShortestRouteByEdgeCountShouldWork));
+
+            var route = await graph.Select().Route()
+                .FromVertex(HamburgId)
+                .WithMinimalMetric(edge => edge.Get<double>(DistanceLabel), 0.0, (left, right) => left + right)
+                .ToVertex(BerlinId)
+                .Resolve();
+
+            route.Cost.Should().Be(289.0);
+            route.Steps[0].Edge.Id.Should().Be(A24Id);
+        }
         
         [Fact]
         public async void DeletionsOfMissingEntitiesShouldFail()

@@ -2,11 +2,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Graphene.InMemory
+namespace Graphene
 {
-    public class MemoryAttributeSet : IAttributeSet
+    public class AttributeSet : IAttributeSet
     {
-        internal MemoryAttributeSet() { }
+        public AttributeSet() { }
         
         private Lazy<IDictionary<string, object?>> Attributes { get; } = new(() => new SortedDictionary<string, object?>(), isThreadSafe: false);
         

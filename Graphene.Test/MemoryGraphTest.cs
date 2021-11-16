@@ -14,8 +14,8 @@ namespace Graphene.Test
         public async void CreatingVerticesAndEdgesShouldWork()
         {
             var graph = await PrepareExampleGraph(nameof(CreatingVerticesAndEdgesShouldWork));
-            var bremen = new MemoryVertex(CityLabel);
-            var a1 = new MemoryEdge(HighwayLabel, bremen.Id, HamburgId, false);
+            var bremen = new Vertex(CityLabel);
+            var a1 = new Edge(HighwayLabel, bremen.Id, HamburgId, false);
 
             await graph.Execute(new Transaction
             {
@@ -34,8 +34,8 @@ namespace Graphene.Test
         public async void EmptyGuidsShouldBeRejected()
         {
             var graph = await PrepareExampleGraph(nameof(EmptyGuidsShouldBeRejected));
-            var bremen = new MemoryVertex(CityLabel, Guid.Empty);
-            var a1 = new MemoryEdge(HighwayLabel, bremen.Id, HamburgId, false, Guid.Empty);
+            var bremen = new Vertex(CityLabel, Guid.Empty);
+            var a1 = new Edge(HighwayLabel, bremen.Id, HamburgId, false, Guid.Empty);
             Exception? exception = null;
             
             try
@@ -59,7 +59,7 @@ namespace Graphene.Test
         public async void CreatingDuplicateGuidsShouldBeRejected()
         {
             var graph = await PrepareExampleGraph(nameof(CreatingDuplicateGuidsShouldBeRejected));
-            var anotherHamburg = new MemoryVertex(CityLabel, HamburgId);
+            var anotherHamburg = new Vertex(CityLabel, HamburgId);
             Exception? exception = null;
 
             try
@@ -82,10 +82,10 @@ namespace Graphene.Test
         public async void UpdatingEntitiesShouldWork()
         {
             var graph = await PrepareExampleGraph(nameof(UpdatingEntitiesShouldWork));
-            var hamburgPatch = new MemoryVertex(CityLabel, HamburgId)
+            var hamburgPatch = new Vertex(CityLabel, HamburgId)
                 .WithAttribute(PopulationLabel, 2000000)
                 .WithAttribute("Metropolis", true);
-            var a24Patch = new MemoryEdge(HighwayLabel, HamburgId, BerlinId, false, A24Id)
+            var a24Patch = new Edge(HighwayLabel, HamburgId, BerlinId, false, A24Id)
                 .WithAttribute(DistanceLabel, 300.0)
                 .WithAttribute("UnderConstruction", true);
 
@@ -110,7 +110,7 @@ namespace Graphene.Test
         public async void UpdatesToMissingEntitiesShouldFail()
         {
             var graph = await PrepareExampleGraph(nameof(UpdatesToMissingEntitiesShouldFail));
-            var misguidedPatch = new MemoryVertex(CityLabel);
+            var misguidedPatch = new Vertex(CityLabel);
             Exception? exception = null;
 
             try
@@ -133,7 +133,7 @@ namespace Graphene.Test
         public async void DeletingEntitiesShouldWork()
         {
             var graph = await PrepareExampleGraph(nameof(DeletingEntitiesShouldWork));
-            var hamburg = new MemoryVertex(CityLabel, HamburgId);
+            var hamburg = new Vertex(CityLabel, HamburgId);
 
             await graph.Execute(new Transaction
             {
@@ -200,7 +200,7 @@ namespace Graphene.Test
         public async void DeletionsOfMissingEntitiesShouldFail()
         {
             var graph = await PrepareExampleGraph(nameof(UpdatesToMissingEntitiesShouldFail));
-            var misguidedDeletion = new MemoryVertex(CityLabel);
+            var misguidedDeletion = new Vertex(CityLabel);
             Exception? exception = null;
 
             try
@@ -236,25 +236,25 @@ namespace Graphene.Test
         private static async Task<MemoryGraph> PrepareExampleGraph(string name)
         {
             var graph = new MemoryGraph(name);
-            var hamburg = new MemoryVertex(CityLabel, HamburgId)
+            var hamburg = new Vertex(CityLabel, HamburgId)
                 .WithAttribute(NameLabel, "Hamburg")
                 .WithAttribute(PopulationLabel, 1841000)
                 .WithAttribute(CoordinatesLabel, new Coordinate(53.55, 9.99));
-            var berlin = new MemoryVertex(CityLabel, BerlinId)
+            var berlin = new Vertex(CityLabel, BerlinId)
                 .WithAttribute(NameLabel, "Berlin")
                 .WithAttribute(PopulationLabel, 3645000)
                 .WithAttribute(CoordinatesLabel, new Coordinate(52.52, 14.41));
-            var munich = new MemoryVertex(CityLabel, MunichId)
+            var munich = new Vertex(CityLabel, MunichId)
                 .WithAttribute(NameLabel, "Munich")
                 .WithAttribute(PopulationLabel, 1472000)
                 .WithAttribute(CoordinatesLabel, new Coordinate(48.14, 11.58));
-            var a24 = new MemoryEdge(HighwayLabel, hamburg.Id, berlin.Id, false, A24Id)
+            var a24 = new Edge(HighwayLabel, hamburg.Id, berlin.Id, false, A24Id)
                 .WithAttribute(NameLabel, "A24")
                 .WithAttribute(DistanceLabel, 289.0);
-            var a9 = new MemoryEdge(HighwayLabel, berlin.Id, munich.Id, false, A9Id)
+            var a9 = new Edge(HighwayLabel, berlin.Id, munich.Id, false, A9Id)
                 .WithAttribute(NameLabel, "A9")
                 .WithAttribute(DistanceLabel, 585.0);
-            var a7 = new MemoryEdge(HighwayLabel, munich.Id, hamburg.Id, false, A7Id)
+            var a7 = new Edge(HighwayLabel, munich.Id, hamburg.Id, false, A7Id)
                 .WithAttribute(NameLabel, "A7")
                 .WithAttribute(DistanceLabel, 778.0);
 

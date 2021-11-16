@@ -13,5 +13,20 @@ namespace Graphene
         {
             entity.Attributes.Set(name, value);
         }
+        
+        public static Vertex Patch(this IReadOnlyVertex sourceVertex)
+        {
+            return new Vertex(sourceVertex.Label, sourceVertex.Id);
+        }
+
+        public static Edge Patch(this IReadOnlyEdge sourceEdge)
+        {
+            return new Edge(
+                sourceEdge.Label, 
+                sourceEdge.FromVertex, 
+                sourceEdge.ToVertex, 
+                sourceEdge.Directed,
+                sourceEdge.Id);
+        }
     }
 }

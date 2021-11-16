@@ -1,17 +1,16 @@
 using System;
-using System.Collections.Generic;
 
-namespace Graphene.InMemory
+namespace Graphene
 {
-    public class MemoryVertex : IVertex
+    public class Vertex : IVertex
     {
-        public MemoryVertex(string label)
+        public Vertex(string label)
         {
             Id = Guid.NewGuid();
             Label = label;
         }
         
-        public MemoryVertex(string label, Guid id)
+        public Vertex(string label, Guid id)
         {
             Id = id;
             Label = label;
@@ -21,9 +20,9 @@ namespace Graphene.InMemory
         
         public string Label { get; }
 
-        public IAttributeSet Attributes { get; } = new MemoryAttributeSet();
+        public IAttributeSet Attributes { get; } = new AttributeSet();
 
-        public MemoryVertex WithAttribute(string name, object? value)
+        public Vertex WithAttribute(string name, object? value)
         {
             Attributes.Set(name, value);
             return this;

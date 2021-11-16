@@ -131,14 +131,14 @@ namespace Graphene.InMemory
 
         internal void CreateVertex(IReadOnlyVertex vertex)
         {
-            var newVertex = new MemoryVertex(vertex.Label, vertex.Id);
+            var newVertex = new Vertex(vertex.Label, vertex.Id);
             newVertex.Attributes.PatchWith(vertex.Attributes);
             Entities.Add(vertex.Id, newVertex);
         }
 
         internal void CreateEdge(IReadOnlyEdge edge)
         {
-            var newEdge = new MemoryEdge(edge.Label, edge.FromVertex, edge.ToVertex, edge.Directed, edge.Id);
+            var newEdge = new Edge(edge.Label, edge.FromVertex, edge.ToVertex, edge.Directed, edge.Id);
             newEdge.Attributes.PatchWith(edge.Attributes);
             Entities.Add(newEdge.Id, newEdge);
             AddEdgeToVertexLink(newEdge.Id, newEdge.FromVertex);

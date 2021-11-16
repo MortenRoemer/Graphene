@@ -1,15 +1,15 @@
 using System;
 
-namespace Graphene.InMemory
+namespace Graphene
 {
-    public class MemoryEdge : IEdge
+    public class Edge : IEdge
     {
-        public MemoryEdge(string label, Guid fromVertex, Guid toVertex, bool directed)
+        public Edge(string label, Guid fromVertex, Guid toVertex, bool directed)
             : this(label, fromVertex, toVertex, directed, Guid.NewGuid())
         {
         }
         
-        public MemoryEdge(string label, Guid fromVertex, Guid toVertex, bool directed, Guid id)
+        public Edge(string label, Guid fromVertex, Guid toVertex, bool directed, Guid id)
         {
             Id = id;
             Label = label;
@@ -26,9 +26,9 @@ namespace Graphene.InMemory
         
         IReadOnlyAttributeSet IReadOnlyEntity.Attributes => Attributes;
 
-        public IAttributeSet Attributes { get; } = new MemoryAttributeSet();
+        public IAttributeSet Attributes { get; } = new AttributeSet();
         
-        public MemoryEdge WithAttribute(string name, object? value)
+        public Edge WithAttribute(string name, object? value)
         {
             Attributes.Set(name, value);
             return this;

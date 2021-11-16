@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Graphene.Test", "Graphene.T
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Graphene.Random", "Graphene.Random\Graphene.Random.csproj", "{3DB49B0E-1AF1-4E12-8DD2-06E26602671D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Graphene.InMemory", "Graphene.InMemory\Graphene.InMemory.csproj", "{E947142F-6DD2-4205-9F5A-70DF0A30D4DA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -58,5 +60,17 @@ Global
 		{3DB49B0E-1AF1-4E12-8DD2-06E26602671D}.Release|x64.Build.0 = Release|Any CPU
 		{3DB49B0E-1AF1-4E12-8DD2-06E26602671D}.Release|x86.ActiveCfg = Release|Any CPU
 		{3DB49B0E-1AF1-4E12-8DD2-06E26602671D}.Release|x86.Build.0 = Release|Any CPU
+		{E947142F-6DD2-4205-9F5A-70DF0A30D4DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E947142F-6DD2-4205-9F5A-70DF0A30D4DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E947142F-6DD2-4205-9F5A-70DF0A30D4DA}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{E947142F-6DD2-4205-9F5A-70DF0A30D4DA}.Debug|x64.Build.0 = Debug|Any CPU
+		{E947142F-6DD2-4205-9F5A-70DF0A30D4DA}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E947142F-6DD2-4205-9F5A-70DF0A30D4DA}.Debug|x86.Build.0 = Debug|Any CPU
+		{E947142F-6DD2-4205-9F5A-70DF0A30D4DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E947142F-6DD2-4205-9F5A-70DF0A30D4DA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E947142F-6DD2-4205-9F5A-70DF0A30D4DA}.Release|x64.ActiveCfg = Release|Any CPU
+		{E947142F-6DD2-4205-9F5A-70DF0A30D4DA}.Release|x64.Build.0 = Release|Any CPU
+		{E947142F-6DD2-4205-9F5A-70DF0A30D4DA}.Release|x86.ActiveCfg = Release|Any CPU
+		{E947142F-6DD2-4205-9F5A-70DF0A30D4DA}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

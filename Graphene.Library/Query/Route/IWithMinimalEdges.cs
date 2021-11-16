@@ -1,11 +1,12 @@
 using System;
+using System.Linq.Expressions;
 
 namespace Graphene.Query.Route
 {
     public interface IWithMinimalEdges
     {
-        IToVertex<int> ToVertex(int vertexId);
+        IToVertex<int> ToVertex(Guid vertexId);
         
-        IWithMinimalEdges Where(Func<IReadOnlyEdge, bool> filter);
+        IWithMinimalEdges Where(Expression<Func<IReadOnlyEdge, bool>> filter);
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Linq.Expressions;
 
 namespace Graphene.Query.Route
 {
@@ -6,6 +7,6 @@ namespace Graphene.Query.Route
     {
         IWithMinimalEdges WithMinimalEdges();
 
-        IWithMinimalMetric<TMetric> WithMinimalMetric<TMetric>(Func<IReadOnlyEdge, TMetric> metricFunction, Func<TMetric, TMetric, TMetric> accumulatorFunction) where TMetric : IComparable<TMetric>;
+        IWithMinimalMetric<TMetric> WithMinimalMetric<TMetric>(Expression<Func<IReadOnlyEdge, TMetric>> metricFunction, TMetric defaultCost, Expression<Func<TMetric, TMetric, TMetric>> accumulatorFunction) where TMetric : IComparable<TMetric>;
     }
 }

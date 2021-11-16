@@ -1,13 +1,15 @@
+using System;
+
 namespace Graphene
 {
-    public interface IReadOnlyEntity
+    public interface IReadOnlyEntity : IEntityReference
     {
-        IReadOnlyGraph Graph { get; }
-
-        int Id { get; }
-
-        string Label { get; }
-
         IReadOnlyAttributeSet Attributes { get; }
+    }
+
+    public static class ReadOnlyEntityExtension
+    {
+        public static T? Get<T>(this IReadOnlyEntity entity, string name)
+            => entity.Attributes.Get<T>(name);
     }
 }

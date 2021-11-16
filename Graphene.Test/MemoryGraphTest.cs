@@ -1,7 +1,9 @@
-using System;
-using System.Diagnostics;
-using System.Linq;
+using FluentAssertions;
 using Graphene.InMemory;
+using Graphene.Transactions;
+using System;
+using System.Threading.Tasks;
+using Graphene.Test.Utility;
 using Xunit;
 
 namespace Graphene.Test
@@ -9,220 +11,264 @@ namespace Graphene.Test
     public class MemoryGraphTest
     {
         [Fact]
-        public void NewGraphShouldBeEmpty()
+        public async void CreatingVerticesAndEdgesShouldWork()
         {
-            var graph = new MemoryGraph();
-            Assert.NotNull(graph.Vertices);
-            Assert.Empty(graph.Vertices);
-            Assert.NotNull(graph.Edges);
-            Assert.Empty(graph.Edges);
-            Assert.Equal(0, graph.Size);
+            var graph = await PrepareExampleGraph(nameof(CreatingVerticesAndEdgesShouldWork));
+            var bremen = new Vertex(CityLabel);
+            var a1 = new Edge(HighwayLabel, bremen.Id, HamburgId, false);
+
+            await graph.Execute(new Transaction
+            {
+                bremen.ToCreateVertexAction(),
+                a1.ToCreateEdgeAction()
+            });
+
+            var cities = await graph.FindVertices(5, vertex => vertex.Label == CityLabel);
+            cities.Results.Should().HaveCount(4);
+
+            var highways = await graph.FindEdges(5, edge => edge.Label == HighwayLabel);
+            highways.Results.Should().HaveCount(4);
         }
 
         [Fact]
-        public void NewVertexShouldBeEmpty()
+        public async void EmptyGuidsShouldBeRejected()
         {
-            var graph = new MemoryGraph();
-            var initialDataVersion = graph.DataVersion;
-            var vertex = graph.Vertices.Create();
-            Assert.NotNull(vertex.Graph);
-            Assert.Null(vertex.Label);
-            Assert.NotNull(vertex.Attributes);
-            Assert.Empty(vertex.Attributes);
-            Assert.NotNull(vertex.BidirectionalEdges);
-            Assert.Empty(vertex.BidirectionalEdges);
-            Assert.NotNull(vertex.IngoingEdges);
-            Assert.Empty(vertex.IngoingEdges);
-            Assert.NotNull(vertex.OutgoingEdges);
-            Assert.Empty(vertex.OutgoingEdges);
-            Assert.NotEqual(initialDataVersion,  graph.DataVersion);
-        }
-
-        [Fact]
-        public void NewEdgeShouldBeEmpty()
-        {
-            var graph = new MemoryGraph();
-            var fromVertex = graph.Vertices.Create();
-            var toVertex = graph.Vertices.Create();
-            var previousDataVersion = graph.DataVersion;
+            var graph = await PrepareExampleGraph(nameof(EmptyGuidsShouldBeRejected));
+            var bremen = new Vertex(CityLabel, Guid.Empty);
+            var a1 = new Edge(HighwayLabel, bremen.Id, HamburgId, false, Guid.Empty);
+            Exception? exception = null;
             
-            var edge = fromVertex.OutgoingEdges.Add(toVertex);
-            Assert.Equal(fromVertex.Id, edge.FromVertex.Id);
-            Assert.Equal(toVertex.Id, edge.ToVertex.Id);
-            Assert.NotNull(edge.Graph);
-            Assert.True(edge.Directed);
-            Assert.Null(edge.Label);
-            Assert.NotNull(edge.Attributes);
-            Assert.Empty(edge.Attributes);
-            Assert.NotEqual(previousDataVersion, graph.DataVersion);
-            previousDataVersion = graph.DataVersion;
-
-            edge = fromVertex.IngoingEdges.Add(toVertex, null);
-            Assert.Equal(fromVertex.Id, edge.ToVertex.Id);
-            Assert.Equal(toVertex.Id, edge.FromVertex.Id);
-            Assert.NotNull(edge.Graph);
-            Assert.True(edge.Directed);
-            Assert.Null(edge.Label);
-            Assert.NotNull(edge.Attributes);
-            Assert.Empty(edge.Attributes);
-            Assert.NotEqual(previousDataVersion, graph.DataVersion);
-            previousDataVersion = graph.DataVersion;
-
-            edge = fromVertex.BidirectionalEdges.Add(toVertex, null);
-            Assert.Equal(fromVertex.Id, edge.FromVertex.Id);
-            Assert.Equal(toVertex.Id, edge.ToVertex.Id);
-            Assert.NotNull(edge.Graph);
-            Assert.False(edge.Directed);
-            Assert.Null(edge.Label);
-            Assert.NotNull(edge.Attributes);
-            Assert.Empty(edge.Attributes);
-            Assert.NotEqual(previousDataVersion, graph.DataVersion);
-        }
-
-        [Theory]
-        [InlineData("lmao")]
-        [InlineData(null)]
-        public void LabelShouldStickToEntity(string label)
-        {
-            IGraph graph = new MemoryGraph();
-            IEntity entity = graph.Vertices.Create(label);
-            Assert.Equal(label, entity.Label);
+            try
+            {
+                await graph.Execute(new Transaction
+                {
+                    bremen.ToCreateVertexAction(),
+                    a1.ToCreateEdgeAction()
+                });
+            }
+            catch (Exception caughtException)
+            {
+                exception = caughtException;
+            }
+            
+            exception.Should().NotBeNull().And.BeOfType<GraphActionException>();
+            exception!.Message.Should().Contain("empty Guid is not valid");
         }
 
         [Fact]
-        public void AttributesShouldStickToEntity()
+        public async void CreatingDuplicateGuidsShouldBeRejected()
         {
-            var graph = new MemoryGraph();
-            var entity = graph.Vertices.Create();
-            var previousDataVersion = graph.DataVersion;
-            entity.Attributes.Set("value", 5L);
-            Assert.Equal(1L, entity.Attributes.Count);
-            Assert.True(entity.Attributes.TryGet("value", out long value));
-            Assert.Equal(5L, value);
-            Assert.NotEqual(previousDataVersion, graph.DataVersion);
+            var graph = await PrepareExampleGraph(nameof(CreatingDuplicateGuidsShouldBeRejected));
+            var anotherHamburg = new Vertex(CityLabel, HamburgId);
+            Exception? exception = null;
+
+            try
+            {
+                await graph.Execute(new Transaction
+                {
+                    anotherHamburg.ToCreateVertexAction()
+                });
+            }
+            catch (Exception caughtException)
+            {
+                exception = caughtException;
+            }
+            
+            exception.Should().NotBeNull().And.BeOfType<GraphActionException>();
+            exception!.Message.Should().Contain("there is already an entity with id");
         }
 
         [Fact]
-        public void MergeGraphShouldWork()
+        public async void UpdatingEntitiesShouldWork()
         {
-            IGraph sourceGraph = new MemoryGraph();
-            IVertex va = sourceGraph.Vertices.Create("va");
-            va.Attributes.Set("value", 1);
-            IVertex vb = sourceGraph.Vertices.Create("vb");
-            vb.Attributes.Set("value", 2);
-            IEdge ea = va.BidirectionalEdges.Add(vb, "ea");
-            ea.Attributes.Set("value", 10);
+            var graph = await PrepareExampleGraph(nameof(UpdatingEntitiesShouldWork));
+            var hamburgPatch = new Vertex(CityLabel, HamburgId)
+                .WithAttribute(PopulationLabel, 2000000)
+                .WithAttribute("Metropolis", true);
+            var a24Patch = new Edge(HighwayLabel, HamburgId, BerlinId, false, A24Id)
+                .WithAttribute(DistanceLabel, 300.0)
+                .WithAttribute("UnderConstruction", true);
 
-            IGraph targetGraph = new MemoryGraph();
-            IVertex vc = targetGraph.Vertices.Create("vc");
-            vc.Attributes.Set("value", 3);
-            IVertex vd = targetGraph.Vertices.Create("vd");
-            vd.Attributes.Set("value", 4);
-            IEdge eb = vc.BidirectionalEdges.Add(vd, "eb");
-            eb.Attributes.Set("value", 20);
+            await graph.Execute(new Transaction
+            {
+                hamburgPatch.ToUpdateEntityAction(),
+                a24Patch.ToUpdateEntityAction()
+            });
 
-            targetGraph.Merge(sourceGraph);
+            var patchedHamburg = await graph.Get(HamburgId);
+            patchedHamburg.Get<string>(NameLabel).Should().Be("Hamburg");
+            patchedHamburg.Get<int>(PopulationLabel).Should().Be(2000000);
+            patchedHamburg.Get<bool>("Metropolis").Should().Be(true);
 
-            using var vertices = targetGraph.Vertices
-                .OrderBy(vertex => vertex.Label)
-                .GetEnumerator();
-
-            Assert.True(vertices.MoveNext());
-            Assert.Equal("va", vertices.Current.Label);
-            Assert.Equal(1, vertices.Current.Attributes.TryGet("value", out int valueA) ? valueA : throw new Exception());
-            Assert.True(vertices.MoveNext());
-            Assert.Equal("vb", vertices.Current.Label);
-            Assert.Equal(2, vertices.Current.Attributes.TryGet("value", out int valueB) ? valueB : throw new Exception());
-            Assert.True(vertices.MoveNext());
-            Assert.Equal("vc", vertices.Current.Label);
-            Assert.Equal(3, vertices.Current.Attributes.TryGet("value", out int valueC) ? valueC : throw new Exception());
-            Assert.True(vertices.MoveNext());
-            Assert.Equal("vd", vertices.Current.Label);
-            Assert.Equal(4, vertices.Current.Attributes.TryGet("value", out int valueD) ? valueD : throw new Exception());
-            Assert.False(vertices.MoveNext());
-
-            using var edges = targetGraph.Edges
-                .OrderBy(edge => edge.Label)
-                .GetEnumerator();
-
-            Assert.True(edges.MoveNext());
-            Assert.Equal("ea", edges.Current.Label);
-            Assert.Equal(10, edges.Current.Attributes.TryGet("value", out int valueE) ? valueE : throw new Exception());
-            Assert.True(edges.MoveNext());
-            Assert.Equal("eb", edges.Current.Label);
-            Assert.Equal(20, edges.Current.Attributes.TryGet("value", out int valueF) ? valueF : throw new Exception());
-            Assert.False(edges.MoveNext());
+            var patchedA24 = await graph.Get(A24Id);
+            patchedA24.Get<string>(NameLabel).Should().Be("A24");
+            patchedA24.Get<double>(DistanceLabel).Should().Be(300.0);
+            patchedA24.Get<bool>("UnderConstruction").Should().Be(true);
         }
 
         [Fact]
-        public void CloneGraphShouldWork()
+        public async void UpdatesToMissingEntitiesShouldFail()
         {
-            IGraph sourceGraph = new MemoryGraph();
-            IVertex va = sourceGraph.Vertices.Create("va");
-            va.Attributes.Set("value", 1);
-            IVertex vb = sourceGraph.Vertices.Create("vb");
-            vb.Attributes.Set("value", 2);
-            IEdge ea = va.BidirectionalEdges.Add(vb, "ea");
-            ea.Attributes.Set("value", 10);
+            var graph = await PrepareExampleGraph(nameof(UpdatesToMissingEntitiesShouldFail));
+            var misguidedPatch = new Vertex(CityLabel);
+            Exception? exception = null;
 
-            IGraph targetGraph = sourceGraph.Clone();
-
-            using var vertices = targetGraph.Vertices
-                .OrderBy(vertex => vertex.Label)
-                .GetEnumerator();
-
-            Assert.True(vertices.MoveNext());
-            Assert.Equal("va", vertices.Current.Label);
-            Assert.Equal(1, vertices.Current.Attributes.TryGet("value", out int valueA) ? valueA : throw new Exception());
-            Assert.True(vertices.MoveNext());
-            Assert.Equal("vb", vertices.Current.Label);
-            Assert.Equal(2, vertices.Current.Attributes.TryGet("value", out int valueB) ? valueB : throw new Exception());
-            Assert.False(vertices.MoveNext());
-
-            using var edges = targetGraph.Edges.GetEnumerator();
-
-            Assert.True(edges.MoveNext());
-            Assert.Equal("ea", edges.Current.Label);
-            Assert.Equal(10, edges.Current.Attributes.TryGet("value", out int valueC) ? valueC : throw new Exception());
-            Assert.False(edges.MoveNext());
+            try
+            {
+                await graph.Execute(new Transaction
+                {
+                    misguidedPatch.ToUpdateEntityAction()
+                });
+            }
+            catch (Exception caughtException)
+            {
+                exception = caughtException;
+            }
+            
+            exception.Should().NotBeNull().And.BeOfType<GraphActionException>();
+            exception!.Message.Should().Contain("there is no entity with id");
         }
 
         [Fact]
-        public void AttributeClearShouldWork()
+        public async void DeletingEntitiesShouldWork()
         {
-            var graph = new MemoryGraph();
-            var entity = graph.Vertices.Create();
-            var previousDataVersion = graph.DataVersion;
-            entity.Attributes.Set("value", 1);
-            Assert.NotEqual(previousDataVersion, graph.DataVersion);
-            previousDataVersion = graph.DataVersion;
-            entity.Attributes.Clear();
-            Assert.NotEqual(previousDataVersion, graph.DataVersion);
-            Assert.Empty(entity.Attributes);
+            var graph = await PrepareExampleGraph(nameof(DeletingEntitiesShouldWork));
+            var hamburg = new Vertex(CityLabel, HamburgId);
+
+            await graph.Execute(new Transaction
+            {
+                hamburg.ToDeleteEntityAction()
+            });
+            
+            var cities = await graph.FindVertices(3, vertex => vertex.Label == CityLabel);
+            cities.Results.Should().HaveCount(2);
+
+            var highways = await graph.FindEdges(2, edge => edge.Label == HighwayLabel);
+            highways.Results.Should().HaveCount(1);
         }
 
         [Fact]
-        public void GenericEdgeEnumerationShouldGiveAllEdgesForAVertex()
+        public async void FindingShortestRouteByEdgeCountShouldWork()
         {
-            IGraph graph = new MemoryGraph();
-            IVertex va = graph.Vertices.Create();
-            IVertex vb = graph.Vertices.Create();
-            _ = va.BidirectionalEdges.Add(vb, null);
-            _ = va.IngoingEdges.Add(vb, null);
-            _ = va.OutgoingEdges.Add(vb, null);
-            Assert.Equal(3, va.Edges.Count());
+            var graph = await PrepareExampleGraph(nameof(FindingShortestRouteByEdgeCountShouldWork));
+
+            var route = await graph.Select().Route()
+                .FromVertex(HamburgId)
+                .WithMinimalEdges()
+                .Where(edge => edge.Label == HighwayLabel)
+                .ToVertex(BerlinId)
+                .Resolve();
+
+            route.Cost.Should().Be(1);
+            route.Steps[0].Edge.Id.Should().Be(A24Id);
+        }
+        
+        [Fact]
+        public async void FindingShortestRouteByDistanceCountShouldWork()
+        {
+            var graph = await PrepareExampleGraph(nameof(FindingShortestRouteByDistanceCountShouldWork));
+
+            var route = await graph.Select().Route()
+                .FromVertex(HamburgId)
+                .WithMinimalMetric(edge => edge.Get<double>(DistanceLabel), 0.0, (left, right) => left + right)
+                .Where(edge => edge.Label == HighwayLabel)
+                .ToVertex(BerlinId)
+                .Resolve();
+
+            route.Cost.Should().Be(289.0);
+            route.Steps[0].Edge.Id.Should().Be(A24Id);
+        }
+        
+        [Fact]
+        public async void FindingShortestRouteByHeuristicShouldWork()
+        {
+            var graph = await PrepareExampleGraph(nameof(FindingShortestRouteByHeuristicShouldWork));
+
+            var route = await graph.Select().Route()
+                .FromVertex(HamburgId)
+                .WithMinimalMetric(edge => edge.Get<double>(DistanceLabel), 0.0, (left, right) => left + right)
+                .Where(edge => edge.Label == HighwayLabel)
+                .WithHeuristic((fromVertex, toVertex) => fromVertex.Get<Coordinate>(CoordinatesLabel).CalcDistanceTo(toVertex.Get<Coordinate>(CoordinatesLabel)))
+                .ToVertex(BerlinId)
+                .Resolve();
+
+            route.Cost.Should().Be(289.0);
+            route.Steps[0].Edge.Id.Should().Be(A24Id);
+        }
+        
+        [Fact]
+        public async void DeletionsOfMissingEntitiesShouldFail()
+        {
+            var graph = await PrepareExampleGraph(nameof(UpdatesToMissingEntitiesShouldFail));
+            var misguidedDeletion = new Vertex(CityLabel);
+            Exception? exception = null;
+
+            try
+            {
+                await graph.Execute(new Transaction
+                {
+                    misguidedDeletion.ToDeleteEntityAction()
+                });
+            }
+            catch (Exception caughtException)
+            {
+                exception = caughtException;
+            }
+            
+            exception.Should().NotBeNull().And.BeOfType<GraphActionException>();
+            exception!.Message.Should().Contain("there is no entity with id");
         }
 
-        [Fact]
-        public void GenericVertexEnumerationShouldGiveAllVerticesForAnEdge()
+        private const string CityLabel = "City";
+        private const string DistanceLabel = "Distance";
+        private const string HighwayLabel = "Highway";
+        private const string NameLabel = "Name";
+        private const string PopulationLabel = "Population";
+        private const string CoordinatesLabel = "Coordinates";
+
+        private static readonly Guid HamburgId = Guid.NewGuid();
+        private static readonly Guid MunichId = Guid.NewGuid();
+        private static readonly Guid BerlinId = Guid.NewGuid();
+        private static readonly Guid A24Id = Guid.NewGuid();
+        private static readonly Guid A9Id = Guid.NewGuid();
+        private static readonly Guid A7Id = Guid.NewGuid();
+        
+        private static async Task<MemoryGraph> PrepareExampleGraph(string name)
         {
-            IGraph graph = new MemoryGraph();
-            IVertex va = graph.Vertices.Create();
-            IVertex vb = graph.Vertices.Create();
-            IEdge ea = va.BidirectionalEdges.Add(vb, null);
-            Assert.Equal(2, ea.Vertices.Count());
-            IEdge eb = va.BidirectionalEdges.Add(va, null);
-            Assert.Equal(1, eb.Vertices.Count());
+            var graph = new MemoryGraph(name);
+            var hamburg = new Vertex(CityLabel, HamburgId)
+                .WithAttribute(NameLabel, "Hamburg")
+                .WithAttribute(PopulationLabel, 1841000)
+                .WithAttribute(CoordinatesLabel, new Coordinate(53.55, 9.99));
+            var berlin = new Vertex(CityLabel, BerlinId)
+                .WithAttribute(NameLabel, "Berlin")
+                .WithAttribute(PopulationLabel, 3645000)
+                .WithAttribute(CoordinatesLabel, new Coordinate(52.52, 14.41));
+            var munich = new Vertex(CityLabel, MunichId)
+                .WithAttribute(NameLabel, "Munich")
+                .WithAttribute(PopulationLabel, 1472000)
+                .WithAttribute(CoordinatesLabel, new Coordinate(48.14, 11.58));
+            var a24 = new Edge(HighwayLabel, hamburg.Id, berlin.Id, false, A24Id)
+                .WithAttribute(NameLabel, "A24")
+                .WithAttribute(DistanceLabel, 289.0);
+            var a9 = new Edge(HighwayLabel, berlin.Id, munich.Id, false, A9Id)
+                .WithAttribute(NameLabel, "A9")
+                .WithAttribute(DistanceLabel, 585.0);
+            var a7 = new Edge(HighwayLabel, munich.Id, hamburg.Id, false, A7Id)
+                .WithAttribute(NameLabel, "A7")
+                .WithAttribute(DistanceLabel, 778.0);
+
+            await graph.Execute(new Transaction
+            {
+                hamburg.ToCreateVertexAction(),
+                berlin.ToCreateVertexAction(),
+                munich.ToCreateVertexAction(),
+                a24.ToCreateEdgeAction(),
+                a9.ToCreateEdgeAction(),
+                a7.ToCreateEdgeAction()
+            });
+
+            return graph;
         }
     }
 }

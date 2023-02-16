@@ -24,7 +24,7 @@ namespace Graphene.InMemory.Query
             Func<TMetric, TMetric, TMetric> accumulatorFunction
         )
         {
-            PriorityQueue<TMetric, Node> queue = new();
+            Utility.PriorityQueue<TMetric, Node> queue = new();
             HashSet<Guid> visitedNodes = new();
             var origin = Graph._Entities[originId] as IReadOnlyVertex;
             var target = Graph._Entities[targetId] as IReadOnlyVertex;
